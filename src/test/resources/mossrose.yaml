@@ -1,0 +1,15 @@
+# Mossrose config info
+---
+cluster:
+  name: zn-job
+jobs:
+  - id: 1
+    group: test
+    cron: 0/5 * * * * ?
+    runInCluster: false
+    main: com.jiuxian.mossrose.test.SomeJob
+  - id: 2
+    group: test
+    cron: 0 0/1 * * * ?
+    runInCluster: true
+    main: com.jiuxian.mossrose.test.SomeDistributedJob
