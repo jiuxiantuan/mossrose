@@ -10,6 +10,6 @@ jobs:
     main: com.jiuxian.mossrose.test.SomeJob
   - id: 2
     group: test
-    cron: 0 0/1 * * * ?
+    cron: 0/20 * * * * ?
     runInCluster: true
     main: com.jiuxian.mossrose.test.SomeDistributedJob
