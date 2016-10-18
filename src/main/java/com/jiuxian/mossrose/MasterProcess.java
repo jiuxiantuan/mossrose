@@ -41,29 +41,31 @@ public class MasterProcess implements Process, Closeable {
 
 	private MossroseConfig mossroseConfig;
 
-	private ClusterDiscovery clusterDiscovery;
-
 	public MasterProcess(MossroseConfig mossroseConfig, ClusterDiscovery clusterDiscovery) {
 		super();
 		this.mossroseConfig = Preconditions.checkNotNull(mossroseConfig);
-		this.clusterDiscovery = Preconditions.checkNotNull(clusterDiscovery);
+
+		String clusterName = mossroseConfig.getCluster().getName();
+		List<String> hosts = clusterDiscovery.findHosts();
+
+		// Get ignite instance
+		IgniteConfiguration cfg = new IgniteConfiguration();
+		cfg.setGridName(clusterName);
+		cfg.setMetricsLogFrequency(0);
+		cfg.setGridLogger(new Slf4jLogger());
+		TcpDiscoverySpi discoSpi = new TcpDiscoverySpi();
+		TcpDiscoveryVmIpFinder ipFinder = new TcpDiscoveryVmIpFinder();
+		ipFinder.setAddresses(hosts);
+		discoSpi.setIpFinder(ipFinder);
+		cfg.setDiscoverySpi(discoSpi);
+		ignite = Ignition.start(cfg);
+
+		LOGGER.info("Inital ignite cluser {} with hosts {}", clusterName, hosts);
 	}
 
 	@Override
 	public void run() {
 		try {
-			// Get ignite instance
-			IgniteConfiguration cfg = new IgniteConfiguration();
-			cfg.setGridName(clusterDiscovery.getClusterName());
-			cfg.setMetricsLogFrequency(0);
-			cfg.setGridLogger(new Slf4jLogger());
-			TcpDiscoverySpi discoSpi = new TcpDiscoverySpi();
-			TcpDiscoveryVmIpFinder ipFinder = new TcpDiscoveryVmIpFinder();
-			ipFinder.setAddresses(clusterDiscovery.findHosts());
-			discoSpi.setIpFinder(ipFinder);
-			cfg.setDiscoverySpi(discoSpi);
-			ignite = Ignition.start(cfg);
-
 			scheduler = StdSchedulerFactory.getDefaultScheduler();
 			// define the jobs
 			List<JobMeta> jobs = mossroseConfig.getJobs();

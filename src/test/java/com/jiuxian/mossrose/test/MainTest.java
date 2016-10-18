@@ -15,8 +15,9 @@ public class MainTest {
 	@Test
 	public void test() {
 		String name = "djob";
-		Guard guard = new ZookeeperGuard("192.168.5.99,192.168.5.104", 5 * 1000);
-		Process process = new MasterProcess(MossroseConfigFactory.fromClasspathYamlFile("mossrose.yaml"), new ZookeeperClusterDiscovery(name, guard));
+		String zks = "192.168.5.99,192.168.5.104";
+		Guard guard = new ZookeeperGuard(zks, 5 * 1000);
+		Process process = new MasterProcess(MossroseConfigFactory.fromClasspathYamlFile("mossrose.yaml"), new ZookeeperClusterDiscovery("/mossrose/jobtest", zks));
 		new SimpleSingleLane(name, guard, process).compete();
 
 		try {
