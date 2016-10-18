@@ -36,10 +36,12 @@ public class ZookeeperClusterDiscovery implements ClusterDiscovery, Closeable {
 		this.root = root;
 		client = CuratorFrameworkFactory.newClient(zks, new ExponentialBackoffRetry(1000, 3));
 		client.start();
+		
+		String dataPath = ZKPaths.makePath(root, DATA_NODE);
 		try {
-			if (client.checkExists().forPath(root) == null) {
-				LOGGER.info("Root {} not exists, create it.", root);
-				client.create().creatingParentsIfNeeded().forPath(root);
+			if (client.checkExists().forPath(dataPath) == null) {
+				LOGGER.info("Root data path {} not exists, create it.", dataPath);
+				client.create().creatingParentsIfNeeded().forPath(dataPath);
 			}
 		} catch (Exception e) {
 			LOGGER.error(e.getMessage(), e);
@@ -58,7 +60,7 @@ public class ZookeeperClusterDiscovery implements ClusterDiscovery, Closeable {
 				client.create().withMode(CreateMode.EPHEMERAL).forPath(lockPath);
 				// write data if lock sucess
 				try {
-					client.create().creatingParentsIfNeeded().forPath(ZKPaths.makePath(dataPath, LocalUtils.getLocalIp()));
+					client.create().withMode(CreateMode.EPHEMERAL).forPath(ZKPaths.makePath(dataPath, LocalUtils.getLocalIp()));
 					break;
 				} catch (NodeExistsException e) {
 					throw Throwables.propagate(e);
