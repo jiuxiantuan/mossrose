@@ -36,7 +36,7 @@ public class ZookeeperClusterDiscovery implements ClusterDiscovery, Closeable {
 		this.root = root;
 		client = CuratorFrameworkFactory.newClient(zks, new ExponentialBackoffRetry(1000, 3));
 		client.start();
-		
+
 		String dataPath = ZKPaths.makePath(root, DATA_NODE);
 		try {
 			if (client.checkExists().forPath(dataPath) == null) {
@@ -96,6 +96,12 @@ public class ZookeeperClusterDiscovery implements ClusterDiscovery, Closeable {
 
 	@Override
 	public void close() throws IOException {
+		String dataPath = ZKPaths.makePath(root, DATA_NODE);
+		try {
+			client.delete().forPath(ZKPaths.makePath(dataPath, LocalUtils.getLocalIp()));
+		} catch (Exception e) {
+			// ignore
+		}
 		if (client != null) {
 			client.close();
 		}
