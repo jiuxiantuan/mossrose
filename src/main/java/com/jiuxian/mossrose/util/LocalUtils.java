@@ -10,6 +10,10 @@ import com.google.common.base.Throwables;
 
 public final class LocalUtils {
 
+	public static final String LOCALHOST = "127.0.0.1";
+
+	public static final String ANYHOST = "0.0.0.0";
+
 	public static String getLocalIp() {
 		try {
 			Enumeration<NetworkInterface> allNetInterfaces = NetworkInterface.getNetworkInterfaces();
@@ -19,7 +23,7 @@ public final class LocalUtils {
 				Enumeration<InetAddress> addresses = netInterface.getInetAddresses();
 				while (addresses.hasMoreElements()) {
 					ip = (InetAddress) addresses.nextElement();
-					if (ip != null && ip instanceof Inet4Address) {
+					if (ip instanceof Inet4Address && isValidAddress(ip)) {
 						return ip.getHostAddress();
 					}
 				}
@@ -28,6 +32,13 @@ public final class LocalUtils {
 			throw Throwables.propagate(e);
 		}
 		throw new RuntimeException("Cannot get local ip.");
+	}
+
+	private static boolean isValidAddress(InetAddress address) {
+		if (address == null || address.isLoopbackAddress())
+			return false;
+		String name = address.getHostAddress();
+		return (name != null && !ANYHOST.equals(name) && !LOCALHOST.equals(name));
 	}
 
 	public static void main(String[] args) {
