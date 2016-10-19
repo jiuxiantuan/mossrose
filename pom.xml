@@ -2,7 +2,7 @@
 	<modelVersion>4.0.0</modelVersion>
 	<groupId>com.jiuxian</groupId>
 	<artifactId>mossrose</artifactId>
-	<version>0.0.1-SNAPSHOT</version>
+	<version>1.0.0-RELEASE</version>
 	<parent>
 		<groupId>com.zhongniang</groupId>
 		<artifactId>zn-parent</artifactId>
