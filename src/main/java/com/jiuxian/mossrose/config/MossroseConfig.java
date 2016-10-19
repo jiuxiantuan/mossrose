@@ -4,6 +4,12 @@ import java.util.List;
 
 import com.google.common.base.Preconditions;
 
+/**
+ * Mossrose配置，用于配置集群及任务元信息
+ * 
+ * @author <a href="mailto:wangyuxuan@jiuxian.com">Yuxuan Wang</a>
+ *
+ */
 public class MossroseConfig {
 
 	private Cluster cluster;
@@ -11,6 +17,9 @@ public class MossroseConfig {
 
 	public static class Cluster {
 
+		/**
+		 * 集群名字
+		 */
 		private String name;
 
 		public String getName() {
@@ -24,11 +33,32 @@ public class MossroseConfig {
 
 	}
 
+	/**
+	 * 任务元信息
+	 * 
+	 * @author <a href="mailto:wangyuxuan@jiuxian.com">Yuxuan Wang</a>
+	 *
+	 */
 	public static class JobMeta {
+		/**
+		 * 任务id
+		 */
 		private String id;
+		/**
+		 * 任务cron表达式
+		 */
 		private String cron;
+		/**
+		 * 任务类全名
+		 */
 		private String main;
+		/**
+		 * 任务组
+		 */
 		private String group;
+		/**
+		 * 是否在集群中执行，如果为false，则直接在主节点上执行，如果为true，则会平均分配到集群中执行
+		 */
 		private boolean runInCluster;
 
 		public String getId() {
