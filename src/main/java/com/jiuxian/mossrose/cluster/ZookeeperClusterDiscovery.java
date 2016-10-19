@@ -16,7 +16,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import com.google.common.base.Throwables;
-import com.jiuxian.mossrose.util.NetworkUtils;
+import com.jiuxian.theone.util.NetworkUtils;
 
 public class ZookeeperClusterDiscovery implements ClusterDiscovery, Closeable {
 

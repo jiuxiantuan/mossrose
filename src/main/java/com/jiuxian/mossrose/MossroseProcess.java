@@ -1,6 +1,5 @@
 package com.jiuxian.mossrose;
 
-import java.io.Closeable;
 import java.io.IOException;
 import java.util.List;
 import java.util.UUID;
@@ -32,17 +31,17 @@ import com.jiuxian.mossrose.job.DistributedJob;
 import com.jiuxian.mossrose.job.SimpleJob;
 import com.jiuxian.theone.Process;
 
-public class MasterProcess implements Process, Closeable {
+public class MossroseProcess implements Process {
 
 	private Scheduler scheduler;
 
 	private Ignite ignite;
 
-	private static final Logger LOGGER = LoggerFactory.getLogger(MasterProcess.class);
+	private static final Logger LOGGER = LoggerFactory.getLogger(MossroseProcess.class);
 
 	private MossroseConfig mossroseConfig;
 
-	public MasterProcess(MossroseConfig mossroseConfig, ClusterDiscovery clusterDiscovery) {
+	public MossroseProcess(MossroseConfig mossroseConfig, ClusterDiscovery clusterDiscovery) {
 		super();
 		this.mossroseConfig = Preconditions.checkNotNull(mossroseConfig);
 
