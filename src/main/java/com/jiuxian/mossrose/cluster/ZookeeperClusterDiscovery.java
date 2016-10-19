@@ -16,7 +16,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import com.google.common.base.Throwables;
-import com.jiuxian.mossrose.util.LocalUtils;
+import com.jiuxian.mossrose.util.NetworkUtils;
 
 public class ZookeeperClusterDiscovery implements ClusterDiscovery, Closeable {
 
@@ -36,7 +36,7 @@ public class ZookeeperClusterDiscovery implements ClusterDiscovery, Closeable {
 		this.root = root;
 		client = CuratorFrameworkFactory.newClient(zks, new ExponentialBackoffRetry(1000, 3));
 		client.start();
-
+		
 		String dataPath = ZKPaths.makePath(root, DATA_NODE);
 		try {
 			if (client.checkExists().forPath(dataPath) == null) {
@@ -60,7 +60,7 @@ public class ZookeeperClusterDiscovery implements ClusterDiscovery, Closeable {
 				client.create().withMode(CreateMode.EPHEMERAL).forPath(lockPath);
 				// write data if lock sucess
 				try {
-					client.create().withMode(CreateMode.EPHEMERAL).forPath(ZKPaths.makePath(dataPath, LocalUtils.getLocalIp()));
+					client.create().withMode(CreateMode.EPHEMERAL).forPath(ZKPaths.makePath(dataPath, NetworkUtils.getLocalIp()));
 					break;
 				} catch (NodeExistsException e) {
 					throw Throwables.propagate(e);
@@ -98,7 +98,7 @@ public class ZookeeperClusterDiscovery implements ClusterDiscovery, Closeable {
 	public void close() throws IOException {
 		String dataPath = ZKPaths.makePath(root, DATA_NODE);
 		try {
-			client.delete().forPath(ZKPaths.makePath(dataPath, LocalUtils.getLocalIp()));
+			client.delete().forPath(ZKPaths.makePath(dataPath, NetworkUtils.getLocalIp()));
 		} catch (Exception e) {
 			// ignore
 		}
