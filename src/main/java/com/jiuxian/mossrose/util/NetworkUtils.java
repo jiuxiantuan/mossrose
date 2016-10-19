@@ -12,10 +12,9 @@ import com.google.common.base.Throwables;
 public final class NetworkUtils {
 
 	public static String getLocalIp() {
-		InetAddress localAddress;
 		try {
-			localAddress = InetAddress.getLocalHost();
-			if (!localAddress.isAnyLocalAddress() && !localAddress.isLoopbackAddress()) {
+			InetAddress localAddress = InetAddress.getLocalHost();
+			if (localAddress != null && !localAddress.isAnyLocalAddress() && !localAddress.isLoopbackAddress()) {
 				return localAddress.getHostAddress();
 			}
 		} catch (UnknownHostException e1) {
