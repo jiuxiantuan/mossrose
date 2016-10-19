@@ -4,7 +4,6 @@ import java.net.Inet4Address;
 import java.net.InetAddress;
 import java.net.NetworkInterface;
 import java.net.SocketException;
-import java.net.UnknownHostException;
 import java.util.Enumeration;
 
 import com.google.common.base.Throwables;
@@ -17,7 +16,7 @@ public final class NetworkUtils {
 			if (localAddress != null && !localAddress.isAnyLocalAddress() && !localAddress.isLoopbackAddress()) {
 				return localAddress.getHostAddress();
 			}
-		} catch (UnknownHostException e1) {
+		} catch (Exception e1) {
 			throw Throwables.propagate(e1);
 		}
 		try {

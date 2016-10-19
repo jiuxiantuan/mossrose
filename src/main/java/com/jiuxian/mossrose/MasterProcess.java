@@ -8,6 +8,7 @@ import java.util.UUID;
 import org.apache.ignite.Ignite;
 import org.apache.ignite.Ignition;
 import org.apache.ignite.configuration.IgniteConfiguration;
+import org.apache.ignite.lang.IgniteRunnable;
 import org.apache.ignite.logger.slf4j.Slf4jLogger;
 import org.apache.ignite.spi.discovery.tcp.TcpDiscoverySpi;
 import org.apache.ignite.spi.discovery.tcp.ipfinder.vm.TcpDiscoveryVmIpFinder;
@@ -60,6 +61,15 @@ public class MasterProcess implements Process, Closeable {
 		cfg.setDiscoverySpi(discoSpi);
 		ignite = Ignition.start(cfg);
 
+		ignite.compute().broadcast(new IgniteRunnable() {
+
+			private static final long serialVersionUID = 1L;
+
+			@Override
+			public void run() {
+				System.out.println("Join ignite cluser " + clusterName + "with hosts " + hosts);
+			}
+		});
 		LOGGER.info("Inital ignite cluser {} with hosts {}", clusterName, hosts);
 	}
 

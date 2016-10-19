@@ -4,7 +4,6 @@ import java.io.Serializable;
 import java.util.List;
 
 import org.apache.ignite.Ignite;
-import org.apache.ignite.lang.IgniteRunnable;
 import org.quartz.Job;
 import org.quartz.JobExecutionContext;
 import org.quartz.JobExecutionException;
@@ -24,28 +23,21 @@ public class MossroseJob implements Job {
 
 	@Override
 	public void execute(JobExecutionContext context) throws JobExecutionException {
-		if (runInCluster) {
-			ignite.compute().run(new IgniteRunnable() {
-				private static final long serialVersionUID = 1L;
-
-				@Override
-				public void run() {
-					doExecute();
-				}
-			});
-		} else {
-			doExecute();
-		}
-	}
-
-	private void doExecute() {
 		if (simpleJob != null) {
-			simpleJob.execute();
+			if (runInCluster) {
+				ignite.compute().run(() -> simpleJob.execute());
+			} else {
+				simpleJob.execute();
+			}
 		}
 		if (distributedJob != null) {
-			List<Serializable> items = distributedJob.slice();
+			final List<Serializable> items = distributedJob.slice();
 			if (items != null) {
-				items.stream().parallel().forEach(e -> distributedJob.execute(e));
+				if (runInCluster) {
+					items.stream().forEach(e -> ignite.compute().run(() -> distributedJob.execute(e)));
+				} else {
+					items.stream().parallel().forEach(e -> distributedJob.execute(e));
+				}
 			}
 		}
 	}
