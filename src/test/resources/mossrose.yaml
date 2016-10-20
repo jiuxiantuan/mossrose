@@ -1,7 +1,7 @@
 # Mossrose config info
 ---
 cluster:
-  name: zn-job
+  name: mossrose-example
   loadBalancingMode: ROUND_ROBIN
 jobs:
   - id: 1

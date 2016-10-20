@@ -7,6 +7,7 @@ import org.quartz.Job;
 import org.quartz.JobExecutionContext;
 import org.quartz.JobExecutionException;
 
+import com.jiuxian.mossrose.compute.GridCompute;
 import com.jiuxian.mossrose.compute.GridComputer;
 import com.jiuxian.mossrose.job.DistributedJob;
 import com.jiuxian.mossrose.job.SimpleJob;
@@ -25,7 +26,7 @@ public class MossroseJob implements Job {
 	public void execute(JobExecutionContext context) throws JobExecutionException {
 		if (simpleJob != null) {
 			if (runInCluster) {
-				gridComputer.execute(() -> simpleJob.execute());
+				gridComputer.execute(new SimpleJobUnit(simpleJob));
 			} else {
 				simpleJob.execute();
 			}
@@ -34,7 +35,7 @@ public class MossroseJob implements Job {
 			final List<Serializable> items = distributedJob.slice();
 			if (items != null) {
 				if (runInCluster) {
-					items.stream().forEach(e -> gridComputer.execute(() -> distributedJob.execute(e)));
+					items.stream().forEach(e -> gridComputer.execute(new DistributeJobUnit(distributedJob, e)));
 				} else {
 					items.stream().parallel().forEach(e -> distributedJob.execute(e));
 				}
@@ -56,6 +57,41 @@ public class MossroseJob implements Job {
 
 	public void setDistributedJob(DistributedJob<Serializable> distributedJob) {
 		this.distributedJob = distributedJob;
+	}
+
+	public static class SimpleJobUnit implements GridCompute {
+		private static final long serialVersionUID = 1L;
+
+		private final SimpleJob simpleJob;
+
+		public SimpleJobUnit(SimpleJob simpleJob) {
+			super();
+			this.simpleJob = simpleJob;
+		}
+
+		@Override
+		public void apply() {
+			simpleJob.execute();
+		}
+	}
+
+	public static class DistributeJobUnit implements GridCompute {
+		private static final long serialVersionUID = 1L;
+
+		private final DistributedJob<Serializable> distributedJob;
+
+		private final Serializable slice;
+
+		public DistributeJobUnit(DistributedJob<Serializable> distributedJob, Serializable slice) {
+			super();
+			this.distributedJob = distributedJob;
+			this.slice = slice;
+		}
+
+		@Override
+		public void apply() {
+			distributedJob.execute(slice);
+		}
 	}
 
 }
