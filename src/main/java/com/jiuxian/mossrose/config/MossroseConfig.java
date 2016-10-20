@@ -5,7 +5,7 @@ import java.util.List;
 import com.google.common.base.Preconditions;
 
 /**
- * Mossrose配置，用于配置集群及任务元信息
+ * Mossrose meta configuration
  * 
  * @author <a href="mailto:wangyuxuan@jiuxian.com">Yuxuan Wang</a>
  *
@@ -15,10 +15,16 @@ public class MossroseConfig {
 	private Cluster cluster;
 	private List<JobMeta> jobs;
 
+	/**
+	 * cluster meta
+	 * 
+	 * @author <a href="mailto:wangyuxuan@jiuxian.com">Yuxuan Wang</a>
+	 *
+	 */
 	public static class Cluster {
 
 		/**
-		 * 集群名字
+		 * cluster name
 		 */
 		private String name;
 
@@ -34,30 +40,31 @@ public class MossroseConfig {
 	}
 
 	/**
-	 * 任务元信息
+	 * job meta
 	 * 
 	 * @author <a href="mailto:wangyuxuan@jiuxian.com">Yuxuan Wang</a>
 	 *
 	 */
 	public static class JobMeta {
 		/**
-		 * 任务id
+		 * job id
 		 */
 		private String id;
 		/**
-		 * 任务cron表达式
+		 * cron
 		 */
 		private String cron;
 		/**
-		 * 任务类全名
+		 * class name of job
 		 */
 		private String main;
 		/**
-		 * 任务组
+		 * group
 		 */
 		private String group;
 		/**
-		 * 是否在集群中执行，如果为false，则直接在主节点上执行，如果为true，则会平均分配到集群中执行
+		 * If true, the job will run on any node in the cluster; If false，the
+		 * job will run on master node
 		 */
 		private boolean runInCluster;
 
