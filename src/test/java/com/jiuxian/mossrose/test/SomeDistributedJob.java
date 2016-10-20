@@ -14,7 +14,7 @@ public class SomeDistributedJob implements DistributedJob<String> {
 
 	@Override
 	public void execute(String item) {
-		System.out.println("DistributedJob: " + item);
+		System.out.println(Thread.currentThread() + " DistributedJob: " + item);
 	}
 
 }

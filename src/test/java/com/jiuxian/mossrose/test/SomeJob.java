@@ -8,7 +8,7 @@ public class SomeJob implements SimpleJob {
 
 	@Override
 	public void execute() {
-		System.out.println("SimpleJob: " + UUID.randomUUID());
+		System.out.println(Thread.currentThread() + " SimpleJob: " + UUID.randomUUID());
 	}
 
 }

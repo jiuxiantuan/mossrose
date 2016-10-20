@@ -41,7 +41,9 @@ public class IgniteGridComputer implements GridComputer {
 		cfg.setDiscoverySpi(discoSpi);
 
 		if (loadBalancingMode == LoadBalancingMode.ROUND_ROBIN) {
-			cfg.setLoadBalancingSpi(new RoundRobinLoadBalancingSpi());
+			RoundRobinLoadBalancingSpi roundRobinLoadBalancingSpi = new RoundRobinLoadBalancingSpi();
+			roundRobinLoadBalancingSpi.setPerTask(true);
+			cfg.setLoadBalancingSpi(roundRobinLoadBalancingSpi);
 		} else if (loadBalancingMode == LoadBalancingMode.RANDOM) {
 			cfg.setLoadBalancingSpi(new WeightedRandomLoadBalancingSpi());
 		}
