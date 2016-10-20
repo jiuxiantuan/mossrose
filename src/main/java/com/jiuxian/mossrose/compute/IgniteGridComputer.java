@@ -40,11 +40,11 @@ public class IgniteGridComputer implements GridComputer {
 		discoSpi.setIpFinder(ipFinder);
 		cfg.setDiscoverySpi(discoSpi);
 
-//		if (loadBalancingMode == LoadBalancingMode.ROUND_ROBIN) {
-//			cfg.setLoadBalancingSpi(new RoundRobinLoadBalancingSpi());
-//		} else if (loadBalancingMode == LoadBalancingMode.RANDOM) {
-//			cfg.setLoadBalancingSpi(new WeightedRandomLoadBalancingSpi());
-//		}
+		if (loadBalancingMode == LoadBalancingMode.ROUND_ROBIN) {
+			cfg.setLoadBalancingSpi(new RoundRobinLoadBalancingSpi());
+		} else if (loadBalancingMode == LoadBalancingMode.RANDOM) {
+			cfg.setLoadBalancingSpi(new WeightedRandomLoadBalancingSpi());
+		}
 
 		ignite = Ignition.start(cfg);
 		ignite.compute().broadcast(new IgniteRunnable() {
