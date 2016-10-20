@@ -28,13 +28,23 @@ public class MossroseConfig {
 		 */
 		private String name;
 
+		private LoadBalancingMode loadBalancingMode;
+
 		public String getName() {
 			return name;
+		}
+
+		public LoadBalancingMode getLoadBalancingMode() {
+			return loadBalancingMode;
 		}
 
 		@Override
 		public String toString() {
 			return "Cluster [name=" + name + "]";
+		}
+
+		public enum LoadBalancingMode {
+			ROUND_ROBIN, RANDOM;
 		}
 
 	}

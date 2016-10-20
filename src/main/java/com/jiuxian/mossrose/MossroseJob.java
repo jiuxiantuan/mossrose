@@ -3,11 +3,11 @@ package com.jiuxian.mossrose;
 import java.io.Serializable;
 import java.util.List;
 
-import org.apache.ignite.Ignite;
 import org.quartz.Job;
 import org.quartz.JobExecutionContext;
 import org.quartz.JobExecutionException;
 
+import com.jiuxian.mossrose.compute.GridComputer;
 import com.jiuxian.mossrose.job.DistributedJob;
 import com.jiuxian.mossrose.job.SimpleJob;
 
@@ -17,7 +17,7 @@ public class MossroseJob implements Job {
 
 	private DistributedJob<Serializable> distributedJob;
 
-	private Ignite ignite;
+	private GridComputer gridComputer;
 
 	private boolean runInCluster;
 
@@ -25,7 +25,7 @@ public class MossroseJob implements Job {
 	public void execute(JobExecutionContext context) throws JobExecutionException {
 		if (simpleJob != null) {
 			if (runInCluster) {
-				ignite.compute().run(() -> simpleJob.execute());
+				gridComputer.execute(() -> simpleJob.execute());
 			} else {
 				simpleJob.execute();
 			}
@@ -34,7 +34,7 @@ public class MossroseJob implements Job {
 			final List<Serializable> items = distributedJob.slice();
 			if (items != null) {
 				if (runInCluster) {
-					items.stream().forEach(e -> ignite.compute().run(() -> distributedJob.execute(e)));
+					items.stream().forEach(e -> gridComputer.execute(() -> distributedJob.execute(e)));
 				} else {
 					items.stream().parallel().forEach(e -> distributedJob.execute(e));
 				}
@@ -50,8 +50,8 @@ public class MossroseJob implements Job {
 		this.simpleJob = simpleJob;
 	}
 
-	public void setIgnite(Ignite ignite) {
-		this.ignite = ignite;
+	public void setGridComputer(GridComputer gridComputer) {
+		this.gridComputer = gridComputer;
 	}
 
 	public void setDistributedJob(DistributedJob<Serializable> distributedJob) {

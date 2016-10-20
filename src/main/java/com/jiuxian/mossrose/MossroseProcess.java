@@ -1,11 +1,14 @@
 package com.jiuxian.mossrose;
 
 import com.jiuxian.mossrose.cluster.ClusterDiscovery;
+import com.jiuxian.mossrose.compute.IgniteGridComputer;
 import com.jiuxian.mossrose.config.MossroseConfig;
 import com.jiuxian.theone.zk.ZookeeperUniqueProcess;
 
 /**
- * Mossrose basic implementation
+ * Mossrose basic implementation<br>
+ * 
+ * Use zookeeper for master election, and ignite for grid computation
  * 
  * @author <a href="mailto:wangyuxuan@jiuxian.com">Yuxuan Wang</a>
  *
@@ -21,7 +24,7 @@ public class MossroseProcess extends ZookeeperUniqueProcess {
 	 *            zookeeper address
 	 */
 	public MossroseProcess(MossroseConfig mossroseConfig, ClusterDiscovery clusterDiscovery, String zks) {
-		super(new QuartzProcess(mossroseConfig, clusterDiscovery), zks);
+		super(new QuartzProcess(mossroseConfig, new IgniteGridComputer(mossroseConfig.getCluster(), clusterDiscovery)), zks);
 	}
 
 	/**
@@ -39,7 +42,7 @@ public class MossroseProcess extends ZookeeperUniqueProcess {
 	 *            interval for lock competition
 	 */
 	public MossroseProcess(MossroseConfig mossroseConfig, ClusterDiscovery clusterDiscovery, String zks, String zkroot, int heartbeat, int interval) {
-		super(new QuartzProcess(mossroseConfig, clusterDiscovery), zks, zkroot, heartbeat, interval);
+		super(new QuartzProcess(mossroseConfig, new IgniteGridComputer(mossroseConfig.getCluster(), clusterDiscovery)), zks, zkroot, heartbeat, interval);
 	}
 
 }
