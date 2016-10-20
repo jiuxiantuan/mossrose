@@ -4,9 +4,9 @@
 	<artifactId>mossrose</artifactId>
 	<version>1.1.0-RELEASE</version>
 	<parent>
-		<groupId>com.zhongniang</groupId>
-		<artifactId>zn-parent</artifactId>
-		<version>1.2.2-RELEASE</version>
+		<groupId>com.jiuxian</groupId>
+		<artifactId>jiuxian-bom</artifactId>
+		<version>1.0.0-RELEASE</version>
 	</parent>
 
 	<dependencies>
