@@ -1,5 +1,5 @@
 # mossrose
-<h3>High-Avaliable Distributed Schedule System</h3>
+<h3>High-Avaliable Distributed Schedule Framework</h3>
 
 <hr>
 
@@ -7,6 +7,15 @@
 
 * Zookeeper
 * Java 8
+ 
+## Installation
+<pre><code>
+&lt;dependency&gt;
+  &lt;groupId&gt;com.jiuxian&lt;/groupId&gt;
+  &lt;artifactId&gt;mossrose&lt;/artifactId&gt;
+  &lt;version&gt;1.1.0-RELEASE&lt;/version&gt;
+&lt;/dependency&gt;
+</code></pre>
 
 ## Key concept
 
@@ -27,7 +36,7 @@
 public class SomeJob implements SimpleJob {
 
     @Override
-	public void execute() {
+    public void execute() {
 		System.out.println("SimpleJob: " + UUID.randomUUID());
 	}
 
