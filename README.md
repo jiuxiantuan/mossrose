@@ -3,6 +3,9 @@
 
 <hr>
 
+## 社区
+ * QQ群：595011342
+
 ## Requirement
 
 * Zookeeper
