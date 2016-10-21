@@ -1,19 +1,33 @@
 <project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
 	<modelVersion>4.0.0</modelVersion>
-	<groupId>com.jiuxian</groupId>
-	<artifactId>mossrose</artifactId>
-	<version>1.1.0-RELEASE</version>
 	<parent>
 		<groupId>com.jiuxian</groupId>
 		<artifactId>jiuxian-bom</artifactId>
 		<version>1.0.0-RELEASE</version>
 	</parent>
+	<groupId>com.jiuxian</groupId>
+	<artifactId>mossrose</artifactId>
+	<version>1.1.0-RELEASE</version>
+	<description>High-Avaliable Distributed Schedule System</description>
+	<url>https://github.com/jiuxiantuan/mossrose</url>
+	<licenses>
+		<license>
+			<name>Apache 2</name>
+			<url>http://www.apache.org/licenses/LICENSE-2.0.txt</url>
+			<distribution>repo</distribution>
+			<comments>A business-friendly OSS license</comments>
+		</license>
+	</licenses>
+	
+	<properties>
+		<theone.version>1.2.1-RELEASE</theone.version>
+	</properties>
 
 	<dependencies>
 		<dependency>
 			<groupId>com.jiuxian</groupId>
 			<artifactId>theone</artifactId>
-			<version>1.2.0-RELEASE</version>
+			<version>${theone.version}</version>
 		</dependency>
 		<dependency>
 			<groupId>org.apache.ignite</groupId>
