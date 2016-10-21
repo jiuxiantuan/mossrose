@@ -19,7 +19,6 @@ import java.io.IOException;
 import java.util.List;
 import java.util.UUID;
 
-import org.apache.ignite.Ignite;
 import org.quartz.CronScheduleBuilder;
 import org.quartz.JobBuilder;
 import org.quartz.JobDetail;
@@ -44,8 +43,6 @@ public class QuartzProcess implements Process {
 
 	private Scheduler scheduler;
 
-	private Ignite ignite;
-	
 	private GridComputer gridComputer;
 
 	private static final Logger LOGGER = LoggerFactory.getLogger(QuartzProcess.class);
@@ -87,7 +84,8 @@ public class QuartzProcess implements Process {
 						throw Throwables.propagate(e);
 					}
 
-					Trigger trigger = TriggerBuilder.newTrigger().withIdentity(id + "trigger", group).startNow().withSchedule(CronScheduleBuilder.cronSchedule(jobMeta.getCron())).build();
+					Trigger trigger = TriggerBuilder.newTrigger().withIdentity(id + "trigger", group).startNow()
+							.withSchedule(CronScheduleBuilder.cronSchedule(jobMeta.getCron())).build();
 
 					// Tell quartz to schedule the job using our trigger
 					scheduler.scheduleJob(job, trigger);
@@ -109,12 +107,13 @@ public class QuartzProcess implements Process {
 			try {
 				scheduler.shutdown();
 			} catch (SchedulerException e) {
-				LOGGER.error(e.getMessage(), e);
-				// Just ignore
 			}
 		}
-		if (ignite != null) {
-			ignite.close();
+		if (gridComputer != null) {
+			try {
+				gridComputer.close();
+			} catch (Exception e) {
+			}
 		}
 	}
 
