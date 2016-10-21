@@ -23,7 +23,7 @@ import java.util.List;
  * 
  * @author <a href="mailto:wangyuxuan@jiuxian.com">Yuxuan Wang</a>
  *
- * @param <T>
+ * @param <T> The type of the sliced data
  */
 public interface DistributedJob<T extends Serializable> {
 
