@@ -13,7 +13,7 @@
 <dependency>
   <groupId>com.jiuxian</groupId>
   <artifactId>mossrose</artifactId>
-  <version>1.1.0-RELEASE</version>
+  <version>1.1.1-RELEASE</version>
 </dependency>
 ```
 
@@ -45,10 +45,8 @@ public class SomeJob implements SimpleJob {
 
 #### Config the job - mossrose.yaml
 ```
-# Mossrose config info
----
 cluster:
-  name: mossrose-example    # 集群命名空间
+  name: mossrose-example    # 集群命名空间，MossroseProcess将以此分组，在组内选举主节点，并且同一个命名空间内的节点组成一个计算网格
   loadBalancingMode: ROUND_ROBIN    # 集群负载均衡策略，可选：ROUND_ROBIN/RANDOM
 jobs:
   - id: 1   # 作业ID
@@ -62,16 +60,13 @@ jobs:
 ```
 public class MainTest {
 
-    @Test
+	@Test
 	public void test() throws Exception {
-		String zks = "localhost"; // zookeeper集群地址
-		try (MossroseProcess process = new MossroseProcess(
-				MossroseConfigFactory.fromClasspathYamlFile("mossrose.yaml"), 
-				new ZookeeperClusterDiscovery("/mossrose/jobtest", zks), zks)) {
+		String zks = "192.168.5.99,192.168.5.104"; // zookeeper集群地址
+		try (MossroseProcess process = new MossroseProcess(MossroseConfigFactory.fromClasspathYamlFile("mossrose.yaml"), zks)) {
 			process.run();
 
 			try {
-                // Block the unit test
 				Thread.sleep(60 * 60 * 1000);
 			} catch (InterruptedException e) {
 			}

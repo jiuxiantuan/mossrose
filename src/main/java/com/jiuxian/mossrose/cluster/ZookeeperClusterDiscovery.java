@@ -26,7 +26,6 @@ import org.apache.curator.framework.CuratorFrameworkFactory;
 import org.apache.curator.retry.ExponentialBackoffRetry;
 import org.apache.curator.utils.ZKPaths;
 import org.apache.zookeeper.CreateMode;
-import org.apache.zookeeper.KeeperException.NodeExistsException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -35,29 +34,42 @@ import com.jiuxian.theone.util.NetworkUtils;
 
 public class ZookeeperClusterDiscovery implements ClusterDiscovery, Closeable {
 
-	private String root;
+	private String group;
 
 	private CuratorFramework client;
 
-	private int lockInterval = 3000;
-
-	private static final String LOCK_NODE = "lock";
-	private static final String DATA_NODE = "data";
+	private static final String ZK_ROOT = "/mossrose/discovery";
 
 	private static final Logger LOGGER = LoggerFactory.getLogger(ZookeeperClusterDiscovery.class);
 
-	public ZookeeperClusterDiscovery(String root, String zks) {
+	/**
+	 * @param group
+	 *            cluster group to discovery with
+	 * @param zks
+	 *            zookeeper address
+	 */
+	public ZookeeperClusterDiscovery(String group, String zks) {
 		super();
-		this.root = root;
+		this.group = group;
 		client = CuratorFrameworkFactory.newClient(zks, new ExponentialBackoffRetry(1000, 3));
 		client.start();
-		
-		String dataPath = ZKPaths.makePath(root, DATA_NODE);
+
 		try {
-			if (client.checkExists().forPath(dataPath) == null) {
-				LOGGER.info("Root data path {} not exists, create it.", dataPath);
-				client.create().creatingParentsIfNeeded().forPath(dataPath);
+			// Create root
+			final String groupPath = ZKPaths.makePath(ZK_ROOT, group);
+			if (client.checkExists().forPath(groupPath) == null) {
+				LOGGER.info("Group path {} not exists, create it.", groupPath);
+				client.create().creatingParentsIfNeeded().forPath(groupPath);
 			}
+
+			// Register the current host
+			final String host = NetworkUtils.getLocalIp();
+			final String hostNode = ZKPaths.makePath(groupPath, host);
+			if (client.checkExists().forPath(hostNode) != null) {
+				throw new RuntimeException(
+						"Host " + host + " has already been registered on group path " + groupPath + " ,  host should be unique in a group.");
+			}
+			client.create().withMode(CreateMode.EPHEMERAL).forPath(hostNode);
 		} catch (Exception e) {
 			LOGGER.error(e.getMessage(), e);
 			throw Throwables.propagate(e);
@@ -67,43 +79,15 @@ public class ZookeeperClusterDiscovery implements ClusterDiscovery, Closeable {
 
 	@Override
 	public List<String> findHosts() {
-		String lockPath = ZKPaths.makePath(root, LOCK_NODE);
-		String dataPath = ZKPaths.makePath(root, DATA_NODE);
-		while (true) {
-			try {
-				// lock for create data
-				client.create().withMode(CreateMode.EPHEMERAL).forPath(lockPath);
-				// write data if lock sucess
-				try {
-					client.create().withMode(CreateMode.EPHEMERAL).forPath(ZKPaths.makePath(dataPath, NetworkUtils.getLocalIp()));
-					break;
-				} catch (NodeExistsException e) {
-					throw Throwables.propagate(e);
-				}
-			} catch (Exception e1) {
-				// Just ignore
-			} finally {
-				// release lock
-				try {
-					client.delete().forPath(lockPath);
-				} catch (Exception e) {
-					// Just ignore
-				}
-			}
-			try {
-				Thread.sleep(lockInterval);
-			} catch (InterruptedException e) {
-				// ignore
-			}
-		}
+		final String groupPath = ZKPaths.makePath(ZK_ROOT, group);
 		List<String> children = null;
 		try {
-			children = client.getChildren().forPath(dataPath);
+			children = client.getChildren().forPath(groupPath);
 		} catch (Exception e1) {
 			throw Throwables.propagate(e1);
 		}
 		if (children != null && children.size() > 0) {
-			String prefixToRemove = dataPath + "/";
+			String prefixToRemove = groupPath + "/";
 			return children.stream().map(e -> StringUtils.removeStart(e, prefixToRemove)).collect(Collectors.toList());
 		}
 		throw new RuntimeException("No hosts get.");
@@ -111,9 +95,9 @@ public class ZookeeperClusterDiscovery implements ClusterDiscovery, Closeable {
 
 	@Override
 	public void close() throws IOException {
-		String dataPath = ZKPaths.makePath(root, DATA_NODE);
+		final String groupPath = ZKPaths.makePath(ZK_ROOT, group);
 		try {
-			client.delete().forPath(ZKPaths.makePath(dataPath, NetworkUtils.getLocalIp()));
+			client.delete().forPath(ZKPaths.makePath(groupPath, NetworkUtils.getLocalIp()));
 		} catch (Exception e) {
 			// ignore
 		}

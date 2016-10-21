@@ -1,7 +1,7 @@
 # Mossrose config info
 ---
 cluster:
-  name: mossrose-example    # 集群命名空间
+  name: mossrose-example    # 集群命名空间，MossroseProcess将以此分组，在组内选举主节点，并且同一个命名空间内的节点组成一个计算网格
   loadBalancingMode: ROUND_ROBIN    # 集群负载均衡策略，可选：ROUND_ROBIN/RANDOM
 jobs:
   - id: 1   # 作业ID
