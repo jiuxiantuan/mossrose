@@ -9,13 +9,13 @@
 * Java 8
  
 ## Installation
-<pre><code>
-&lt;dependency&gt;
-  &lt;groupId&gt;com.jiuxian&lt;/groupId&gt;
-  &lt;artifactId&gt;mossrose&lt;/artifactId&gt;
-  &lt;version&gt;1.1.0-RELEASE&lt;/version&gt;
-&lt;/dependency&gt;
-</code></pre>
+```
+<dependency>
+  <groupId>com.jiuxian</groupId>
+  <artifactId>mossrose</artifactId>
+  <version>1.1.0-RELEASE</version>
+</dependency>
+```
 
 ## Key concept
 
@@ -32,19 +32,19 @@
 ## Quick Start
 
 #### Implement a simple job
-<pre><code>
+```
 public class SomeJob implements SimpleJob {
 
     @Override
     public void execute() {
-		System.out.println("SimpleJob: " + UUID.randomUUID());
+    	System.out.println("SimpleJob: " + UUID.randomUUID());
 	}
 
 }
-</code></pre>
+```
 
 #### Config the job - mossrose.yaml
-<pre><code>
+```
 # Mossrose config info
 ---
 cluster:
@@ -56,10 +56,10 @@ jobs:
     cron: 0/5 * * * * ? # 作业cron表达式
     runInCluster: true  # 是否在集群中分布执行，如果为false，则只在主节点上执行
     main: com.jiuxian.mossrose.test.SomeJob # 作业类全名
-</code></pre>
+```
 
 #### Run mossrose main class
-<pre><code>
+```
 public class MainTest {
 
     @Test
@@ -79,11 +79,11 @@ public class MainTest {
 	}
 
 }
-</code></pre>
+```
 
 ## Distributed Job
 #### Implement a distributed job
-<pre><code>
+```
 public class SomeDistributedJob implements DistributedJob<String> {
 
     @Override
@@ -97,4 +97,4 @@ public class SomeDistributedJob implements DistributedJob<String> {
 	}
 
 }
-</code></pre>
+```
