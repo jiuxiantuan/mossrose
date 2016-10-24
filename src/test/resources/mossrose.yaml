@@ -9,6 +9,7 @@ jobs:
     cron: 0/5 * * * * ? # 作业cron表达式
     runInCluster: true  # 是否在集群中分布执行，如果为false，则只在主节点上执行
     main: com.jiuxian.mossrose.test.SomeJob # 作业类全名
+    description: 一个简单作业的例子
   - id: 2
     group: test
     cron: 0/20 * * * * ?

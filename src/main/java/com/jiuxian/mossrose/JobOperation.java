@@ -18,6 +18,8 @@ public interface JobOperation {
 		private static final long serialVersionUID = 1L;
 
 		private String id;
+		private String group;
+		private String description;
 		private String cron;
 		private boolean runInCluster;
 		private String mainClass;
@@ -32,6 +34,22 @@ public interface JobOperation {
 
 		public void setId(String id) {
 			this.id = id;
+		}
+
+		public String getGroup() {
+			return group;
+		}
+
+		public void setGroup(String group) {
+			this.group = group;
+		}
+
+		public String getDescription() {
+			return description;
+		}
+
+		public void setDescription(String description) {
+			this.description = description;
 		}
 
 		public String getCron() {
@@ -92,8 +110,9 @@ public interface JobOperation {
 
 		@Override
 		public String toString() {
-			return "JobRuntimeInfo [id=" + id + ", cron=" + cron + ", runInCluster=" + runInCluster + ", mainClass=" + mainClass + ", startTime="
-					+ startTime + ", endTime=" + endTime + ", nextFireTime=" + nextFireTime + ", previousFireTime=" + previousFireTime + "]";
+			return "JobRuntimeInfo [id=" + id + ", group=" + group + ", description=" + description + ", cron=" + cron + ", runInCluster="
+					+ runInCluster + ", mainClass=" + mainClass + ", startTime=" + startTime + ", endTime=" + endTime + ", nextFireTime="
+					+ nextFireTime + ", previousFireTime=" + previousFireTime + "]";
 		}
 
 	}

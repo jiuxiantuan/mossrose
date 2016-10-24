@@ -92,6 +92,10 @@ public class MossroseConfig {
 		 * job will run on master node
 		 */
 		private boolean runInCluster;
+		/**
+		 * description
+		 */
+		private String description;
 
 		public String getId() {
 			return id;
@@ -111,6 +115,10 @@ public class MossroseConfig {
 
 		public boolean isRunInCluster() {
 			return runInCluster;
+		}
+
+		public String getDescription() {
+			return description;
 		}
 
 		@Override

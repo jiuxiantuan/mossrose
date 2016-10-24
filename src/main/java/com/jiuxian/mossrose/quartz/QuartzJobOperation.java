@@ -44,7 +44,11 @@ public class QuartzJobOperation implements JobOperation {
 
 							if (trigger != null) {
 								JobRuntimeInfo job = new JobRuntimeInfo();
+
 								job.setId(jobKey.getName());
+								job.setGroup(jobKey.getGroup());
+								job.setDescription(jobDetail.getDescription());
+
 								JobDataMap dataMap = jobDetail.getJobDataMap();
 
 								job.setRunInCluster(dataMap.getBoolean(JobDataMapKeys.RUN_IN_CLUSTER));

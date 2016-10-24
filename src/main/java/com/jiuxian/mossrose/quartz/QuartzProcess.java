@@ -70,7 +70,7 @@ public class QuartzProcess extends QuartzJobOperation implements Process, JobOpe
 				try {
 					Class<?> jobClazz = Class.forName(mainClass);
 
-					JobDetail job = JobBuilder.newJob(MossroseJob.class).withIdentity(id + "#job", group).build();
+					JobDetail job = JobBuilder.newJob(MossroseJob.class).withIdentity(id, group).withDescription(jobMeta.getDescription()).build();
 					try {
 						Object jobInstance = jobClazz.newInstance();
 						if (jobInstance instanceof SimpleJob) {
