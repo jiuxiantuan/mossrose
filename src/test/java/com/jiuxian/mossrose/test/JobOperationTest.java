@@ -4,6 +4,7 @@ import java.util.List;
 
 import org.junit.Test;
 
+import com.google.common.collect.Iterables;
 import com.jiuxian.mossrose.JobOperation;
 import com.jiuxian.mossrose.JobOperation.JobRuntimeInfo;
 import com.jiuxian.mossrose.cluster.ZookeeperClusterDiscovery;
@@ -30,7 +31,13 @@ public class JobOperationTest {
 			JobOperation jobOperation = quartzProcess;
 			List<JobRuntimeInfo> jobs = jobOperation.allJobs();
 
-			jobs.stream().forEach(e -> System.out.println(e));
+			// run a job now
+			JobRuntimeInfo job = Iterables.getLast(jobs);
+			jobOperation.runJobNow(job.getGroup(), job.getId());
+
+			Thread.sleep(25 * 1000);
+
+			jobOperation.allJobs().stream().forEach(e -> System.out.println(e));
 		}
 
 	}
