@@ -4,12 +4,12 @@ cluster:
   name: mossrose-example    # 集群命名空间，MossroseProcess将以此分组，在组内选举主节点，并且同一个命名空间内的节点组成一个计算网格
   loadBalancingMode: ROUND_ROBIN    # 集群负载均衡策略，可选：ROUND_ROBIN/RANDOM
 jobs:
-  - id: 1   # 作业ID
-    group: test # 作业分组(可选)
+  - id: 1   # 作业ID，可选，如果为空则自动生成一个惟一ID
+    group: test # 作业分组(可选)，默认为default-group
     cron: 0/5 * * * * ? # 作业cron表达式
     runInCluster: true  # 是否在集群中分布执行，如果为false，则只在主节点上执行
     main: com.jiuxian.mossrose.test.SomeJob # 作业类全名
-    description: 一个简单作业的例子
+    description: 一个简单作业的例子 # 可选
   - id: 2
     group: test
     cron: 0/20 * * * * ?

@@ -81,6 +81,61 @@ public class QuartzJobOperation implements JobOperation {
 		return null;
 	}
 
+	@Override
+	public void pauseJob(String group, String id) {
+		if (isSchedulerAvaliable()) {
+			try {
+				scheduler.pauseJob(new JobKey(id, group));
+			} catch (SchedulerException e) {
+				LOGGER.error(e.getMessage(), e);
+			}
+		}
+	}
+
+	@Override
+	public void resumeJob(String group, String id) {
+		if (isSchedulerAvaliable()) {
+			try {
+				scheduler.resumeJob(new JobKey(id, group));
+			} catch (SchedulerException e) {
+				LOGGER.error(e.getMessage(), e);
+			}
+		}
+	}
+
+	@Override
+	public void runJobNow(String group, String id) {
+		if (isSchedulerAvaliable()) {
+			try {
+				scheduler.triggerJob(new JobKey(id, group));
+			} catch (SchedulerException e) {
+				LOGGER.error(e.getMessage(), e);
+			}
+		}
+	}
+
+	@Override
+	public void pauseAllJob() {
+		if (isSchedulerAvaliable()) {
+			try {
+				scheduler.pauseAll();
+			} catch (SchedulerException e) {
+				LOGGER.error(e.getMessage(), e);
+			}
+		}
+	}
+
+	@Override
+	public void resumeAllJob() {
+		if (isSchedulerAvaliable()) {
+			try {
+				scheduler.resumeAll();
+			} catch (SchedulerException e) {
+				LOGGER.error(e.getMessage(), e);
+			}
+		}
+	}
+
 	private boolean isSchedulerAvaliable() {
 		try {
 			return scheduler != null && scheduler.isStarted();
@@ -89,5 +144,4 @@ public class QuartzJobOperation implements JobOperation {
 		}
 		return false;
 	}
-
 }
