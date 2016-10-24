@@ -16,7 +16,7 @@
 <dependency>
   <groupId>com.jiuxian</groupId>
   <artifactId>mossrose</artifactId>
-  <version>1.1.1-RELEASE</version>
+  <version>1.1.2-RELEASE</version>
 </dependency>
 ```
 
@@ -40,7 +40,7 @@ public class SomeJob implements SimpleJob {
 
     @Override
     public void execute() {
-    	System.out.println("SimpleJob: " + UUID.randomUUID());
+        System.out.println("SimpleJob: " + UUID.randomUUID());
 	}
 
 }
@@ -96,3 +96,27 @@ public class SomeDistributedJob implements DistributedJob<String> {
 
 }
 ```
+
+## User Interface
+#### Add mossrose-ui
+```
+<dependency>
+  <groupId>com.jiuxian</groupId>
+  <artifactId>mossrose-ui</artifactId>
+  <version>1.0.0-RELEASE</version>
+</dependency>
+```
+
+#### new RestMossroseUI
+```
+MossroseProcess process = ...
+RestMossroseUI ui = new RestMossroseUI(process.getJobOperation(), 7758);
+```
+
+#### Access UI
+```
+curl -i "http://localhost:7758/all"
+```
+
+#### More about mossrose ui
+[Mossrose UI](https://github.com/jiuxiantuan/mossrose-ui)
