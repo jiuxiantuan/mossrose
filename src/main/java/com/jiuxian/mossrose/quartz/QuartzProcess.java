@@ -13,7 +13,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package com.jiuxian.mossrose;
+package com.jiuxian.mossrose.quartz;
 
 import java.io.IOException;
 import java.util.List;
@@ -32,6 +32,8 @@ import org.slf4j.LoggerFactory;
 
 import com.google.common.base.Preconditions;
 import com.google.common.base.Throwables;
+import com.jiuxian.mossrose.JobOperation;
+import com.jiuxian.mossrose.MossroseJob;
 import com.jiuxian.mossrose.compute.GridComputer;
 import com.jiuxian.mossrose.config.MossroseConfig;
 import com.jiuxian.mossrose.config.MossroseConfig.JobMeta;
@@ -39,7 +41,7 @@ import com.jiuxian.mossrose.job.DistributedJob;
 import com.jiuxian.mossrose.job.SimpleJob;
 import com.jiuxian.theone.Process;
 
-public class QuartzProcess implements Process {
+public class QuartzProcess extends QuartzJobOperation implements Process, JobOperation {
 
 	private Scheduler scheduler;
 
@@ -68,18 +70,18 @@ public class QuartzProcess implements Process {
 				try {
 					Class<?> jobClazz = Class.forName(mainClass);
 
-					JobDetail job = JobBuilder.newJob(MossroseJob.class).withIdentity(id + "job", group).build();
+					JobDetail job = JobBuilder.newJob(MossroseJob.class).withIdentity(id + "#job", group).build();
 					try {
 						Object jobInstance = jobClazz.newInstance();
 						if (jobInstance instanceof SimpleJob) {
-							job.getJobDataMap().put("simpleJob", jobInstance);
+							job.getJobDataMap().put(JobDataMapKeys.SIMPLE_JOB, jobInstance);
 						} else if (jobInstance instanceof DistributedJob) {
-							job.getJobDataMap().put("distributedJob", jobInstance);
+							job.getJobDataMap().put(JobDataMapKeys.DISTRIBUTED_JOB, jobInstance);
 						} else {
 							throw new RuntimeException("Invalid job instance, must be a " + SimpleJob.class + " or a " + DistributedJob.class);
 						}
-						job.getJobDataMap().put("gridComputer", gridComputer);
-						job.getJobDataMap().put("runInCluster", jobMeta.isRunInCluster());
+						job.getJobDataMap().put(JobDataMapKeys.GRID_COMPUTER, gridComputer);
+						job.getJobDataMap().put(JobDataMapKeys.RUN_IN_CLUSTER, jobMeta.isRunInCluster());
 					} catch (InstantiationException | IllegalAccessException e) {
 						throw Throwables.propagate(e);
 					}
@@ -95,6 +97,8 @@ public class QuartzProcess implements Process {
 			}
 
 			scheduler.start();
+
+			super.setScheduler(scheduler);
 		} catch (SchedulerException e) {
 			LOGGER.error(e.getMessage(), e);
 			throw Throwables.propagate(e);

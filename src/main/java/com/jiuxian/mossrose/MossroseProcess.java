@@ -18,6 +18,7 @@ package com.jiuxian.mossrose;
 import com.jiuxian.mossrose.cluster.ZookeeperClusterDiscovery;
 import com.jiuxian.mossrose.compute.IgniteGridComputer;
 import com.jiuxian.mossrose.config.MossroseConfig;
+import com.jiuxian.mossrose.quartz.QuartzProcess;
 import com.jiuxian.theone.zk.ZookeeperUniqueProcess;
 
 /**
