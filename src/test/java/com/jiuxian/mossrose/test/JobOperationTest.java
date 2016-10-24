@@ -27,7 +27,7 @@ public class JobOperationTest {
 
 			Thread.sleep(25 * 1000);
 
-			jobOperation.allJobs().stream().forEach(e -> System.out.println(e));
+			jobOperation.allJobs().stream().forEach(System.out::println);
 
 			try {
 				Thread.sleep(60 * 60 * 1000);
