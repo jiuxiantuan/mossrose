@@ -37,39 +37,9 @@ public class QuartzJobOperation implements JobOperation {
 				Set<JobKey> jobKeys = scheduler.getJobKeys(GroupMatcher.anyJobGroup());
 				if (jobKeys != null) {
 					jobKeys.stream().forEach(jobKey -> {
-						try {
-							final JobDetail jobDetail = scheduler.getJobDetail(jobKey);
-							// Only one trigger for a job
-							final Trigger trigger = Iterables.getFirst(scheduler.getTriggersOfJob(jobKey), null);
-
-							if (trigger != null) {
-								JobRuntimeInfo job = new JobRuntimeInfo();
-
-								job.setId(jobKey.getName());
-								job.setGroup(jobKey.getGroup());
-								job.setDescription(jobDetail.getDescription());
-
-								JobDataMap dataMap = jobDetail.getJobDataMap();
-
-								job.setRunInCluster(dataMap.getBoolean(JobDataMapKeys.RUN_IN_CLUSTER));
-								Object jobMain = Objects.firstNonNull(dataMap.get(JobDataMapKeys.SIMPLE_JOB),
-										dataMap.get(JobDataMapKeys.DISTRIBUTED_JOB));
-								if (jobMain != null) {
-									job.setMainClass(jobMain.getClass().getName());
-								}
-
-								job.setStartTime(trigger.getStartTime());
-								job.setEndTime(trigger.getEndTime());
-								job.setPreviousFireTime(trigger.getPreviousFireTime());
-								job.setNextFireTime(trigger.getNextFireTime());
-								if (trigger instanceof CronTrigger) {
-									job.setCron(((CronTrigger) trigger).getCronExpression());
-								}
-
-								jobs.add(job);
-							}
-						} catch (SchedulerException eInGettingJobInfo) {
-							LOGGER.error(eInGettingJobInfo.getMessage(), eInGettingJobInfo);
+						JobRuntimeInfo job = getInfoInfoByKey(jobKey);
+						if (job != null) {
+							jobs.add(job);
 						}
 					});
 				}
@@ -134,6 +104,51 @@ public class QuartzJobOperation implements JobOperation {
 				LOGGER.error(e.getMessage(), e);
 			}
 		}
+	}
+
+	@Override
+	public JobRuntimeInfo jobInfo(String group, String id) {
+		JobRuntimeInfo job = null;
+		if (isSchedulerAvaliable()) {
+			job = getInfoInfoByKey(new JobKey(id, group));
+		}
+		return job;
+	}
+
+	private JobRuntimeInfo getInfoInfoByKey(final JobKey jobKey) {
+		JobRuntimeInfo job = null;
+		try {
+			final JobDetail jobDetail = scheduler.getJobDetail(jobKey);
+			// Only one trigger for a job
+			final Trigger trigger = Iterables.getFirst(scheduler.getTriggersOfJob(jobKey), null);
+
+			if (trigger != null) {
+				job = new JobRuntimeInfo();
+
+				job.setId(jobKey.getName());
+				job.setGroup(jobKey.getGroup());
+				job.setDescription(jobDetail.getDescription());
+
+				JobDataMap dataMap = jobDetail.getJobDataMap();
+
+				job.setRunInCluster(dataMap.getBoolean(JobDataMapKeys.RUN_IN_CLUSTER));
+				Object jobMain = Objects.firstNonNull(dataMap.get(JobDataMapKeys.SIMPLE_JOB), dataMap.get(JobDataMapKeys.DISTRIBUTED_JOB));
+				if (jobMain != null) {
+					job.setMainClass(jobMain.getClass().getName());
+				}
+
+				job.setStartTime(trigger.getStartTime());
+				job.setEndTime(trigger.getEndTime());
+				job.setPreviousFireTime(trigger.getPreviousFireTime());
+				job.setNextFireTime(trigger.getNextFireTime());
+				if (trigger instanceof CronTrigger) {
+					job.setCron(((CronTrigger) trigger).getCronExpression());
+				}
+			}
+		} catch (SchedulerException eInGettingJobInfo) {
+			LOGGER.error(eInGettingJobInfo.getMessage(), eInGettingJobInfo);
+		}
+		return job;
 	}
 
 	private boolean isSchedulerAvaliable() {

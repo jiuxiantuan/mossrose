@@ -13,15 +13,17 @@ import java.util.List;
 public interface JobOperation {
 
 	List<JobRuntimeInfo> allJobs();
-	
+
 	void pauseAllJob();
-	
+
 	void resumeAllJob();
-	
+
+	JobRuntimeInfo jobInfo(String group, String id);
+
 	void pauseJob(String group, String id);
-	
+
 	void resumeJob(String group, String id);
-	
+
 	void runJobNow(String group, String id);
 
 	public static class JobRuntimeInfo implements Serializable {
