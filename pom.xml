@@ -20,7 +20,7 @@
 	</licenses>
 
 	<properties>
-		<theone.version>1.2.2-RELEASE</theone.version>
+		<theone.version>1.2.3-RELEASE</theone.version>
 	</properties>
 
 	<dependencies>

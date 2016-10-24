@@ -29,6 +29,10 @@ public interface JobOperation {
 	public static class JobRuntimeInfo implements Serializable {
 		private static final long serialVersionUID = 1L;
 
+		public enum State {
+			NONE, NORMAL, PAUSED, COMPLETE, ERROR, BLOCKED
+		}
+
 		private String id;
 		private String group;
 		private String description;
@@ -39,6 +43,8 @@ public interface JobOperation {
 		private Date endTime;
 		private Date nextFireTime;
 		private Date previousFireTime;
+
+		private State state;
 
 		public String getId() {
 			return id;
@@ -120,11 +126,18 @@ public interface JobOperation {
 			this.previousFireTime = previousFireTime;
 		}
 
+		public State getState() {
+			return state;
+		}
+
+		public void setState(State state) {
+			this.state = state;
+		}
+
 		@Override
 		public String toString() {
 			return "JobRuntimeInfo [id=" + id + ", group=" + group + ", description=" + description + ", cron=" + cron + ", runInCluster="
-					+ runInCluster + ", mainClass=" + mainClass + ", startTime=" + startTime + ", endTime=" + endTime + ", nextFireTime="
-					+ nextFireTime + ", previousFireTime=" + previousFireTime + "]";
+					+ runInCluster + ", mainClass=" + mainClass + ", state=" + state + "]";
 		}
 
 	}

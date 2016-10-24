@@ -32,16 +32,11 @@ import com.jiuxian.theone.zk.ZookeeperUniqueProcess;
  */
 public class MossroseProcess extends ZookeeperUniqueProcess {
 
-	/**
-	 * @param mossroseConfig
-	 *            mossrose configuration
-	 * @param zks
-	 *            zookeeper address
-	 */
-	public MossroseProcess(MossroseConfig mossroseConfig, String zks) {
-		super(new QuartzProcess(mossroseConfig,
-				new IgniteGridComputer(mossroseConfig.getCluster(), new ZookeeperClusterDiscovery(mossroseConfig.getCluster().getName(), zks))), zks,
-				mossroseConfig.getCluster().getName());
+	private JobOperation jobOperation;
+
+	public MossroseProcess(QuartzProcess quartzProcess, String zks, String group) {
+		super(quartzProcess, zks, group);
+		this.jobOperation = quartzProcess;
 	}
 
 	/**
@@ -49,15 +44,15 @@ public class MossroseProcess extends ZookeeperUniqueProcess {
 	 *            mossrose configuration
 	 * @param zks
 	 *            zookeeper address
-	 * @param heartbeat
-	 *            zookeeper heartbeat interval
-	 * @param interval
-	 *            interval for lock competition
 	 */
-	public MossroseProcess(MossroseConfig mossroseConfig, String zks, int heartbeat, int interval) {
-		super(new QuartzProcess(mossroseConfig,
+	public MossroseProcess(MossroseConfig mossroseConfig, String zks) {
+		this(new QuartzProcess(mossroseConfig,
 				new IgniteGridComputer(mossroseConfig.getCluster(), new ZookeeperClusterDiscovery(mossroseConfig.getCluster().getName(), zks))), zks,
-				mossroseConfig.getCluster().getName(), heartbeat, interval);
+				mossroseConfig.getCluster().getName());
+	}
+
+	public JobOperation getJobOperation() {
+		return jobOperation;
 	}
 
 }

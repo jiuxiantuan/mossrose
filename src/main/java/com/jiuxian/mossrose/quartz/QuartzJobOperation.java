@@ -18,6 +18,7 @@ import com.google.common.base.Objects;
 import com.google.common.collect.Iterables;
 import com.google.common.collect.Lists;
 import com.jiuxian.mossrose.JobOperation;
+import com.jiuxian.mossrose.JobOperation.JobRuntimeInfo.State;
 
 public class QuartzJobOperation implements JobOperation {
 
@@ -141,6 +142,7 @@ public class QuartzJobOperation implements JobOperation {
 				job.setEndTime(trigger.getEndTime());
 				job.setPreviousFireTime(trigger.getPreviousFireTime());
 				job.setNextFireTime(trigger.getNextFireTime());
+				job.setState(State.valueOf(scheduler.getTriggerState(trigger.getKey()).name()));
 				if (trigger instanceof CronTrigger) {
 					job.setCron(((CronTrigger) trigger).getCronExpression());
 				}
