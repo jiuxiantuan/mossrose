@@ -19,7 +19,8 @@ import com.jiuxian.mossrose.cluster.ZookeeperClusterDiscovery;
 import com.jiuxian.mossrose.compute.IgniteGridComputer;
 import com.jiuxian.mossrose.config.MossroseConfig;
 import com.jiuxian.mossrose.quartz.QuartzProcess;
-import com.jiuxian.theone.zk.ZookeeperUniqueProcess;
+import com.jiuxian.theone.CompetitiveProcess;
+import com.jiuxian.theone.zk.ZookeeperCompetitiveImpl;
 
 /**
  * Mossrose basic implementation<br>
@@ -30,12 +31,12 @@ import com.jiuxian.theone.zk.ZookeeperUniqueProcess;
  * @author <a href="mailto:wangyuxuan@jiuxian.com">Yuxuan Wang</a>
  *
  */
-public class MossroseProcess extends ZookeeperUniqueProcess {
+public class MossroseProcess extends CompetitiveProcess {
 
 	private JobOperation jobOperation;
 
 	public MossroseProcess(QuartzProcess quartzProcess, String zks, String group) {
-		super(quartzProcess, zks, group);
+		super(quartzProcess, new ZookeeperCompetitiveImpl(zks, group));
 		this.jobOperation = quartzProcess;
 	}
 

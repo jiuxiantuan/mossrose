@@ -16,7 +16,7 @@
 <dependency>
   <groupId>com.jiuxian</groupId>
   <artifactId>mossrose</artifactId>
-  <version>1.1.2-RELEASE</version>
+  <version>1.3.0-RELEASE</version>
 </dependency>
 ```
 
@@ -65,7 +65,7 @@ public class MainTest {
 
 	@Test
 	public void test() throws Exception {
-		String zks = "192.168.5.99,192.168.5.104"; // zookeeper集群地址
+		String zks = "localhost"; // zookeeper集群地址
 		try (MossroseProcess process = new MossroseProcess(MossroseConfigFactory.fromClasspathYamlFile("mossrose.yaml"), zks)) {
 			process.run();
 
@@ -103,7 +103,7 @@ public class SomeDistributedJob implements DistributedJob<String> {
 <dependency>
   <groupId>com.jiuxian</groupId>
   <artifactId>mossrose-ui</artifactId>
-  <version>1.0.0-RELEASE</version>
+  <version>1.1.0-RELEASE</version>
 </dependency>
 ```
 
