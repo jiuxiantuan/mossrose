@@ -19,6 +19,7 @@ import com.jiuxian.mossrose.cluster.ZookeeperClusterDiscovery;
 import com.jiuxian.mossrose.compute.IgniteGridComputer;
 import com.jiuxian.mossrose.config.MossroseConfig;
 import com.jiuxian.mossrose.quartz.QuartzProcess;
+import com.jiuxian.theone.Competitive;
 import com.jiuxian.theone.CompetitiveProcess;
 import com.jiuxian.theone.zk.ZookeeperCompetitiveImpl;
 
@@ -34,10 +35,16 @@ import com.jiuxian.theone.zk.ZookeeperCompetitiveImpl;
 public class MossroseProcess extends CompetitiveProcess {
 
 	private JobOperation jobOperation;
+	private Competitive competitive;
+
+	public MossroseProcess(QuartzProcess quartzProcess, Competitive competitive) {
+		super(quartzProcess, competitive);
+		this.jobOperation = quartzProcess;
+		this.competitive = competitive;
+	}
 
 	public MossroseProcess(QuartzProcess quartzProcess, String zks, String group) {
-		super(quartzProcess, new ZookeeperCompetitiveImpl(zks, group));
-		this.jobOperation = quartzProcess;
+		this(quartzProcess, new ZookeeperCompetitiveImpl(zks, group));
 	}
 
 	/**
@@ -54,6 +61,10 @@ public class MossroseProcess extends CompetitiveProcess {
 
 	public JobOperation getJobOperation() {
 		return jobOperation;
+	}
+
+	public Competitive getCompetitive() {
+		return competitive;
 	}
 
 }
