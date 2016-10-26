@@ -66,7 +66,7 @@ public final class IgniteClusterBuilder {
 
 			@Override
 			public void run() {
-				System.out.println("Join ignite cluser " + clusterName + "with hosts " + hosts);
+				System.out.println("Join ignite cluser " + clusterName + " with hosts " + hosts);
 			}
 		});
 		LOGGER.info("Inital ignite cluser {} with hosts {}", clusterName, hosts);
