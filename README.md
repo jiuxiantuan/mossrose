@@ -116,7 +116,7 @@ process.run();
 
 #### Access UI
 ```
-curl -i "http://localhost:7758/all"
+http://localhost:7758/all
 ```
 
 #### More about mossrose ui
