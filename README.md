@@ -111,6 +111,7 @@ public class SomeDistributedJob implements DistributedJob<String> {
 ```
 MossroseProcess process = ...
 RestMossroseUI ui = new RestMossroseUI(process.getJobOperation(), process.getCompetitive(), 7758);
+process.run();
 ```
 
 #### Access UI
