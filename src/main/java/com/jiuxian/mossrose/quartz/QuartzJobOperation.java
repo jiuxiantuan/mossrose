@@ -38,7 +38,7 @@ public class QuartzJobOperation implements JobOperation {
 				Set<JobKey> jobKeys = scheduler.getJobKeys(GroupMatcher.anyJobGroup());
 				if (jobKeys != null) {
 					jobKeys.stream().forEach(jobKey -> {
-						JobRuntimeInfo job = getInfoInfoByKey(jobKey);
+						JobRuntimeInfo job = getJobInfoByKey(jobKey);
 						if (job != null) {
 							jobs.add(job);
 						}
@@ -111,12 +111,12 @@ public class QuartzJobOperation implements JobOperation {
 	public JobRuntimeInfo jobInfo(String group, String id) {
 		JobRuntimeInfo job = null;
 		if (isSchedulerAvaliable()) {
-			job = getInfoInfoByKey(new JobKey(id, group));
+			job = getJobInfoByKey(new JobKey(id, group));
 		}
 		return job;
 	}
 
-	private JobRuntimeInfo getInfoInfoByKey(final JobKey jobKey) {
+	private JobRuntimeInfo getJobInfoByKey(final JobKey jobKey) {
 		JobRuntimeInfo job = null;
 		try {
 			final JobDetail jobDetail = scheduler.getJobDetail(jobKey);
