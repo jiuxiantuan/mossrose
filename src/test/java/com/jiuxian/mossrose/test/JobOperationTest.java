@@ -15,24 +15,23 @@ public class JobOperationTest {
 	@Test
 	public void test() throws Exception {
 		String zks = "192.168.5.99,192.168.5.104"; // zookeeper集群地址
-		try (MossroseProcess process = new MossroseProcess(MossroseConfigFactory.fromClasspathYamlFile("mossrose.yaml"), zks)) {
-			process.run();
+		MossroseProcess process = new MossroseProcess(MossroseConfigFactory.fromClasspathYamlFile("mossrose.yaml"), zks);
+		process.run();
 
-			JobOperation jobOperation = process.getJobOperation();
+		JobOperation jobOperation = process.getJobOperation();
 
-			List<JobRuntimeInfo> jobs = jobOperation.allJobs();
-			// run a job now
-			JobRuntimeInfo job = Iterables.getLast(jobs);
-			jobOperation.runJobNow(job.getGroup(), job.getId());
+		List<JobRuntimeInfo> jobs = jobOperation.allJobs();
+		// run a job now
+		JobRuntimeInfo job = Iterables.getLast(jobs);
+		jobOperation.runJobNow(job.getGroup(), job.getId());
 
-			Thread.sleep(25 * 1000);
+		Thread.sleep(25 * 1000);
 
-			jobOperation.allJobs().stream().forEach(System.out::println);
+		jobOperation.allJobs().stream().forEach(System.out::println);
 
-			try {
-				Thread.sleep(60 * 60 * 1000);
-			} catch (InterruptedException e) {
-			}
+		try {
+			Thread.sleep(60 * 60 * 1000);
+		} catch (InterruptedException e) {
 		}
 
 	}

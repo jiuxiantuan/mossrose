@@ -16,7 +16,7 @@
 <dependency>
   <groupId>com.jiuxian</groupId>
   <artifactId>mossrose</artifactId>
-  <version>1.3.1-RELEASE</version>
+  <version>1.3.2-RELEASE</version>
 </dependency>
 ```
 
@@ -61,22 +61,9 @@ jobs:
 
 #### Run mossrose main class
 ```
-public class MainTest {
-
-	@Test
-	public void test() throws Exception {
-		String zks = "localhost"; // zookeeper集群地址
-		try (MossroseProcess process = new MossroseProcess(MossroseConfigFactory.fromClasspathYamlFile("mossrose.yaml"), zks)) {
-			process.run();
-
-			try {
-				Thread.sleep(60 * 60 * 1000);
-			} catch (InterruptedException e) {
-			}
-		}
-	}
-
-}
+	String zks = "localhost"; // zookeeper集群地址
+	MossroseProcess process = new MossroseProcess(MossroseConfigFactory.fromClasspathYamlFile("mossrose.yaml"), zks);
+	process.run();
 ```
 
 ## Distributed Job

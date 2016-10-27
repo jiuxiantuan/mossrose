@@ -113,12 +113,6 @@ public class QuartzProcess extends QuartzJobOperation implements Process, JobOpe
 			} catch (SchedulerException e) {
 			}
 		}
-		if (gridComputer != null) {
-			try {
-				gridComputer.close();
-			} catch (Exception e) {
-			}
-		}
 	}
 
 }
