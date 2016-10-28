@@ -147,10 +147,11 @@ public class MossroseConfig {
 
 		Preconditions.checkNotNull(jobs);
 		Preconditions.checkArgument(jobs.size() > 0);
-		for (JobMeta meta : jobs) {
-			Preconditions.checkNotNull(meta.getCron());
-			Preconditions.checkNotNull(meta.getMain());
-		}
+
+		jobs.forEach(e -> {
+			Preconditions.checkNotNull(e.getCron());
+			Preconditions.checkNotNull(e.getMain());
+		});
 	}
 
 }
