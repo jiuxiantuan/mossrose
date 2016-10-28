@@ -90,7 +90,7 @@ public class SomeDistributedJob implements DistributedJob<String> {
 <dependency>
   <groupId>com.jiuxian</groupId>
   <artifactId>mossrose-ui</artifactId>
-  <version>1.1.1-RELEASE</version>
+  <version>1.1.2-RELEASE</version>
 </dependency>
 ```
 
