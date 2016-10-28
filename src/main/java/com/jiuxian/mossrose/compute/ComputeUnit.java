@@ -18,7 +18,7 @@ package com.jiuxian.mossrose.compute;
 import java.io.Serializable;
 
 @FunctionalInterface
-public interface GridCompute extends Serializable {
+public interface ComputeUnit extends Serializable {
 
 	void apply();
 
