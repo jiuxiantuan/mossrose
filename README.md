@@ -1,5 +1,5 @@
 # mossrose
-<h3>High-Avaliable Distributed Schedule Framework</h3>
+<h3>High-Available Distributed Schedule Framework</h3>
 
 <hr>
 
