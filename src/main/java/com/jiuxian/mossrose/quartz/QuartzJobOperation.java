@@ -2,6 +2,7 @@ package com.jiuxian.mossrose.quartz;
 
 import java.util.List;
 import java.util.Set;
+import java.util.stream.Collectors;
 
 import org.quartz.CronTrigger;
 import org.quartz.JobDataMap;
@@ -16,7 +17,6 @@ import org.slf4j.LoggerFactory;
 
 import com.google.common.base.Objects;
 import com.google.common.collect.Iterables;
-import com.google.common.collect.Lists;
 import com.jiuxian.mossrose.JobOperation;
 import com.jiuxian.mossrose.JobOperation.JobRuntimeInfo.State;
 
@@ -33,17 +33,11 @@ public class QuartzJobOperation implements JobOperation {
 	@Override
 	public List<JobRuntimeInfo> allJobs() {
 		return ifSchedulerAvaliable(() -> {
-			final List<JobRuntimeInfo> jobs = Lists.newArrayList();
-			Set<JobKey> jobKeys = scheduler.getJobKeys(GroupMatcher.anyJobGroup());
+			final Set<JobKey> jobKeys = scheduler.getJobKeys(GroupMatcher.anyJobGroup());
 			if (jobKeys != null) {
-				jobKeys.stream().forEach(jobKey -> {
-					JobRuntimeInfo job = getJobInfoByKey(jobKey);
-					if (job != null) {
-						jobs.add(job);
-					}
-				});
+				return jobKeys.stream().map(e -> getJobInfoByKey(e)).collect(Collectors.toList());
 			}
-			return jobs;
+			return null;
 		});
 	}
 
@@ -116,7 +110,7 @@ public class QuartzJobOperation implements JobOperation {
 
 	private void ifSchedulerAvaliable(QuartzOp op) {
 		try {
-			if (scheduler != null && scheduler.isStarted()) {
+			if (isSchedulerAvaliable()) {
 				op.apply();
 			}
 		} catch (SchedulerException e) {
@@ -126,7 +120,7 @@ public class QuartzJobOperation implements JobOperation {
 
 	private <T> T ifSchedulerAvaliable(ResultQuartzOp<T> op) {
 		try {
-			if (scheduler != null && scheduler.isStarted()) {
+			if (isSchedulerAvaliable()) {
 				return op.apply();
 			}
 		} catch (SchedulerException e) {
@@ -134,7 +128,11 @@ public class QuartzJobOperation implements JobOperation {
 		}
 		return null;
 	}
-	
+
+	private boolean isSchedulerAvaliable() throws SchedulerException {
+		return scheduler != null && scheduler.isStarted();
+	}
+
 	@FunctionalInterface
 	public interface QuartzOp {
 		void apply() throws SchedulerException;
