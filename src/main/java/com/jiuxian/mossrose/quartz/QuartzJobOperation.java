@@ -32,88 +32,49 @@ public class QuartzJobOperation implements JobOperation {
 
 	@Override
 	public List<JobRuntimeInfo> allJobs() {
-		if (isSchedulerAvaliable()) {
+		return ifSchedulerAvaliable(() -> {
 			final List<JobRuntimeInfo> jobs = Lists.newArrayList();
-			try {
-				Set<JobKey> jobKeys = scheduler.getJobKeys(GroupMatcher.anyJobGroup());
-				if (jobKeys != null) {
-					jobKeys.stream().forEach(jobKey -> {
-						JobRuntimeInfo job = getJobInfoByKey(jobKey);
-						if (job != null) {
-							jobs.add(job);
-						}
-					});
-				}
-			} catch (SchedulerException e) {
-				LOGGER.error(e.getMessage(), e);
+			Set<JobKey> jobKeys = scheduler.getJobKeys(GroupMatcher.anyJobGroup());
+			if (jobKeys != null) {
+				jobKeys.stream().forEach(jobKey -> {
+					JobRuntimeInfo job = getJobInfoByKey(jobKey);
+					if (job != null) {
+						jobs.add(job);
+					}
+				});
 			}
 			return jobs;
-		}
-		return null;
+		});
 	}
 
 	@Override
 	public void pauseJob(String group, String id) {
-		if (isSchedulerAvaliable()) {
-			try {
-				scheduler.pauseJob(new JobKey(id, group));
-			} catch (SchedulerException e) {
-				LOGGER.error(e.getMessage(), e);
-			}
-		}
+		ifSchedulerAvaliable(() -> scheduler.pauseJob(new JobKey(id, group)));
 	}
 
 	@Override
 	public void resumeJob(String group, String id) {
-		if (isSchedulerAvaliable()) {
-			try {
-				scheduler.resumeJob(new JobKey(id, group));
-			} catch (SchedulerException e) {
-				LOGGER.error(e.getMessage(), e);
-			}
-		}
+		ifSchedulerAvaliable(() -> scheduler.resumeJob(new JobKey(id, group)));
 	}
 
 	@Override
 	public void runJobNow(String group, String id) {
-		if (isSchedulerAvaliable()) {
-			try {
-				scheduler.triggerJob(new JobKey(id, group));
-			} catch (SchedulerException e) {
-				LOGGER.error(e.getMessage(), e);
-			}
-		}
+		ifSchedulerAvaliable(() -> scheduler.triggerJob(new JobKey(id, group)));
 	}
 
 	@Override
 	public void pauseAllJob() {
-		if (isSchedulerAvaliable()) {
-			try {
-				scheduler.pauseAll();
-			} catch (SchedulerException e) {
-				LOGGER.error(e.getMessage(), e);
-			}
-		}
+		ifSchedulerAvaliable(scheduler::pauseAll);
 	}
 
 	@Override
 	public void resumeAllJob() {
-		if (isSchedulerAvaliable()) {
-			try {
-				scheduler.resumeAll();
-			} catch (SchedulerException e) {
-				LOGGER.error(e.getMessage(), e);
-			}
-		}
+		ifSchedulerAvaliable(scheduler::resumeAll);
 	}
 
 	@Override
 	public JobRuntimeInfo jobInfo(String group, String id) {
-		JobRuntimeInfo job = null;
-		if (isSchedulerAvaliable()) {
-			job = getJobInfoByKey(new JobKey(id, group));
-		}
-		return job;
+		return ifSchedulerAvaliable(() -> getJobInfoByKey(new JobKey(id, group)));
 	}
 
 	private JobRuntimeInfo getJobInfoByKey(final JobKey jobKey) {
@@ -153,12 +114,34 @@ public class QuartzJobOperation implements JobOperation {
 		return job;
 	}
 
-	private boolean isSchedulerAvaliable() {
+	private void ifSchedulerAvaliable(QuartzOp op) {
 		try {
-			return scheduler != null && scheduler.isStarted();
+			if (scheduler != null && scheduler.isStarted()) {
+				op.apply();
+			}
 		} catch (SchedulerException e) {
 			LOGGER.error(e.getMessage(), e);
 		}
-		return false;
+	}
+
+	private <T> T ifSchedulerAvaliable(ResultQuartzOp<T> op) {
+		try {
+			if (scheduler != null && scheduler.isStarted()) {
+				return op.apply();
+			}
+		} catch (SchedulerException e) {
+			LOGGER.error(e.getMessage(), e);
+		}
+		return null;
+	}
+	
+	@FunctionalInterface
+	public interface QuartzOp {
+		void apply() throws SchedulerException;
+	}
+
+	@FunctionalInterface
+	public interface ResultQuartzOp<T> {
+		T apply() throws SchedulerException;
 	}
 }
