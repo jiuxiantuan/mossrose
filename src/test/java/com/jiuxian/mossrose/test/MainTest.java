@@ -10,7 +10,7 @@ public class MainTest {
 	@Test
 	public void test() throws Exception {
 		String zks = "192.168.5.99,192.168.5.104"; // zookeeper集群地址
-		MossroseProcess process = new MossroseProcess(MossroseConfigFactory.fromClasspathYamlFile("mossrose.yaml"), zks);
+		MossroseProcess process = new MossroseProcess(MossroseConfigFactory.fromClasspathYamlFile("mossrose.yml"), zks);
 		process.run();
 
 		try {

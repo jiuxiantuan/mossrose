@@ -13,7 +13,7 @@ public class YamlConfigParserTest {
 	@Test
 	public void test() {
 		ConfigParser parser = new YamlConfigParser();
-		MossroseConfig config = parser.fromClasspathFile("mossrose.yaml");
+		MossroseConfig config = parser.fromClasspathFile("mossrose.yml");
 
 		Assert.assertNotNull(config);
 
