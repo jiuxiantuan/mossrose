@@ -46,7 +46,7 @@ public class SomeJob implements SimpleJob {
 }
 ```
 
-#### Config the job - mossrose.yaml
+#### Config the job - mossrose.yml
 ```
 cluster:
   name: mossrose-example    # 集群命名空间，MossroseProcess将以此分组，在组内选举主节点，并且同一个命名空间内的节点组成一个计算网格
@@ -62,7 +62,7 @@ jobs:
 #### Run mossrose main class
 ```
 	String zks = "localhost"; // zookeeper集群地址
-	MossroseProcess process = new MossroseProcess(MossroseConfigFactory.fromClasspathYamlFile("mossrose.yaml"), zks);
+	MossroseProcess process = new MossroseProcess(MossroseConfigFactory.fromClasspathYamlFile("mossrose.yml"), zks);
 	process.run();
 ```
 
