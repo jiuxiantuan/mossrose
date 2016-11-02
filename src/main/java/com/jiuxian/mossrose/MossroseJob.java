@@ -22,6 +22,7 @@ import org.quartz.Job;
 import org.quartz.JobExecutionContext;
 import org.quartz.JobExecutionException;
 
+import com.jiuxian.mossrose.compute.ComputeUnit;
 import com.jiuxian.mossrose.compute.GridComputer;
 import com.jiuxian.mossrose.job.DistributedJob;
 import com.jiuxian.mossrose.job.SimpleJob;
@@ -40,7 +41,7 @@ public class MossroseJob implements Job {
 	public void execute(JobExecutionContext context) throws JobExecutionException {
 		if (simpleJob != null) {
 			if (runInCluster) {
-				gridComputer.execute(simpleJob::execute);
+				gridComputer.execute(new SimpleJobUnit(simpleJob));
 			} else {
 				simpleJob.execute();
 			}
@@ -49,7 +50,7 @@ public class MossroseJob implements Job {
 			final List<Serializable> items = distributedJob.slice();
 			if (items != null) {
 				if (runInCluster) {
-					items.stream().forEach(e -> gridComputer.execute(() -> distributedJob.execute(e)));
+					items.stream().forEach(e -> gridComputer.execute(new DistributedJobUnit<Serializable>(distributedJob, e)));
 				} else {
 					items.stream().parallel().forEach(e -> distributedJob.execute(e));
 				}
@@ -71,6 +72,42 @@ public class MossroseJob implements Job {
 
 	public void setDistributedJob(DistributedJob<Serializable> distributedJob) {
 		this.distributedJob = distributedJob;
+	}
+
+	// For ignite's not supported of java8 lambda
+	public static class SimpleJobUnit implements ComputeUnit {
+		private static final long serialVersionUID = 1L;
+
+		private final SimpleJob simpleJob;
+
+		protected SimpleJobUnit(SimpleJob simpleJob) {
+			super();
+			this.simpleJob = simpleJob;
+		}
+
+		@Override
+		public void apply() {
+			simpleJob.execute();
+		}
+	}
+
+	public static class DistributedJobUnit<T extends Serializable> implements ComputeUnit {
+		private static final long serialVersionUID = 1L;
+
+		private final DistributedJob<T> distributedJob;
+		private final T item;
+
+		protected DistributedJobUnit(DistributedJob<T> distributedJob, T item) {
+			super();
+			this.distributedJob = distributedJob;
+			this.item = item;
+		}
+
+		@Override
+		public void apply() {
+			distributedJob.execute(item);
+		}
+
 	}
 
 }
