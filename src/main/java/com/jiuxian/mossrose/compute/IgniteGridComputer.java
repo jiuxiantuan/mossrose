@@ -76,7 +76,7 @@ public class IgniteGridComputer implements GridComputer {
 
 	@Override
 	public void execute(ComputeUnit gridCompute) {
-		ignite.compute().run(() -> gridCompute.apply());
+		ignite.compute().run(gridCompute::apply);
 	}
 
 	@Override
