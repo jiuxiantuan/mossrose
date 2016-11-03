@@ -15,9 +15,15 @@
  */
 package com.jiuxian.mossrose.config;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 public class MossroseConfigFactory {
 
+	private static final Logger LOGGER = LoggerFactory.getLogger(MossroseConfigFactory.class);
+
 	public static MossroseConfig fromClasspathYamlFile(String file) {
+		LOGGER.info("Loading mossrose ymal config file: {}", file);
 		return new YamlConfigParser().fromClasspathFile(file);
 	}
 

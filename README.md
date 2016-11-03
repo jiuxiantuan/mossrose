@@ -16,7 +16,7 @@
 <dependency>
   <groupId>com.jiuxian</groupId>
   <artifactId>mossrose</artifactId>
-  <version>1.3.5-RELEASE</version>
+  <version>1.3.6-RELEASE</version>
 </dependency>
 ```
 
@@ -90,14 +90,14 @@ public class SomeDistributedJob implements DistributedJob<String> {
 <dependency>
   <groupId>com.jiuxian</groupId>
   <artifactId>mossrose-ui</artifactId>
-  <version>1.1.2-RELEASE</version>
+  <version>1.1.3-RELEASE</version>
 </dependency>
 ```
 
 #### new RestMossroseUI
 ```
 MossroseProcess process = ...
-RestMossroseUI ui = new RestMossroseUI(process.getJobOperation(), process.getCompetitive(), 7758);
+RestMossroseUI ui = new RestMossroseUI(process, 7758);
 process.run();
 ```
 

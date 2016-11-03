@@ -40,7 +40,27 @@ public class ZookeeperClusterDiscovery implements ClusterDiscovery, Closeable {
 
 	private static final String ZK_ROOT = "/mossrose/discovery";
 
+	private static final int DEFAULT_RETRY_INTERVAL = 3000;
+	private static final int DEFAULT_RETRIES = 10;
+
+	private static final int DEFAULT_SESSION_TIMEOUT_MS = 10;
+	private static final int DEFAULT_CONNECTION_TIMEOUT_MS = 10;
+
 	private static final Logger LOGGER = LoggerFactory.getLogger(ZookeeperClusterDiscovery.class);
+
+	/**
+	 * If the current host has been registered, interval in millseconds of retry
+	 */
+	private int retryInterval = DEFAULT_RETRY_INTERVAL;
+
+	/**
+	 * retry times, no retry with 0 or negative number
+	 */
+	private int retries = DEFAULT_RETRIES;
+
+	public ZookeeperClusterDiscovery(String group, String zks) {
+		this(group, zks, DEFAULT_SESSION_TIMEOUT_MS, DEFAULT_CONNECTION_TIMEOUT_MS);
+	}
 
 	/**
 	 * @param group
@@ -48,10 +68,10 @@ public class ZookeeperClusterDiscovery implements ClusterDiscovery, Closeable {
 	 * @param zks
 	 *            zookeeper address
 	 */
-	public ZookeeperClusterDiscovery(String group, String zks) {
+	public ZookeeperClusterDiscovery(String group, String zks, int sessionTimeoutMs, int connectionTimeoutMs) {
 		super();
 		this.group = group;
-		client = CuratorFrameworkFactory.newClient(zks, new ExponentialBackoffRetry(1000, 3));
+		client = CuratorFrameworkFactory.newClient(zks, 10000, 10000, new ExponentialBackoffRetry(1000, 3));
 		client.start();
 
 		try {
@@ -65,10 +85,27 @@ public class ZookeeperClusterDiscovery implements ClusterDiscovery, Closeable {
 			// Register the current host
 			final String host = NetworkUtils.getLocalIp();
 			final String hostNode = ZKPaths.makePath(groupPath, host);
-			if (client.checkExists().forPath(hostNode) != null) {
+
+			// retry with conflict
+			int retry = 0;
+			boolean conflicted = true;
+			while (retry++ <= retries) {
+				conflicted = client.checkExists().forPath(hostNode) != null;
+				if (conflicted) {
+					LOGGER.info("Host {} already been registered on group path {}, wait for the {}th retry.", host, groupPath, retry);
+					try {
+						Thread.sleep(retryInterval);
+					} catch (InterruptedException e) {
+						throw Throwables.propagate(e);
+					}
+				}
+			}
+			if (conflicted) {
 				throw new RuntimeException(
 						"Host " + host + " has already been registered on group path " + groupPath + " ,  host should be unique in a group.");
 			}
+
+			LOGGER.info("Register host {} on group path {}.", host, groupPath);
 			client.create().withMode(CreateMode.EPHEMERAL).forPath(hostNode);
 		} catch (Exception e) {
 			LOGGER.error(e.getMessage(), e);
@@ -104,6 +141,14 @@ public class ZookeeperClusterDiscovery implements ClusterDiscovery, Closeable {
 		if (client != null) {
 			client.close();
 		}
+	}
+
+	public void setRetryInterval(int retryInterval) {
+		this.retryInterval = retryInterval;
+	}
+
+	public void setRetries(int retries) {
+		this.retries = retries;
 	}
 
 }

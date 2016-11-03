@@ -7,7 +7,7 @@
 	</parent>
 	<groupId>com.jiuxian</groupId>
 	<artifactId>mossrose</artifactId>
-	<version>1.3.5-RELEASE</version>
+	<version>1.3.6-RELEASE</version>
 	<description>High-Avaliable Distributed Schedule System</description>
 	<url>https://github.com/jiuxiantuan/mossrose</url>
 	<licenses>
