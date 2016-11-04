@@ -2,8 +2,6 @@ package com.jiuxian.mossrose.test;
 
 import java.util.List;
 
-import org.apache.commons.lang3.RandomUtils;
-
 import com.google.common.base.Splitter;
 import com.jiuxian.mossrose.job.DistributedJob;
 
@@ -16,11 +14,13 @@ public class SomeDistributedJob implements DistributedJob<String> {
 
 	@Override
 	public void execute(String item) {
-		try {
-			Thread.sleep(RandomUtils.nextLong(0, 1000));
-		} catch (InterruptedException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
+		if ("D".equals(item)) {
+			try {
+				Thread.sleep(3000);
+			} catch (InterruptedException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			}
 		}
 		System.out.println(Thread.currentThread() + " DistributedJob: " + item);
 	}
