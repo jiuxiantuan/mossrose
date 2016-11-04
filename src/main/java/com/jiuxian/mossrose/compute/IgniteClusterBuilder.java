@@ -13,9 +13,10 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package com.jiuxian.mossrose.cluster;
+package com.jiuxian.mossrose.compute;
 
 import java.util.List;
+import java.util.stream.Collectors;
 
 import org.apache.ignite.Ignite;
 import org.apache.ignite.Ignition;
@@ -30,8 +31,11 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import com.google.common.base.Objects;
+import com.jiuxian.mossrose.cluster.ClusterAddress;
+import com.jiuxian.mossrose.cluster.ClusterDiscovery;
 import com.jiuxian.mossrose.config.MossroseConfig.Cluster;
 import com.jiuxian.mossrose.config.MossroseConfig.Cluster.LoadBalancingMode;
+import com.jiuxian.theone.util.NetworkUtils;
 
 public final class IgniteClusterBuilder {
 
@@ -39,18 +43,25 @@ public final class IgniteClusterBuilder {
 
 	public static Ignite build(Cluster cluster, ClusterDiscovery clusterDiscovery) {
 		// Get ignite instance
-		String clusterName = cluster.getName();
-		LoadBalancingMode loadBalancingMode = Objects.firstNonNull(cluster.getLoadBalancingMode(), LoadBalancingMode.ROUND_ROBIN);
-		List<String> hosts = clusterDiscovery.findHosts();
+		final String clusterName = cluster.getName();
+		final LoadBalancingMode loadBalancingMode = Objects.firstNonNull(cluster.getLoadBalancingMode(), LoadBalancingMode.ROUND_ROBIN);
 
-		IgniteConfiguration cfg = new IgniteConfiguration();
+		// find ignite cluster
+		final ClusterAddress currentAddress = new ClusterAddress(NetworkUtils.getLocalIp(), cluster.getPort());
+		final List<ClusterAddress> hosts = clusterDiscovery.findHosts(currentAddress);
+
+		// constuct ignite
+		final TcpDiscoveryVmIpFinder ipFinder = new TcpDiscoveryVmIpFinder();
+		ipFinder.setAddresses(hosts.stream().map(e -> e.toPlainAddress()).collect(Collectors.toList()));
+
+		final TcpDiscoverySpi discoSpi = new TcpDiscoverySpi();
+		discoSpi.setIpFinder(ipFinder);
+		discoSpi.setLocalPort(cluster.getPort());
+
+		final IgniteConfiguration cfg = new IgniteConfiguration();
 		cfg.setGridName(clusterName);
 		cfg.setMetricsLogFrequency(0);
 		cfg.setGridLogger(new Slf4jLogger());
-		TcpDiscoverySpi discoSpi = new TcpDiscoverySpi();
-		TcpDiscoveryVmIpFinder ipFinder = new TcpDiscoveryVmIpFinder();
-		ipFinder.setAddresses(hosts);
-		discoSpi.setIpFinder(ipFinder);
 		cfg.setDiscoverySpi(discoSpi);
 
 		if (loadBalancingMode == LoadBalancingMode.ROUND_ROBIN) {

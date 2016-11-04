@@ -37,11 +37,15 @@ public class MossroseConfig {
 	 *
 	 */
 	public static class Cluster {
+		
+		private static final int DEFAULT_PORT= 18888;
 
 		/**
 		 * cluster name
 		 */
 		private String name;
+
+		private int port = DEFAULT_PORT;
 
 		private LoadBalancingMode loadBalancingMode;
 
@@ -53,9 +57,13 @@ public class MossroseConfig {
 			return loadBalancingMode;
 		}
 
+		public int getPort() {
+			return port;
+		}
+
 		@Override
 		public String toString() {
-			return "Cluster [name=" + name + "]";
+			return "Cluster [name=" + name + ", port=" + port + ", loadBalancingMode=" + loadBalancingMode + "]";
 		}
 
 		public enum LoadBalancingMode {

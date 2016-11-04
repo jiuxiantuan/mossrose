@@ -34,6 +34,9 @@ public class YamlConfigParser implements ConfigParser {
 		ObjectMapper mapper = new ObjectMapper(new YAMLFactory());
 		MossroseConfig config = null;
 		try (InputStream in = this.getClass().getClassLoader().getResourceAsStream(file)) {
+			if (in == null) {
+				throw new RuntimeException("Mossrose config file " + file + " cannot be found.");
+			}
 			config = mapper.readValue(in, MossroseConfig.class);
 			config.validate();
 		} catch (IOException e) {

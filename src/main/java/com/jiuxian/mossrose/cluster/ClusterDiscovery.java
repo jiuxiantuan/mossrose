@@ -25,6 +25,6 @@ import java.util.List;
  */
 public interface ClusterDiscovery {
 
-	List<String> findHosts();
+	List<ClusterAddress> findHosts(ClusterAddress currentAddress);
 
 }

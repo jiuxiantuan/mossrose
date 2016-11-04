@@ -6,5 +6,6 @@ public interface JobDataMapKeys {
 	String DISTRIBUTED_JOB = "distributedJob";
 	String RUN_IN_CLUSTER = "runInCluster";
 	String GRID_COMPUTER = "gridComputer";
+	String JOB_ID = "jobId";
 
 }

@@ -17,11 +17,16 @@ package com.jiuxian.mossrose;
 
 import java.io.Serializable;
 import java.util.List;
+import java.util.concurrent.TimeUnit;
+import java.util.stream.Collectors;
 
 import org.quartz.Job;
 import org.quartz.JobExecutionContext;
 import org.quartz.JobExecutionException;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
+import com.google.common.base.Stopwatch;
 import com.jiuxian.mossrose.compute.ComputeUnit;
 import com.jiuxian.mossrose.compute.GridComputer;
 import com.jiuxian.mossrose.job.DistributedJob;
@@ -37,11 +42,16 @@ public class MossroseJob implements Job {
 
 	private boolean runInCluster;
 
+	private String jobId;
+
+	private static final Logger LOGGER = LoggerFactory.getLogger(MossroseJob.class);
+
 	@Override
 	public void execute(JobExecutionContext context) throws JobExecutionException {
+		final Stopwatch watch = Stopwatch.createStarted();
 		if (simpleJob != null) {
 			if (runInCluster) {
-				gridComputer.execute(new SimpleJobUnit(simpleJob));
+				gridComputer.execute(simpleJob::execute);
 			} else {
 				simpleJob.execute();
 			}
@@ -50,12 +60,14 @@ public class MossroseJob implements Job {
 			final List<Serializable> items = distributedJob.slice();
 			if (items != null) {
 				if (runInCluster) {
-					items.stream().forEach(e -> gridComputer.execute(new DistributedJobUnit<Serializable>(distributedJob, e)));
+					gridComputer.execute(items.stream().<ComputeUnit> map(e -> () -> distributedJob.execute(e)).collect(Collectors.toList()));
 				} else {
 					items.stream().parallel().forEach(e -> distributedJob.execute(e));
 				}
 			}
 		}
+		watch.stop();
+		LOGGER.info("Job {} use time: {} ms.", jobId, watch.elapsed(TimeUnit.MILLISECONDS));
 	}
 
 	public void setRunInCluster(boolean runInCluster) {
@@ -74,40 +86,8 @@ public class MossroseJob implements Job {
 		this.distributedJob = distributedJob;
 	}
 
-	// For ignite's not supported of java8 lambda
-	public static class SimpleJobUnit implements ComputeUnit {
-		private static final long serialVersionUID = 1L;
-
-		private final SimpleJob simpleJob;
-
-		protected SimpleJobUnit(SimpleJob simpleJob) {
-			super();
-			this.simpleJob = simpleJob;
-		}
-
-		@Override
-		public void apply() {
-			simpleJob.execute();
-		}
-	}
-
-	public static class DistributedJobUnit<T extends Serializable> implements ComputeUnit {
-		private static final long serialVersionUID = 1L;
-
-		private final DistributedJob<T> distributedJob;
-		private final T item;
-
-		protected DistributedJobUnit(DistributedJob<T> distributedJob, T item) {
-			super();
-			this.distributedJob = distributedJob;
-			this.item = item;
-		}
-
-		@Override
-		public void apply() {
-			distributedJob.execute(item);
-		}
-
+	public void setJobId(String jobId) {
+		this.jobId = jobId;
 	}
 
 }

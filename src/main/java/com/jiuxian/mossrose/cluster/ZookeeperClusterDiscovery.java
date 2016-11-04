@@ -81,32 +81,6 @@ public class ZookeeperClusterDiscovery implements ClusterDiscovery, Closeable {
 				LOGGER.info("Group path {} not exists, create it.", groupPath);
 				client.create().creatingParentsIfNeeded().forPath(groupPath);
 			}
-
-			// Register the current host
-			final String host = NetworkUtils.getLocalIp();
-			final String hostNode = ZKPaths.makePath(groupPath, host);
-
-			// retry with conflict
-			int retry = 0;
-			boolean conflicted = true;
-			while (retry++ <= retries) {
-				conflicted = client.checkExists().forPath(hostNode) != null;
-				if (conflicted) {
-					LOGGER.info("Host {} already been registered on group path {}, wait for the {}th retry.", host, groupPath, retry);
-					try {
-						Thread.sleep(retryInterval);
-					} catch (InterruptedException e) {
-						throw Throwables.propagate(e);
-					}
-				}
-			}
-			if (conflicted) {
-				throw new RuntimeException(
-						"Host " + host + " has already been registered on group path " + groupPath + " ,  host should be unique in a group.");
-			}
-
-			LOGGER.info("Register host {} on group path {}.", host, groupPath);
-			client.create().withMode(CreateMode.EPHEMERAL).forPath(hostNode);
 		} catch (Exception e) {
 			LOGGER.error(e.getMessage(), e);
 			throw Throwables.propagate(e);
@@ -115,7 +89,9 @@ public class ZookeeperClusterDiscovery implements ClusterDiscovery, Closeable {
 	}
 
 	@Override
-	public List<String> findHosts() {
+	public List<ClusterAddress> findHosts(ClusterAddress currentAddress) {
+		registerCurrentAddress(currentAddress);
+
 		final String groupPath = ZKPaths.makePath(ZK_ROOT, group);
 		List<String> children = null;
 		try {
@@ -125,9 +101,44 @@ public class ZookeeperClusterDiscovery implements ClusterDiscovery, Closeable {
 		}
 		if (children != null && children.size() > 0) {
 			String prefixToRemove = groupPath + "/";
-			return children.stream().map(e -> StringUtils.removeStart(e, prefixToRemove)).collect(Collectors.toList());
+			return children.stream().map(e -> StringUtils.removeStart(e, prefixToRemove)).map(e -> new ClusterAddress(e))
+					.collect(Collectors.toList());
 		}
-		throw new RuntimeException("No hosts get.");
+		throw new RuntimeException("No address get.");
+	}
+
+	private void registerCurrentAddress(ClusterAddress currentAddress) {
+		try {
+			// Register the current address
+			final String address = currentAddress.toPlainAddress();
+			final String groupPath = ZKPaths.makePath(ZK_ROOT, group);
+			final String addressNode = ZKPaths.makePath(groupPath, address);
+
+			// retry with conflict
+			int retry = 0;
+			boolean conflicted = true;
+			while (retry++ <= retries) {
+				conflicted = client.checkExists().forPath(addressNode) != null;
+				if (conflicted) {
+					LOGGER.info("Address {} already been registered on group path {}, wait for the {}th retry.", address, groupPath, retry);
+					try {
+						Thread.sleep(retryInterval);
+					} catch (InterruptedException e) {
+						throw Throwables.propagate(e);
+					}
+				}
+			}
+			if (conflicted) {
+				throw new RuntimeException(
+						"Address " + address + " has already been registered on group path " + groupPath + " ,  host should be unique in a group.");
+			}
+
+			LOGGER.info("Register host {} on group path {}.", address, groupPath);
+			client.create().withMode(CreateMode.EPHEMERAL).forPath(addressNode);
+		} catch (Exception e) {
+			LOGGER.error(e.getMessage(), e);
+			throw Throwables.propagate(e);
+		}
 	}
 
 	@Override

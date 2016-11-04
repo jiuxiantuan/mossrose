@@ -64,15 +64,15 @@ public class QuartzProcess extends QuartzJobOperation implements Process, JobOpe
 			// define the jobs
 			List<JobMeta> jobs = mossroseConfig.getJobs();
 			for (JobMeta jobMeta : jobs) {
-				String mainClass = jobMeta.getMain();
-				String id = jobMeta.getId() != null ? jobMeta.getId() : UUID.randomUUID().toString();
-				String group = jobMeta.getGroup() != null ? jobMeta.getGroup() : "default-group";
+				final String mainClass = jobMeta.getMain();
+				final String id = jobMeta.getId() != null ? jobMeta.getId() : UUID.randomUUID().toString();
+				final String group = jobMeta.getGroup() != null ? jobMeta.getGroup() : "default-group";
 				try {
 					Class<?> jobClazz = Class.forName(mainClass);
 
-					JobDetail job = JobBuilder.newJob(MossroseJob.class).withIdentity(id, group).withDescription(jobMeta.getDescription()).build();
+					final JobDetail job = JobBuilder.newJob(MossroseJob.class).withIdentity(id, group).withDescription(jobMeta.getDescription()).build();
 					try {
-						Object jobInstance = jobClazz.newInstance();
+						final Object jobInstance = jobClazz.newInstance();
 						if (jobInstance instanceof SimpleJob) {
 							job.getJobDataMap().put(JobDataMapKeys.SIMPLE_JOB, jobInstance);
 						} else if (jobInstance instanceof DistributedJob) {
@@ -81,12 +81,13 @@ public class QuartzProcess extends QuartzJobOperation implements Process, JobOpe
 							throw new RuntimeException("Invalid job instance, must be a " + SimpleJob.class + " or a " + DistributedJob.class);
 						}
 						job.getJobDataMap().put(JobDataMapKeys.GRID_COMPUTER, gridComputer);
+						job.getJobDataMap().put(JobDataMapKeys.JOB_ID, id);
 						job.getJobDataMap().put(JobDataMapKeys.RUN_IN_CLUSTER, jobMeta.isRunInCluster());
 					} catch (InstantiationException | IllegalAccessException e) {
 						throw Throwables.propagate(e);
 					}
 
-					Trigger trigger = TriggerBuilder.newTrigger().withIdentity(id + "trigger", group).startNow()
+					final Trigger trigger = TriggerBuilder.newTrigger().withIdentity(id + "trigger", group).startNow()
 							.withSchedule(CronScheduleBuilder.cronSchedule(jobMeta.getCron())).build();
 
 					// Tell quartz to schedule the job using our trigger
