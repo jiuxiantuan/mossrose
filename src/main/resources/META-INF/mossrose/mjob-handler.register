@@ -1,0 +1,3 @@
+com.jiuxian.mossrose.job.SimpleJob=com.jiuxian.mossrose.job.factory.SimpleJobHandler
+com.jiuxian.mossrose.job.DistributedJob=com.jiuxian.mossrose.job.factory.DistributedJobHandler
+com.jiuxian.mossrose.job.StreamingJob=com.jiuxian.mossrose.job.factory.StreamingJobHandler

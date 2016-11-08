@@ -15,7 +15,6 @@ import org.quartz.impl.matchers.GroupMatcher;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import com.google.common.base.Objects;
 import com.google.common.collect.Iterables;
 import com.jiuxian.mossrose.JobOperation;
 import com.jiuxian.mossrose.JobOperation.JobRuntimeInfo.State;
@@ -87,7 +86,7 @@ public class QuartzJobOperation implements JobOperation {
 
 				JobDataMap dataMap = jobDetail.getJobDataMap();
 
-				Object jobMain = Objects.firstNonNull(dataMap.get(JobDataMapKeys.SIMPLE_JOB), dataMap.get(JobDataMapKeys.DISTRIBUTED_JOB));
+				Object jobMain = dataMap.get(JobDataMapKeys.MJOB);
 				if (jobMain != null) {
 					job.setMainClass(jobMain.getClass().getName());
 				}

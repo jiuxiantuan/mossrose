@@ -21,7 +21,7 @@ package com.jiuxian.mossrose.job;
  * @author <a href="mailto:wangyuxuan@jiuxian.com">Yuxuan Wang</a>
  *
  */
-public interface SimpleJob {
+public interface SimpleJob extends MJob {
 
 	void execute();
 

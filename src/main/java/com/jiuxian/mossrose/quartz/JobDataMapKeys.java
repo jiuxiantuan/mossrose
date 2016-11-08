@@ -2,8 +2,7 @@ package com.jiuxian.mossrose.quartz;
 
 public interface JobDataMapKeys {
 
-	String SIMPLE_JOB = "simpleJob";
-	String DISTRIBUTED_JOB = "distributedJob";
+	String MJOB = "mJob";
 	String GRID_COMPUTER = "gridComputer";
 	String JOB_ID = "jobId";
 

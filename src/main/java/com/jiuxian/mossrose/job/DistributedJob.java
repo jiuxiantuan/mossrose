@@ -23,12 +23,20 @@ import java.util.List;
  * 
  * @author <a href="mailto:wangyuxuan@jiuxian.com">Yuxuan Wang</a>
  *
- * @param <T> The type of the sliced data
+ * @param <T>
+ *            The type of the sliced data
  */
-public interface DistributedJob<T extends Serializable> {
+public interface DistributedJob<T extends Serializable> extends MJob {
 
-	List<T> slice();
+	Slicer<T> slicer();
+	Executor<T> executor();
 
-	void execute(T item);
+	interface Slicer<T> {
+		List<T> slice();
+	}
+
+	interface Executor<T> {
+		void execute(T item);
+	}
 
 }

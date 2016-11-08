@@ -5,12 +5,16 @@ cluster:
   loadBalancingMode: ROUND_ROBIN    # 集群负载均衡策略，可选：ROUND_ROBIN/RANDOM
   port: 18888 #集群运行所在的端口号，默认为18888
 jobs:
-  - id: 1   # 作业ID，可选，如果为空则自动生成一个惟一ID
+  - id: SomeJob   # 作业ID，可选，如果为空则自动生成一个惟一ID
     group: test # 作业分组(可选)，默认为default-group
     cron: 0/5 * * * * ? # 作业cron表达式
     main: com.jiuxian.mossrose.test.SomeJob # 作业类全名
     description: 一个简单作业的例子 # 可选
-  - id: 2
+  - id: SomeDistributedJob
+    group: test
+    cron: 0/15 * * * * ?
+    main: com.jiuxian.mossrose.test.SomeDistributedJob
+  - id: SomeStreamingJob
     group: test
     cron: 0/20 * * * * ?
-    main: com.jiuxian.mossrose.test.SomeDistributedJob
+    main: com.jiuxian.mossrose.test.SomeStreamingJob

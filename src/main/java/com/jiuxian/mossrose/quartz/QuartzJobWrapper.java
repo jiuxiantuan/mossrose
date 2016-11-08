@@ -13,12 +13,9 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package com.jiuxian.mossrose;
+package com.jiuxian.mossrose.quartz;
 
-import java.io.Serializable;
-import java.util.List;
 import java.util.concurrent.TimeUnit;
-import java.util.stream.Collectors;
 
 import org.quartz.Job;
 import org.quartz.JobExecutionContext;
@@ -27,49 +24,37 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import com.google.common.base.Stopwatch;
-import com.jiuxian.mossrose.compute.ComputeUnit;
 import com.jiuxian.mossrose.compute.GridComputer;
-import com.jiuxian.mossrose.job.DistributedJob;
-import com.jiuxian.mossrose.job.SimpleJob;
+import com.jiuxian.mossrose.job.MJob;
+import com.jiuxian.mossrose.job.factory.MJobHandler;
+import com.jiuxian.mossrose.job.factory.MJobHandlerFactory;
 
-public class MossroseJob implements Job {
+public class QuartzJobWrapper implements Job {
 
-	private SimpleJob simpleJob;
-
-	private DistributedJob<Serializable> distributedJob;
+	private MJob mJob;
 
 	private GridComputer gridComputer;
 
 	private String jobId;
 
-	private static final Logger LOGGER = LoggerFactory.getLogger(MossroseJob.class);
+	private static final Logger LOGGER = LoggerFactory.getLogger(QuartzJobWrapper.class);
 
 	@Override
 	public void execute(JobExecutionContext context) throws JobExecutionException {
 		final Stopwatch watch = Stopwatch.createStarted();
-		if (simpleJob != null) {
-			gridComputer.execute(simpleJob::execute);
-		}
-		if (distributedJob != null) {
-			final List<Serializable> items = distributedJob.slice();
-			if (items != null) {
-				gridComputer.execute(items.stream().<ComputeUnit> map(e -> () -> distributedJob.execute(e)).collect(Collectors.toList()));
-			}
-		}
+		@SuppressWarnings("unchecked")
+		final MJobHandler<MJob> mJobHandler = (MJobHandler<MJob>) MJobHandlerFactory.getInstance().getMJobHandler(mJob.getClass());
+		mJobHandler.handle(mJob, gridComputer);
 		watch.stop();
 		LOGGER.info("Job {} use time: {} ms.", jobId, watch.elapsed(TimeUnit.MILLISECONDS));
 	}
 
-	public void setSimpleJob(SimpleJob simpleJob) {
-		this.simpleJob = simpleJob;
+	public void setMJob(MJob mJob) {
+		this.mJob = mJob;
 	}
 
 	public void setGridComputer(GridComputer gridComputer) {
 		this.gridComputer = gridComputer;
-	}
-
-	public void setDistributedJob(DistributedJob<Serializable> distributedJob) {
-		this.distributedJob = distributedJob;
 	}
 
 	public void setJobId(String jobId) {

@@ -33,12 +33,9 @@ import org.slf4j.LoggerFactory;
 import com.google.common.base.Preconditions;
 import com.google.common.base.Throwables;
 import com.jiuxian.mossrose.JobOperation;
-import com.jiuxian.mossrose.MossroseJob;
 import com.jiuxian.mossrose.compute.GridComputer;
 import com.jiuxian.mossrose.config.MossroseConfig;
 import com.jiuxian.mossrose.config.MossroseConfig.JobMeta;
-import com.jiuxian.mossrose.job.DistributedJob;
-import com.jiuxian.mossrose.job.SimpleJob;
 import com.jiuxian.theone.Process;
 
 public class QuartzProcess extends QuartzJobOperation implements Process, JobOperation {
@@ -70,16 +67,10 @@ public class QuartzProcess extends QuartzJobOperation implements Process, JobOpe
 				try {
 					Class<?> jobClazz = Class.forName(mainClass);
 
-					final JobDetail job = JobBuilder.newJob(MossroseJob.class).withIdentity(id, group).withDescription(jobMeta.getDescription()).build();
+					final JobDetail job = JobBuilder.newJob(QuartzJobWrapper.class).withIdentity(id, group).withDescription(jobMeta.getDescription())
+							.build();
 					try {
-						final Object jobInstance = jobClazz.newInstance();
-						if (jobInstance instanceof SimpleJob) {
-							job.getJobDataMap().put(JobDataMapKeys.SIMPLE_JOB, jobInstance);
-						} else if (jobInstance instanceof DistributedJob) {
-							job.getJobDataMap().put(JobDataMapKeys.DISTRIBUTED_JOB, jobInstance);
-						} else {
-							throw new RuntimeException("Invalid job instance, must be a " + SimpleJob.class + " or a " + DistributedJob.class);
-						}
+						job.getJobDataMap().put(JobDataMapKeys.MJOB, jobClazz.newInstance());
 						job.getJobDataMap().put(JobDataMapKeys.GRID_COMPUTER, gridComputer);
 						job.getJobDataMap().put(JobDataMapKeys.JOB_ID, id);
 					} catch (InstantiationException | IllegalAccessException e) {
