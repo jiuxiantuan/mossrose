@@ -16,7 +16,7 @@
 <dependency>
   <groupId>com.jiuxian</groupId>
   <artifactId>mossrose</artifactId>
-  <version>1.3.8-RELEASE</version>
+  <version>1.4.0-RELEASE</version>
 </dependency>
 ```
 
@@ -70,14 +70,70 @@ jobs:
 ```
 public class SomeDistributedJob implements DistributedJob<String> {
 
-    @Override
-	public List<String> slice() {
-		return Splitter.on(" ").splitToList("This is a test on the mossrose distributed job, how are you feeling?");
+	private static final Logger LOGGER = LoggerFactory.getLogger(SomeDistributedJob.class);
+
+	@Override
+	public Slicer<String> slicer() {
+		return new Slicer<String>() {
+
+			@Override
+			public List<String> slice() {
+				return Splitter.on(" ").splitToList("This is a test on the mossrose distributed job, how are you feeling?");
+			}
+		};
 	}
 
 	@Override
-	public void execute(String item) {
-		System.out.println(Thread.currentThread() + " DistributedJob: " + item);
+	public com.jiuxian.mossrose.job.DistributedJob.Executor<String> executor() {
+		return new Executor<String>() {
+
+			@Override
+			public void execute(String item) {
+				LOGGER.info(Thread.currentThread() + " DistributedJob: " + item);
+			}
+		};
+	}
+
+}
+```
+
+## Streaming Job
+#### Implement a streaming job
+DistributedJob需要把需要分布式执行的任务集合一次性的返回，在集合非常大的时候会存在内存的问题，StreamingJob解决了这个问题，任务可以以流的方式不断输出，以保证内存可以及时释放。
+```
+public class SomeStreamingJob implements StreamingJob<String> {
+
+	private static final Logger LOGGER = LoggerFactory.getLogger(SomeStreamingJob.class);
+
+	@Override
+	public Streamer<String> streamer() {
+		return new Streamer<String>() {
+
+			private List<String> list = Lists.newArrayList("Sunday", "Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday");
+
+			private int index = 0;
+
+			@Override
+			public boolean hasNext() {
+				return index < list.size() - 1;
+			}
+
+			@Override
+			public String next() {
+				return list.get(index++);
+			}
+		};
+	}
+
+	@Override
+	public Executor<String> executor() {
+		return new Executor<String>() {
+
+			@Override
+			public void execute(String item) {
+				LOGGER.info(Thread.currentThread() + " StreamingJob: " + item);
+			}
+		};
 	}
 
 }
@@ -89,7 +145,7 @@ public class SomeDistributedJob implements DistributedJob<String> {
 <dependency>
   <groupId>com.jiuxian</groupId>
   <artifactId>mossrose-ui</artifactId>
-  <version>1.1.4-RELEASE</version>
+  <version>1.1.5-RELEASE</version>
 </dependency>
 ```
 

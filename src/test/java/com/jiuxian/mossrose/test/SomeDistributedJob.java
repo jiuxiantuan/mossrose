@@ -29,14 +29,6 @@ public class SomeDistributedJob implements DistributedJob<String> {
 
 			@Override
 			public void execute(String item) {
-				if ("D".equals(item)) {
-					try {
-						Thread.sleep(3000);
-					} catch (InterruptedException e) {
-						// TODO Auto-generated catch block
-						e.printStackTrace();
-					}
-				}
 				LOGGER.info(Thread.currentThread() + " DistributedJob: " + item);
 			}
 		};
