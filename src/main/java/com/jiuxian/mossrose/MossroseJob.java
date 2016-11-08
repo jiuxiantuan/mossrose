@@ -40,8 +40,6 @@ public class MossroseJob implements Job {
 
 	private GridComputer gridComputer;
 
-	private boolean runInCluster;
-
 	private String jobId;
 
 	private static final Logger LOGGER = LoggerFactory.getLogger(MossroseJob.class);
@@ -50,28 +48,16 @@ public class MossroseJob implements Job {
 	public void execute(JobExecutionContext context) throws JobExecutionException {
 		final Stopwatch watch = Stopwatch.createStarted();
 		if (simpleJob != null) {
-			if (runInCluster) {
-				gridComputer.execute(simpleJob::execute);
-			} else {
-				simpleJob.execute();
-			}
+			gridComputer.execute(simpleJob::execute);
 		}
 		if (distributedJob != null) {
 			final List<Serializable> items = distributedJob.slice();
 			if (items != null) {
-				if (runInCluster) {
-					gridComputer.execute(items.stream().<ComputeUnit> map(e -> () -> distributedJob.execute(e)).collect(Collectors.toList()));
-				} else {
-					items.stream().parallel().forEach(e -> distributedJob.execute(e));
-				}
+				gridComputer.execute(items.stream().<ComputeUnit> map(e -> () -> distributedJob.execute(e)).collect(Collectors.toList()));
 			}
 		}
 		watch.stop();
 		LOGGER.info("Job {} use time: {} ms.", jobId, watch.elapsed(TimeUnit.MILLISECONDS));
-	}
-
-	public void setRunInCluster(boolean runInCluster) {
-		this.runInCluster = runInCluster;
 	}
 
 	public void setSimpleJob(SimpleJob simpleJob) {

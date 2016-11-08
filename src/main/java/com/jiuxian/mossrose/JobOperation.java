@@ -37,7 +37,6 @@ public interface JobOperation {
 		private String group;
 		private String description;
 		private String cron;
-		private boolean runInCluster;
 		private String mainClass;
 		private Date startTime;
 		private Date endTime;
@@ -76,14 +75,6 @@ public interface JobOperation {
 
 		public void setCron(String cron) {
 			this.cron = cron;
-		}
-
-		public boolean isRunInCluster() {
-			return runInCluster;
-		}
-
-		public void setRunInCluster(boolean runInCluster) {
-			this.runInCluster = runInCluster;
 		}
 
 		public String getMainClass() {
@@ -136,8 +127,9 @@ public interface JobOperation {
 
 		@Override
 		public String toString() {
-			return "JobRuntimeInfo [id=" + id + ", group=" + group + ", description=" + description + ", cron=" + cron + ", runInCluster="
-					+ runInCluster + ", mainClass=" + mainClass + ", state=" + state + "]";
+			return "JobRuntimeInfo [id=" + id + ", group=" + group + ", description=" + description + ", cron=" + cron + ", mainClass=" + mainClass
+					+ ", startTime=" + startTime + ", endTime=" + endTime + ", nextFireTime=" + nextFireTime + ", previousFireTime=" + previousFireTime
+					+ ", state=" + state + "]";
 		}
 
 	}

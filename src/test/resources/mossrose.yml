@@ -8,11 +8,9 @@ jobs:
   - id: 1   # 作业ID，可选，如果为空则自动生成一个惟一ID
     group: test # 作业分组(可选)，默认为default-group
     cron: 0/5 * * * * ? # 作业cron表达式
-    runInCluster: true  # 是否在集群中分布执行，如果为false，则只在主节点上执行
     main: com.jiuxian.mossrose.test.SomeJob # 作业类全名
     description: 一个简单作业的例子 # 可选
   - id: 2
     group: test
     cron: 0/20 * * * * ?
-    runInCluster: true
     main: com.jiuxian.mossrose.test.SomeDistributedJob

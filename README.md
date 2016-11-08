@@ -16,7 +16,7 @@
 <dependency>
   <groupId>com.jiuxian</groupId>
   <artifactId>mossrose</artifactId>
-  <version>1.3.7-RELEASE</version>
+  <version>1.3.8-RELEASE</version>
 </dependency>
 ```
 
@@ -55,7 +55,6 @@ jobs:
   - id: 1   # 作业ID
     group: test # 作业分组(可选)
     cron: 0/5 * * * * ? # 作业cron表达式
-    runInCluster: true  # 是否在集群中分布执行，如果为false，则只在主节点上执行
     main: com.jiuxian.mossrose.test.SomeJob # 作业类全名
 ```
 
@@ -90,7 +89,7 @@ public class SomeDistributedJob implements DistributedJob<String> {
 <dependency>
   <groupId>com.jiuxian</groupId>
   <artifactId>mossrose-ui</artifactId>
-  <version>1.1.3-RELEASE</version>
+  <version>1.1.4-RELEASE</version>
 </dependency>
 ```
 

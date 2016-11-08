@@ -96,11 +96,6 @@ public class MossroseConfig {
 		 */
 		private String group;
 		/**
-		 * If true, the job will run on any node in the cluster; If false，the
-		 * job will run on master node
-		 */
-		private boolean runInCluster;
-		/**
 		 * description
 		 */
 		private String description;
@@ -119,10 +114,6 @@ public class MossroseConfig {
 
 		public String getGroup() {
 			return group;
-		}
-
-		public boolean isRunInCluster() {
-			return runInCluster;
 		}
 
 		public String getDescription() {

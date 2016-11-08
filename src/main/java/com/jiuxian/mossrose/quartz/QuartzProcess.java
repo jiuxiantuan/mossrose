@@ -82,7 +82,6 @@ public class QuartzProcess extends QuartzJobOperation implements Process, JobOpe
 						}
 						job.getJobDataMap().put(JobDataMapKeys.GRID_COMPUTER, gridComputer);
 						job.getJobDataMap().put(JobDataMapKeys.JOB_ID, id);
-						job.getJobDataMap().put(JobDataMapKeys.RUN_IN_CLUSTER, jobMeta.isRunInCluster());
 					} catch (InstantiationException | IllegalAccessException e) {
 						throw Throwables.propagate(e);
 					}

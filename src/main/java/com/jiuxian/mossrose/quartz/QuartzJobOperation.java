@@ -87,7 +87,6 @@ public class QuartzJobOperation implements JobOperation {
 
 				JobDataMap dataMap = jobDetail.getJobDataMap();
 
-				job.setRunInCluster(dataMap.getBoolean(JobDataMapKeys.RUN_IN_CLUSTER));
 				Object jobMain = Objects.firstNonNull(dataMap.get(JobDataMapKeys.SIMPLE_JOB), dataMap.get(JobDataMapKeys.DISTRIBUTED_JOB));
 				if (jobMain != null) {
 					job.setMainClass(jobMain.getClass().getName());
