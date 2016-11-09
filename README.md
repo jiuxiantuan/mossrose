@@ -6,6 +6,9 @@
 ## 社区
  * QQ群：595011342
 
+## 文档
+ * Wiki: https://github.com/jiuxiantuan/mossrose/wiki
+
 ## Requirement
 
 * Zookeeper
@@ -25,7 +28,9 @@
 * SimpleJob
  * 简单任务
 * DistributedJob
- * 分布式任务，通过slice()方法将作业分隔成多个子任务，子任务在集群内分布执行
+ * 分布式任务，通过Slicer将作业分隔成多个子任务，子任务在集群内分布执行
+* StreamingJob
+ * 分布式流式任务，解决分片非常多时DistributedJob内存占用大的问题
 * MossroseProcess
  * 多个MossroseProcess组成集群，集群保证有且只有一个节点竞选成为主节点，主节点负责触发作业；所有节点都是工作节点，主节点触发的任务会在所有工作节点上分布执行
 * MossroseConfig
@@ -138,28 +143,3 @@ public class SomeStreamingJob implements StreamingJob<String> {
 
 }
 ```
-
-## User Interface
-#### Add mossrose-ui
-```
-<dependency>
-  <groupId>com.jiuxian</groupId>
-  <artifactId>mossrose-ui</artifactId>
-  <version>1.1.5-RELEASE</version>
-</dependency>
-```
-
-#### new RestMossroseUI
-```
-MossroseProcess process = ...
-RestMossroseUI ui = new RestMossroseUI(process, 7758);
-process.run();
-```
-
-#### Access UI
-```
-http://localhost:7758/all
-```
-
-#### More about mossrose ui
-[Mossrose UI](https://github.com/jiuxiantuan/mossrose-ui)
