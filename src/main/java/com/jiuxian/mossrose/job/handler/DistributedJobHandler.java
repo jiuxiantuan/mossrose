@@ -1,13 +1,12 @@
-package com.jiuxian.mossrose.job.factory;
+package com.jiuxian.mossrose.job.handler;
 
 import java.io.Serializable;
 import java.util.List;
 import java.util.stream.Collectors;
 
-import com.jiuxian.mossrose.compute.ComputeUnit;
 import com.jiuxian.mossrose.compute.GridComputer;
+import com.jiuxian.mossrose.compute.GridComputer.ComputeFuture;
 import com.jiuxian.mossrose.job.DistributedJob;
-import com.jiuxian.mossrose.job.DistributedJob.Executor;
 
 public class DistributedJobHandler implements MJobHandler<DistributedJob<Serializable>> {
 
@@ -15,8 +14,9 @@ public class DistributedJobHandler implements MJobHandler<DistributedJob<Seriali
 	public void handle(DistributedJob<Serializable> mJob, GridComputer gridComputer) {
 		final List<Serializable> items = mJob.slicer().slice();
 		if (items != null) {
-			final Executor<Serializable> executor = mJob.executor();
-			gridComputer.execute(items.stream().<ComputeUnit> map(e -> () -> executor.execute(e)).collect(Collectors.toList()));
+			List<ComputeFuture> futures = items.stream().parallel().map(item -> gridComputer.execute(() -> mJob.executor().execute(item)))
+					.collect(Collectors.toList());
+			futures.forEach(ComputeFuture::join);
 		}
 	}
 

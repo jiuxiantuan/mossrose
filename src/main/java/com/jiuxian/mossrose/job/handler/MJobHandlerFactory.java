@@ -1,4 +1,4 @@
-package com.jiuxian.mossrose.job.factory;
+package com.jiuxian.mossrose.job.handler;
 
 import java.io.InputStream;
 import java.net.URL;

@@ -15,17 +15,29 @@
  */
 package com.jiuxian.mossrose.compute;
 
-import java.util.List;
-
 import org.apache.ignite.Ignite;
 import org.apache.ignite.IgniteCompute;
-import org.apache.ignite.compute.ComputeTaskFuture;
+import org.apache.ignite.lang.IgniteFuture;
 
-import com.google.common.collect.Lists;
 import com.jiuxian.mossrose.cluster.ClusterDiscovery;
 import com.jiuxian.mossrose.config.MossroseConfig.Cluster;
 
 public class IgniteGridComputer implements GridComputer {
+
+	public static class IgniteComputeFuture implements ComputeFuture {
+		private IgniteFuture<?> igniteFuture;
+
+		IgniteComputeFuture(IgniteFuture<?> igniteFuture) {
+			super();
+			this.igniteFuture = igniteFuture;
+		}
+
+		@Override
+		public void join() {
+			igniteFuture.get();
+		}
+
+	}
 
 	private final Ignite ignite;
 
@@ -34,8 +46,10 @@ public class IgniteGridComputer implements GridComputer {
 	}
 
 	@Override
-	public void execute(ComputeUnit gridCompute) {
-		ignite.compute().run(gridCompute::apply);
+	public ComputeFuture execute(ComputeUnit gridCompute) {
+		final IgniteCompute async = ignite.compute().withAsync();
+		async.run(gridCompute::apply);
+		return new IgniteComputeFuture(async.future());
 	}
 
 	@Override
@@ -43,17 +57,6 @@ public class IgniteGridComputer implements GridComputer {
 		if (ignite != null) {
 			ignite.close();
 		}
-	}
-
-	@Override
-	public void execute(List<ComputeUnit> gridComputes) {
-		IgniteCompute compute = ignite.compute().withAsync();
-		final List<ComputeTaskFuture<?>> futs = Lists.newArrayList();
-		gridComputes.forEach(e -> {
-			compute.run(e::apply);
-			futs.add(compute.future());
-		});
-		futs.forEach(ComputeTaskFuture::get);
 	}
 
 }

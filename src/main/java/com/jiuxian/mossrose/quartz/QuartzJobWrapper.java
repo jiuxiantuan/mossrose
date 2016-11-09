@@ -26,8 +26,8 @@ import org.slf4j.LoggerFactory;
 import com.google.common.base.Stopwatch;
 import com.jiuxian.mossrose.compute.GridComputer;
 import com.jiuxian.mossrose.job.MJob;
-import com.jiuxian.mossrose.job.factory.MJobHandler;
-import com.jiuxian.mossrose.job.factory.MJobHandlerFactory;
+import com.jiuxian.mossrose.job.handler.MJobHandler;
+import com.jiuxian.mossrose.job.handler.MJobHandlerFactory;
 
 public class QuartzJobWrapper implements Job {
 

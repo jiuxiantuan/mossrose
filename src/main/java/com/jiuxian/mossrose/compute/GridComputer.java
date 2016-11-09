@@ -15,12 +15,14 @@
  */
 package com.jiuxian.mossrose.compute;
 
-import java.util.List;
-
 public interface GridComputer extends AutoCloseable {
-	
-	void execute(ComputeUnit gridCompute);
-	
-	void execute(List<ComputeUnit> gridComputes);
-	
+
+	public interface ComputeFuture {
+		/**
+		 * Wait for the GridComputer execution complete
+		 */
+		void join();
+	}
+
+	ComputeFuture execute(ComputeUnit gridCompute);
 }

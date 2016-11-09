@@ -1,4 +1,4 @@
-package com.jiuxian.mossrose.job.factory;
+package com.jiuxian.mossrose.job.handler;
 
 import com.jiuxian.mossrose.compute.GridComputer;
 import com.jiuxian.mossrose.job.MJob;
