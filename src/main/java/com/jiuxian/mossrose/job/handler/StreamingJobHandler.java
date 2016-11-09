@@ -17,10 +17,8 @@ public class StreamingJobHandler implements MJobHandler<StreamingJob<Serializabl
 
 		final List<ComputeFuture> futures = Lists.newArrayList();
 		while (streamer.hasNext()) {
-			futures.add(gridComputer.execute(() -> {
-				final Serializable next = streamer.next();
-				mJob.executor().execute(next);
-			}));
+			final Serializable next = streamer.next();
+			futures.add(gridComputer.execute(() -> mJob.executor().execute(next)));
 		}
 		futures.forEach(ComputeFuture::join);
 	}
