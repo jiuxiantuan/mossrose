@@ -37,8 +37,8 @@ public class MossroseConfig {
 	 *
 	 */
 	public static class Cluster {
-		
-		private static final int DEFAULT_PORT= 18888;
+
+		private static final int DEFAULT_PORT = 18888;
 
 		/**
 		 * cluster name
@@ -59,6 +59,18 @@ public class MossroseConfig {
 
 		public int getPort() {
 			return port;
+		}
+
+		public void setName(String name) {
+			this.name = name;
+		}
+
+		public void setPort(int port) {
+			this.port = port;
+		}
+
+		public void setLoadBalancingMode(LoadBalancingMode loadBalancingMode) {
+			this.loadBalancingMode = loadBalancingMode;
 		}
 
 		@Override
@@ -120,6 +132,26 @@ public class MossroseConfig {
 			return description;
 		}
 
+		public void setId(String id) {
+			this.id = id;
+		}
+
+		public void setCron(String cron) {
+			this.cron = cron;
+		}
+
+		public void setMain(String main) {
+			this.main = main;
+		}
+
+		public void setGroup(String group) {
+			this.group = group;
+		}
+
+		public void setDescription(String description) {
+			this.description = description;
+		}
+
 		@Override
 		public String toString() {
 			return "JobMeta [id=" + id + ", cron=" + cron + ", main=" + main + ", group=" + group + "]";
@@ -133,6 +165,14 @@ public class MossroseConfig {
 
 	public List<JobMeta> getJobs() {
 		return jobs;
+	}
+
+	public void setCluster(Cluster cluster) {
+		this.cluster = cluster;
+	}
+
+	public void setJobs(List<JobMeta> jobs) {
+		this.jobs = jobs;
 	}
 
 	@Override
