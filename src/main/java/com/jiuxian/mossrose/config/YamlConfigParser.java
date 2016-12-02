@@ -38,7 +38,6 @@ public class YamlConfigParser implements ConfigParser {
 				throw new RuntimeException("Mossrose config file " + file + " cannot be found.");
 			}
 			config = mapper.readValue(in, MossroseConfig.class);
-			config.validate();
 		} catch (IOException e) {
 			LOGGER.error(e.getMessage(), e);
 			throw Throwables.propagate(e);

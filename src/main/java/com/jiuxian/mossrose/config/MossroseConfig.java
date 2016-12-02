@@ -17,8 +17,6 @@ package com.jiuxian.mossrose.config;
 
 import java.util.List;
 
-import com.google.common.base.Preconditions;
-
 /**
  * Mossrose meta configuration
  * 
@@ -178,19 +176,6 @@ public class MossroseConfig {
 	@Override
 	public String toString() {
 		return "MossroseConfig [cluster=" + cluster + ", jobs=" + jobs + "]";
-	}
-
-	public void validate() {
-		Preconditions.checkNotNull(cluster);
-		Preconditions.checkNotNull(cluster.getName());
-
-		Preconditions.checkNotNull(jobs);
-		Preconditions.checkArgument(jobs.size() > 0);
-
-		jobs.forEach(e -> {
-			Preconditions.checkNotNull(e.getCron());
-			Preconditions.checkNotNull(e.getMain());
-		});
 	}
 
 }

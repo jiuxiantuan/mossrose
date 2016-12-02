@@ -61,30 +61,20 @@ public class QuartzProcess extends QuartzJobOperation implements Process, JobOpe
 			// define the jobs
 			List<JobMeta> jobs = mossroseConfig.getJobs();
 			for (JobMeta jobMeta : jobs) {
-				final String mainClass = jobMeta.getMain();
 				final String id = jobMeta.getId() != null ? jobMeta.getId() : UUID.randomUUID().toString();
 				final String group = jobMeta.getGroup() != null ? jobMeta.getGroup() : "default-group";
-				try {
-					Class<?> jobClazz = Class.forName(mainClass);
+				final JobDetail job = JobBuilder.newJob(QuartzJobWrapper.class).withIdentity(id, group).withDescription(jobMeta.getDescription())
+						.build();
+				
+				job.getJobDataMap().put(JobDataMapKeys.MJOB, createJobBean(jobMeta));
+				job.getJobDataMap().put(JobDataMapKeys.GRID_COMPUTER, gridComputer);
+				job.getJobDataMap().put(JobDataMapKeys.JOB_ID, id);
 
-					final JobDetail job = JobBuilder.newJob(QuartzJobWrapper.class).withIdentity(id, group).withDescription(jobMeta.getDescription())
-							.build();
-					try {
-						job.getJobDataMap().put(JobDataMapKeys.MJOB, jobClazz.newInstance());
-						job.getJobDataMap().put(JobDataMapKeys.GRID_COMPUTER, gridComputer);
-						job.getJobDataMap().put(JobDataMapKeys.JOB_ID, id);
-					} catch (InstantiationException | IllegalAccessException e) {
-						throw Throwables.propagate(e);
-					}
+				final Trigger trigger = TriggerBuilder.newTrigger().withIdentity(id + "trigger", group).startNow()
+						.withSchedule(CronScheduleBuilder.cronSchedule(jobMeta.getCron())).build();
 
-					final Trigger trigger = TriggerBuilder.newTrigger().withIdentity(id + "trigger", group).startNow()
-							.withSchedule(CronScheduleBuilder.cronSchedule(jobMeta.getCron())).build();
-
-					// Tell quartz to schedule the job using our trigger
-					scheduler.scheduleJob(job, trigger);
-				} catch (ClassNotFoundException e) {
-					throw Throwables.propagate(e);
-				}
+				// Tell quartz to schedule the job using our trigger
+				scheduler.scheduleJob(job, trigger);
 			}
 
 			scheduler.start();
@@ -92,6 +82,14 @@ public class QuartzProcess extends QuartzJobOperation implements Process, JobOpe
 			super.setScheduler(scheduler);
 		} catch (SchedulerException e) {
 			LOGGER.error(e.getMessage(), e);
+			throw Throwables.propagate(e);
+		}
+	}
+
+	protected Object createJobBean(final JobMeta jobMeta) {
+		try {
+			return Class.forName(jobMeta.getMain()).newInstance();
+		} catch (InstantiationException | IllegalAccessException | ClassNotFoundException e) {
 			throw Throwables.propagate(e);
 		}
 	}
