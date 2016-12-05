@@ -18,8 +18,8 @@
 ```
 <dependency>
   <groupId>com.jiuxian</groupId>
-  <artifactId>mossrose</artifactId>
-  <version>1.4.0-RELEASE</version>
+  <artifactId>mossrose-spring</artifactId>
+  <version>1.0.0-RELEASE</version>
 </dependency>
 ```
 
@@ -51,16 +51,34 @@ public class SomeJob implements SimpleJob {
 }
 ```
 
-#### Config the job - mossrose.yml
+#### Config the job in spring
 ```
-cluster:
-  name: mossrose-example    # 集群命名空间，MossroseProcess将以此分组，在组内选举主节点，并且同一个命名空间内的节点组成一个计算网格
-  loadBalancingMode: ROUND_ROBIN    # 集群负载均衡策略，可选：ROUND_ROBIN/RANDOM
-jobs:
-  - id: 1   # 作业ID
-    group: test # 作业分组(可选)
-    cron: 0/5 * * * * ? # 作业cron表达式
-    main: com.jiuxian.mossrose.test.SomeJob # 作业类全名
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans" 
+	xmlns:mossrose="https://jiuxiantuan.github.io/mossrose"
+	xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans.xsd
+		https://jiuxiantuan.github.io/mossrose https://jiuxiantuan.github.io/mossrose/mossrose.xsd">
+
+	<bean class="com.jiuxian.jobs.bean.BusinessBean" />
+	<bean id="simpleExampleJob" class="com.jiuxian.jobs.job.SimpleExampleJob" />
+	<bean id="distributedExampleJob" class="com.jiuxian.jobs.job.DistributedExampleJob" />
+	<bean id="streamingExampleJob" class="com.jiuxian.jobs.job.StreamingExampleJob" />
+
+	<mossrose:springholder />
+	<mossrose:config>
+		<mossrose:cluster name="mossrose-example" />
+		<mossrose:jobs>
+			<mossrose:job id="SimpleExampleJob" cron="0/5 * * * * ?" job-bean-name="simpleExampleJob" group="example" />
+			<mossrose:job id="DistributedExampleJob" cron="0/15 * * * * ?" job-bean-name="distributedExampleJob" group="example" />
+			<mossrose:job id="StreamingExampleJob" cron="0/20 * * * * ?" job-bean-name="streamingExampleJob" group="example"
+				description="分布式流式任务示例" />
+		</mossrose:jobs>
+	</mossrose:config>
+	<mossrose:process zks="#{configTookitProp['zk.address']}" />
+	<mossrose:ui />
+
+</beans>
+
 ```
 
 #### Run mossrose main class
