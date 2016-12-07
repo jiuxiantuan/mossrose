@@ -83,13 +83,6 @@ public class SomeJob implements SimpleJob {
 
 ```
 
-#### Run mossrose main class
-```
-	String zks = "localhost"; // zookeeper集群地址
-	MossroseProcess process = new MossroseProcess(MossroseConfigFactory.fromClasspathYamlFile("mossrose.yml"), zks);
-	process.run();
-```
-
 ## Distributed Job
 #### Implement a distributed job
 ```
