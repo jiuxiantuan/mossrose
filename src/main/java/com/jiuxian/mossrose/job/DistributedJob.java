@@ -29,6 +29,7 @@ import java.util.List;
 public interface DistributedJob<T extends Serializable> extends MJob {
 
 	Slicer<T> slicer();
+
 	Executor<T> executor();
 
 	interface Slicer<T> {

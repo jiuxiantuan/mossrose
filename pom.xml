@@ -3,7 +3,7 @@
 	<parent>
 		<groupId>com.jiuxian</groupId>
 		<artifactId>jiuxian-bom</artifactId>
-		<version>1.0.1-RELEASE</version>
+		<version>1.0.2-RELEASE</version>
 	</parent>
 	<groupId>com.jiuxian</groupId>
 	<artifactId>mossrose</artifactId>

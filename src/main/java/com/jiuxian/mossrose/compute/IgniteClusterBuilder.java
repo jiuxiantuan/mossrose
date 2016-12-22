@@ -70,6 +70,9 @@ public final class IgniteClusterBuilder {
 		} else if (loadBalancingMode == LoadBalancingMode.RANDOM) {
 			cfg.setLoadBalancingSpi(new WeightedRandomLoadBalancingSpi());
 		}
+		
+		// SPI
+		IgniteConfigurationRenderRegistry.render(cfg);
 
 		final Ignite ignite = Ignition.start(cfg);
 		TcpDiscoveryNode localNode = (TcpDiscoveryNode) ignite.cluster().localNode();
