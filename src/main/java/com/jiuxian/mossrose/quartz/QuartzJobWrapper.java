@@ -37,15 +37,11 @@ import com.jiuxian.mossrose.job.to.SpringBeanObjectResource;
 
 public class QuartzJobWrapper implements Job {
 
-	// private MJob mJob;
-
 	private GridComputer gridComputer;
 
 	private JobMeta jobMeta;
 
 	private ObjectResource objectResource;
-
-	// private String jobId;
 
 	private static final Logger LOGGER = LoggerFactory.getLogger(QuartzJobWrapper.class);
 
@@ -60,17 +56,9 @@ public class QuartzJobWrapper implements Job {
 		LOGGER.info("Job {} use time: {} ms.", jobMeta.getId(), watch.elapsed(TimeUnit.MILLISECONDS));
 	}
 
-	// public void setMJob(MJob mJob) {
-	// this.mJob = mJob;
-	// }
-
 	public void setGridComputer(GridComputer gridComputer) {
 		this.gridComputer = gridComputer;
 	}
-	//
-	// public void setJobId(String jobId) {
-	// this.jobId = jobId;
-	// }
 
 	public void setJobMeta(JobMeta jobMeta) {
 		this.jobMeta = jobMeta;
