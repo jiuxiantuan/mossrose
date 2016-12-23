@@ -48,10 +48,13 @@ public class QuartzProcess extends QuartzJobOperation implements Process, JobOpe
 
 	private MossroseConfig mossroseConfig;
 
-	public QuartzProcess(MossroseConfig mossroseConfig, GridComputer gridComputer) {
+	public QuartzProcess(MossroseConfig mossroseConfig) {
 		super();
 		this.mossroseConfig = Preconditions.checkNotNull(mossroseConfig);
-		this.gridComputer = Preconditions.checkNotNull(gridComputer);
+	}
+
+	public void setGridComputer(GridComputer gridComputer) {
+		this.gridComputer = gridComputer;
 	}
 
 	@Override
@@ -65,10 +68,9 @@ public class QuartzProcess extends QuartzJobOperation implements Process, JobOpe
 				final String group = jobMeta.getGroup() != null ? jobMeta.getGroup() : "default-group";
 				final JobDetail job = JobBuilder.newJob(QuartzJobWrapper.class).withIdentity(id, group).withDescription(jobMeta.getDescription())
 						.build();
-				
-				job.getJobDataMap().put(JobDataMapKeys.MJOB, createJobBean(jobMeta));
+
 				job.getJobDataMap().put(JobDataMapKeys.GRID_COMPUTER, gridComputer);
-				job.getJobDataMap().put(JobDataMapKeys.JOB_ID, id);
+				job.getJobDataMap().put(JobDataMapKeys.JOB_META, jobMeta);
 
 				final Trigger trigger = TriggerBuilder.newTrigger().withIdentity(id + "trigger", group).startNow()
 						.withSchedule(CronScheduleBuilder.cronSchedule(jobMeta.getCron())).build();
@@ -82,14 +84,6 @@ public class QuartzProcess extends QuartzJobOperation implements Process, JobOpe
 			super.setScheduler(scheduler);
 		} catch (SchedulerException e) {
 			LOGGER.error(e.getMessage(), e);
-			throw Throwables.propagate(e);
-		}
-	}
-
-	protected Object createJobBean(final JobMeta jobMeta) {
-		try {
-			return Class.forName(jobMeta.getMain()).newInstance();
-		} catch (InstantiationException | IllegalAccessException | ClassNotFoundException e) {
 			throw Throwables.propagate(e);
 		}
 	}

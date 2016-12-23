@@ -24,6 +24,7 @@ import org.apache.ignite.configuration.IgniteConfiguration;
 import org.apache.ignite.lang.IgniteRunnable;
 import org.apache.ignite.logger.slf4j.Slf4jLogger;
 import org.apache.ignite.spi.discovery.tcp.TcpDiscoverySpi;
+import org.apache.ignite.spi.discovery.tcp.internal.TcpDiscoveryNode;
 import org.apache.ignite.spi.discovery.tcp.ipfinder.vm.TcpDiscoveryVmIpFinder;
 import org.apache.ignite.spi.loadbalancing.roundrobin.RoundRobinLoadBalancingSpi;
 import org.apache.ignite.spi.loadbalancing.weightedrandom.WeightedRandomLoadBalancingSpi;
@@ -47,16 +48,16 @@ public final class IgniteClusterBuilder {
 		final LoadBalancingMode loadBalancingMode = Objects.firstNonNull(cluster.getLoadBalancingMode(), LoadBalancingMode.ROUND_ROBIN);
 
 		// find ignite cluster
-		final ClusterAddress currentAddress = new ClusterAddress(NetworkUtils.getLocalIp(), cluster.getPort());
-		final List<ClusterAddress> hosts = clusterDiscovery.findHosts(currentAddress);
+		final List<ClusterAddress> hosts = clusterDiscovery.findHosts();
 
 		// constuct ignite
-		final TcpDiscoveryVmIpFinder ipFinder = new TcpDiscoveryVmIpFinder();
-		ipFinder.setAddresses(hosts.stream().map(e -> e.toPlainAddress()).collect(Collectors.toList()));
-
 		final TcpDiscoverySpi discoSpi = new TcpDiscoverySpi();
-		discoSpi.setIpFinder(ipFinder);
 		discoSpi.setLocalPort(cluster.getPort());
+		if (hosts != null && hosts.size() > 0) {
+			final TcpDiscoveryVmIpFinder ipFinder = new TcpDiscoveryVmIpFinder();
+			ipFinder.setAddresses(hosts.stream().map(e -> e.toPlainAddress()).collect(Collectors.toList()));
+			discoSpi.setIpFinder(ipFinder);
+		}
 
 		final IgniteConfiguration cfg = new IgniteConfiguration();
 		cfg.setGridName(clusterName);
@@ -69,8 +70,15 @@ public final class IgniteClusterBuilder {
 		} else if (loadBalancingMode == LoadBalancingMode.RANDOM) {
 			cfg.setLoadBalancingSpi(new WeightedRandomLoadBalancingSpi());
 		}
+		
+		// SPI
+		IgniteConfigurationRenderRegistry.render(cfg);
 
 		final Ignite ignite = Ignition.start(cfg);
+		TcpDiscoveryNode localNode = (TcpDiscoveryNode) ignite.cluster().localNode();
+		cluster.setPort(localNode.discoveryPort());
+		final ClusterAddress currentAddress = new ClusterAddress(NetworkUtils.getLocalIp(), cluster.getPort());
+		clusterDiscovery.registerCurrentAddress(currentAddress);
 		ignite.compute().broadcast(new IgniteRunnable() {
 
 			private static final long serialVersionUID = 1L;

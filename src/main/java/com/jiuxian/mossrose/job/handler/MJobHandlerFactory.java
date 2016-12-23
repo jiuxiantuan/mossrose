@@ -1,6 +1,7 @@
 package com.jiuxian.mossrose.job.handler;
 
 import java.io.InputStream;
+import java.io.Serializable;
 import java.net.URL;
 import java.util.Enumeration;
 import java.util.Map;
@@ -22,7 +23,7 @@ import com.jiuxian.mossrose.job.MJob;
  */
 public final class MJobHandlerFactory {
 
-	private Map<Class<? extends MJob>, MJobHandler<? extends MJob>> handlers;
+	private Map<Class<? extends MJob<Serializable>>, MJobHandler<? extends MJob<Serializable>>> handlers;
 
 	private static final String REGISTER_FILE = "META-INF/mossrose/mjob-handler.register";
 
@@ -48,9 +49,10 @@ public final class MJobHandlerFactory {
 			for (Map.Entry<Object, Object> entry : props.entrySet()) {
 				LOGGER.info("Init handler: {}", entry);
 				@SuppressWarnings("unchecked")
-				final Class<MJob> mJobClass = (Class<MJob>) Class.forName((String) entry.getKey());
+				final Class<MJob<Serializable>> mJobClass = (Class<MJob<Serializable>>) Class.forName((String) entry.getKey());
 				@SuppressWarnings("unchecked")
-				final MJobHandler<MJob> mJobHandler = ((Class<MJobHandler<MJob>>) Class.forName((String) entry.getValue())).newInstance();
+				final MJobHandler<MJob<Serializable>> mJobHandler = ((Class<MJobHandler<MJob<Serializable>>>) Class
+						.forName((String) entry.getValue())).newInstance();
 				handlers.put(mJobClass, mJobHandler);
 			}
 		} catch (Exception e) {
@@ -66,13 +68,14 @@ public final class MJobHandlerFactory {
 		return Holder.MJOB_HANDLER_FACTORY;
 	}
 
-	public MJobHandler<? extends MJob> getMJobHandler(Class<?> mJobClazz) {
+	public MJobHandler<? extends MJob<Serializable>> getMJobHandler(Class<?> mJobClazz) {
 		Class<?>[] interfaces = mJobClazz.getInterfaces();
 		if (interfaces != null) {
 			for (Class<?> interfass : interfaces) {
-				Optional<Entry<Class<? extends MJob>, MJobHandler<? extends MJob>>> optionalEntry = handlers.entrySet().stream().filter((entry) -> {
-					return entry.getKey() == interfass;
-				}).findFirst();
+				Optional<Entry<Class<? extends MJob<Serializable>>, MJobHandler<? extends MJob<Serializable>>>> optionalEntry = handlers.entrySet()
+						.stream().filter((entry) -> {
+							return entry.getKey() == interfass;
+						}).findFirst();
 				if (optionalEntry.isPresent()) {
 					return optionalEntry.get().getValue();
 				}

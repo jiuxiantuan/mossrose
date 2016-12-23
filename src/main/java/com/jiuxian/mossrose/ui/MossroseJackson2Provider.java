@@ -13,16 +13,27 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package com.jiuxian.mossrose.job;
+package com.jiuxian.mossrose.ui;
 
-import java.io.Serializable;
+import java.text.SimpleDateFormat;
+import java.util.Locale;
+
+import org.jboss.resteasy.plugins.providers.jackson.ResteasyJackson2Provider;
+
+import com.fasterxml.jackson.databind.SerializationFeature;
 
 /**
- * 简单任务
- * 
  * @author <a href="mailto:wangyuxuan@jiuxian.com">Yuxuan Wang</a>
  *
  */
-public interface SimpleJob<T extends Serializable> extends MJob<T> {
+public class MossroseJackson2Provider extends ResteasyJackson2Provider {
+
+	protected MossroseJackson2Provider() {
+		super();
+		configure(SerializationFeature.INDENT_OUTPUT, true);
+		configure(SerializationFeature.WRITE_DATES_AS_TIMESTAMPS, false);
+		_mapperConfig.getConfiguredMapper().getSerializationConfig().with(new SimpleDateFormat("yyyy-MM-dd HH:mm:ss", Locale.CHINA));
+
+	}
 
 }

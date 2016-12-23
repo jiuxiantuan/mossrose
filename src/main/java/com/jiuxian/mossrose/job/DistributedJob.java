@@ -26,17 +26,12 @@ import java.util.List;
  * @param <T>
  *            The type of the sliced data
  */
-public interface DistributedJob<T extends Serializable> extends MJob {
+public interface DistributedJob<T extends Serializable> extends MJob<T> {
 
 	Slicer<T> slicer();
-	Executor<T> executor();
-
+	
 	interface Slicer<T> {
 		List<T> slice();
-	}
-
-	interface Executor<T> {
-		void execute(T item);
 	}
 
 }

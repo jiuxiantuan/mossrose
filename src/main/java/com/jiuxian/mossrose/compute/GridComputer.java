@@ -25,4 +25,6 @@ public interface GridComputer extends AutoCloseable {
 	}
 
 	ComputeFuture execute(ComputeUnit gridCompute);
+	
+	void init();
 }

@@ -23,7 +23,7 @@ public class MossroseConfigFactory {
 	private static final Logger LOGGER = LoggerFactory.getLogger(MossroseConfigFactory.class);
 
 	public static MossroseConfig fromClasspathYamlFile(String file) {
-		LOGGER.info("Loading mossrose ymal config file: {}", file);
+		LOGGER.info("Loading mossrose yml config file: {}", file);
 		return new YamlConfigParser().fromClasspathFile(file);
 	}
 

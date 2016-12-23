@@ -39,9 +39,17 @@ public class IgniteGridComputer implements GridComputer {
 
 	}
 
-	private final Ignite ignite;
+	private Ignite ignite;
+	
+	private Cluster cluster; private ClusterDiscovery clusterDiscovery;
 
 	public IgniteGridComputer(Cluster cluster, ClusterDiscovery clusterDiscovery) {
+		this.cluster = cluster;
+		this.clusterDiscovery = clusterDiscovery;
+	}
+	
+	@Override
+	public void init() {
 		ignite = IgniteClusterBuilder.build(cluster, clusterDiscovery);
 	}
 

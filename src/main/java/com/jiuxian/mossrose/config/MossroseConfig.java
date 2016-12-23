@@ -109,6 +109,19 @@ public class MossroseConfig {
 		 * description
 		 */
 		private String description;
+		
+		/**
+		 * Job bean name in spring
+		 */
+		private String jobBeanName;
+
+		public String getJobBeanName() {
+			return jobBeanName;
+		}
+
+		public void setJobBeanName(String jobBeanName) {
+			this.jobBeanName = jobBeanName;
+		}
 
 		public String getId() {
 			return id;

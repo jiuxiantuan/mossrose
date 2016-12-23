@@ -89,8 +89,7 @@ public class ZookeeperClusterDiscovery implements ClusterDiscovery, Closeable {
 	}
 
 	@Override
-	public List<ClusterAddress> findHosts(ClusterAddress currentAddress) {
-		registerCurrentAddress(currentAddress);
+	public List<ClusterAddress> findHosts() {
 
 		final String groupPath = ZKPaths.makePath(ZK_ROOT, group);
 		List<String> children = null;
@@ -104,10 +103,11 @@ public class ZookeeperClusterDiscovery implements ClusterDiscovery, Closeable {
 			return children.stream().map(e -> StringUtils.removeStart(e, prefixToRemove)).map(e -> new ClusterAddress(e))
 					.collect(Collectors.toList());
 		}
-		throw new RuntimeException("No address get.");
+		return null;
 	}
 
-	private void registerCurrentAddress(ClusterAddress currentAddress) {
+	@Override
+	public void registerCurrentAddress(ClusterAddress currentAddress) {
 		try {
 			// Register the current address
 			final String address = currentAddress.toPlainAddress();
