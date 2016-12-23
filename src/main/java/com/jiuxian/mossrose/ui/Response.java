@@ -13,16 +13,30 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package com.jiuxian.mossrose.job;
-
-import java.io.Serializable;
+package com.jiuxian.mossrose.ui;
 
 /**
- * 简单任务
- * 
  * @author <a href="mailto:wangyuxuan@jiuxian.com">Yuxuan Wang</a>
  *
+ * @param <T>
  */
-public interface SimpleJob<T extends Serializable> extends MJob<T> {
+public class Response<T> {
+
+	private int code;
+	private T body;
+
+	protected Response(int code, T body) {
+		super();
+		this.code = code;
+		this.body = body;
+	}
+
+	public int getCode() {
+		return code;
+	}
+
+	public T getBody() {
+		return body;
+	}
 
 }

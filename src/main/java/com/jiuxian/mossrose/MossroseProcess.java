@@ -16,6 +16,7 @@
 package com.jiuxian.mossrose;
 
 import com.jiuxian.mossrose.cluster.ZookeeperClusterDiscovery;
+import com.jiuxian.mossrose.compute.GridComputer;
 import com.jiuxian.mossrose.compute.IgniteGridComputer;
 import com.jiuxian.mossrose.config.MossroseConfig;
 import com.jiuxian.mossrose.quartz.QuartzProcess;
@@ -36,15 +37,14 @@ public class MossroseProcess extends CompetitiveProcess {
 
 	private JobOperation jobOperation;
 	private Competitive competitive;
+	private GridComputer gridComputer;
 
-	public MossroseProcess(QuartzProcess quartzProcess, Competitive competitive) {
+	public MossroseProcess(QuartzProcess quartzProcess, Competitive competitive, GridComputer gridComputer) {
 		super(quartzProcess, competitive);
 		this.jobOperation = quartzProcess;
 		this.competitive = competitive;
-	}
-
-	public MossroseProcess(QuartzProcess quartzProcess, String zks, String group) {
-		this(quartzProcess, new ZookeeperCompetitiveImpl(zks, group));
+		this.gridComputer = gridComputer;
+		quartzProcess.setGridComputer(gridComputer);
 	}
 
 	/**
@@ -54,9 +54,8 @@ public class MossroseProcess extends CompetitiveProcess {
 	 *            zookeeper address
 	 */
 	public MossroseProcess(MossroseConfig mossroseConfig, String zks) {
-		this(new QuartzProcess(mossroseConfig,
-				new IgniteGridComputer(mossroseConfig.getCluster(), new ZookeeperClusterDiscovery(mossroseConfig.getCluster().getName(), zks))), zks,
-				mossroseConfig.getCluster().getName());
+		this(new QuartzProcess(mossroseConfig), new ZookeeperCompetitiveImpl(zks),
+				new IgniteGridComputer(mossroseConfig.getCluster(), new ZookeeperClusterDiscovery(mossroseConfig.getCluster().getName(), zks)));
 	}
 
 	public JobOperation getJobOperation() {
@@ -65,6 +64,12 @@ public class MossroseProcess extends CompetitiveProcess {
 
 	public Competitive getCompetitive() {
 		return competitive;
+	}
+
+	@Override
+	public void run() {
+		gridComputer.init();
+		super.run();
 	}
 
 }

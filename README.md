@@ -18,8 +18,8 @@
 ```
 <dependency>
   <groupId>com.jiuxian</groupId>
-  <artifactId>mossrose-spring</artifactId>
-  <version>1.0.0-RELEASE</version>
+  <artifactId>mossrose</artifactId>
+  <version>2.0.0-RELEASE</version>
 </dependency>
 ```
 
@@ -41,11 +41,17 @@
 
 #### Implement a simple job
 ```
-public class SomeJob implements SimpleJob {
+public class SomeJob implements SimpleJob<String> {
 
-    @Override
-    public void execute() {
-        System.out.println("SimpleJob: " + UUID.randomUUID());
+	@Override
+	public Executor<String> executor() {
+		return new Executor<String>() {
+
+			@Override
+			public void execute(String item) {
+				System.out.println(Thread.currentThread() + " SimpleJob: " + UUID.randomUUID());
+			}
+		};
 	}
 
 }
