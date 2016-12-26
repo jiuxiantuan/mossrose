@@ -88,6 +88,10 @@ public class SomeJob implements SimpleJob<String> {
 </beans>
 
 ```
+#### Start the job
+```
+applicationContext.getBean(MossroseProcess.class).run();
+```
 
 ## Distributed Job
 #### Implement a distributed job
