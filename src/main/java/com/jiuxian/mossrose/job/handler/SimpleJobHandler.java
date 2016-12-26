@@ -12,7 +12,7 @@ public class SimpleJobHandler implements MJobHandler<SimpleJob<Serializable>> {
 
 	@Override
 	public void handle(JobMeta jobMeta, ObjectResource objectResource, GridComputer gridComputer) {
-		gridComputer.execute(new JobUnit<Serializable>(objectResource, "execute")::execute);
+		gridComputer.execute(new JobUnit<Serializable>(objectResource, "execute")::execute).join();
 	}
 
 }
