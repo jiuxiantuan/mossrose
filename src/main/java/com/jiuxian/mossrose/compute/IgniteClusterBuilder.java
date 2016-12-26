@@ -21,7 +21,6 @@ import java.util.stream.Collectors;
 import org.apache.ignite.Ignite;
 import org.apache.ignite.Ignition;
 import org.apache.ignite.configuration.IgniteConfiguration;
-import org.apache.ignite.lang.IgniteRunnable;
 import org.apache.ignite.logger.slf4j.Slf4jLogger;
 import org.apache.ignite.spi.discovery.tcp.TcpDiscoverySpi;
 import org.apache.ignite.spi.discovery.tcp.internal.TcpDiscoveryNode;
@@ -47,50 +46,54 @@ public final class IgniteClusterBuilder {
 		final String clusterName = cluster.getName();
 		final LoadBalancingMode loadBalancingMode = Objects.firstNonNull(cluster.getLoadBalancingMode(), LoadBalancingMode.ROUND_ROBIN);
 
-		// find ignite cluster
-		final List<ClusterAddress> hosts = clusterDiscovery.findHosts();
-
-		// constuct ignite
-		final TcpDiscoverySpi discoSpi = new TcpDiscoverySpi();
-		discoSpi.setLocalPort(cluster.getPort());
-		if (hosts != null && hosts.size() > 0) {
-			final TcpDiscoveryVmIpFinder ipFinder = new TcpDiscoveryVmIpFinder();
-			ipFinder.setAddresses(hosts.stream().map(e -> e.toPlainAddress()).collect(Collectors.toList()));
-			discoSpi.setIpFinder(ipFinder);
-		}
-
-		final IgniteConfiguration cfg = new IgniteConfiguration();
-		cfg.setGridName(clusterName);
-		cfg.setMetricsLogFrequency(0);
-		cfg.setGridLogger(new Slf4jLogger());
-		cfg.setDiscoverySpi(discoSpi);
-
-		if (loadBalancingMode == LoadBalancingMode.ROUND_ROBIN) {
-			cfg.setLoadBalancingSpi(new RoundRobinLoadBalancingSpi());
-		} else if (loadBalancingMode == LoadBalancingMode.RANDOM) {
-			cfg.setLoadBalancingSpi(new WeightedRandomLoadBalancingSpi());
-		}
-		
-		// SPI
-		IgniteConfigurationRenderRegistry.render(cfg);
-
-		final Ignite ignite = Ignition.start(cfg);
-		TcpDiscoveryNode localNode = (TcpDiscoveryNode) ignite.cluster().localNode();
-		cluster.setPort(localNode.discoveryPort());
-		final ClusterAddress currentAddress = new ClusterAddress(NetworkUtils.getLocalIp(), cluster.getPort());
-		clusterDiscovery.registerCurrentAddress(currentAddress);
-		ignite.compute().broadcast(new IgniteRunnable() {
-
-			private static final long serialVersionUID = 1L;
-
-			@Override
-			public void run() {
-				System.out.println("Join ignite cluser " + clusterName + " with hosts " + hosts);
+		try {
+			// Lock for cluster register
+			while (!clusterDiscovery.lock()) {
+				LOGGER.info("Another node is registering to the cluster, wait 10s to retry fetch lock.");
+				try {
+					Thread.sleep(10 * 1000);
+				} catch (InterruptedException e) {
+				}
 			}
-		});
-		LOGGER.info("Inital ignite cluser {} with hosts {}", clusterName, hosts);
 
-		return ignite;
+			// find ignite cluster
+			final List<ClusterAddress> hosts = clusterDiscovery.findHosts();
+
+			// constuct ignite
+			final TcpDiscoverySpi discoSpi = new TcpDiscoverySpi();
+			discoSpi.setLocalPort(cluster.getPort());
+			if (hosts != null && hosts.size() > 0) {
+				final TcpDiscoveryVmIpFinder ipFinder = new TcpDiscoveryVmIpFinder();
+				ipFinder.setAddresses(hosts.stream().map(e -> e.toPlainAddress()).collect(Collectors.toList()));
+				discoSpi.setIpFinder(ipFinder);
+			}
+
+			final IgniteConfiguration cfg = new IgniteConfiguration();
+			cfg.setGridName(clusterName);
+			cfg.setMetricsLogFrequency(0);
+			cfg.setGridLogger(new Slf4jLogger());
+			cfg.setDiscoverySpi(discoSpi);
+
+			if (loadBalancingMode == LoadBalancingMode.ROUND_ROBIN) {
+				cfg.setLoadBalancingSpi(new RoundRobinLoadBalancingSpi());
+			} else if (loadBalancingMode == LoadBalancingMode.RANDOM) {
+				cfg.setLoadBalancingSpi(new WeightedRandomLoadBalancingSpi());
+			}
+
+			// SPI
+			IgniteConfigurationRenderRegistry.render(cfg);
+
+			final Ignite ignite = Ignition.start(cfg);
+			TcpDiscoveryNode localNode = (TcpDiscoveryNode) ignite.cluster().localNode();
+			cluster.setPort(localNode.discoveryPort());
+			final ClusterAddress currentAddress = new ClusterAddress(NetworkUtils.getLocalIp(), cluster.getPort());
+			clusterDiscovery.registerCurrentAddress(currentAddress);
+			LOGGER.info("{} join ignite cluser {} with hosts {}", currentAddress, clusterName, hosts);
+
+			return ignite;
+		} finally {
+			clusterDiscovery.unlock();
+		}
 	}
 
 }

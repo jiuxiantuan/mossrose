@@ -28,5 +28,9 @@ public interface ClusterDiscovery {
 	List<ClusterAddress> findHosts();
 	
 	void registerCurrentAddress(ClusterAddress currentAddress);
+	
+	boolean lock();
+	
+	boolean unlock();
 
 }

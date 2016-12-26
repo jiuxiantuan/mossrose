@@ -26,9 +26,12 @@ import org.apache.curator.framework.CuratorFrameworkFactory;
 import org.apache.curator.retry.ExponentialBackoffRetry;
 import org.apache.curator.utils.ZKPaths;
 import org.apache.zookeeper.CreateMode;
+import org.apache.zookeeper.KeeperException.NodeExistsException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import com.google.common.base.Objects;
+import com.google.common.base.Preconditions;
 import com.google.common.base.Throwables;
 import com.jiuxian.theone.util.NetworkUtils;
 
@@ -39,6 +42,8 @@ public class ZookeeperClusterDiscovery implements ClusterDiscovery, Closeable {
 	private CuratorFramework client;
 
 	private static final String ZK_ROOT = "/mossrose/discovery";
+
+	private static final String LOCK = "/mossrose/discovery-lock";
 
 	private static final int DEFAULT_RETRY_INTERVAL = 3000;
 	private static final int DEFAULT_RETRIES = 10;
@@ -70,6 +75,9 @@ public class ZookeeperClusterDiscovery implements ClusterDiscovery, Closeable {
 	 */
 	public ZookeeperClusterDiscovery(String group, String zks, int sessionTimeoutMs, int connectionTimeoutMs) {
 		super();
+		Preconditions.checkNotNull(group);
+		Preconditions.checkArgument(!Objects.equal(LOCK, group), "lock is retained, cannot be used as group name.");
+
 		this.group = group;
 		client = CuratorFrameworkFactory.newClient(zks, 10000, 10000, new ExponentialBackoffRetry(1000, 3));
 		client.start();
@@ -160,6 +168,37 @@ public class ZookeeperClusterDiscovery implements ClusterDiscovery, Closeable {
 
 	public void setRetries(int retries) {
 		this.retries = retries;
+	}
+
+	@Override
+	public boolean lock() {
+		final String lockPath = ZKPaths.makePath(LOCK, group);
+		try {
+			if (client.checkExists().forPath(lockPath) == null) {
+				try {
+					client.create().creatingParentsIfNeeded().withMode(CreateMode.EPHEMERAL).forPath(lockPath, NetworkUtils.getLocalIp().getBytes());
+					return true;
+				} catch (NodeExistsException e) {
+					// Ignore as lock failed
+				}
+
+			}
+		} catch (Exception e) {
+			LOGGER.error(e.getMessage(), e);
+		}
+		return false;
+	}
+
+	@Override
+	public boolean unlock() {
+		final String lockPath = ZKPaths.makePath(LOCK, group);
+		try {
+			client.delete().forPath(lockPath);
+			return true;
+		} catch (Exception e) {
+			LOGGER.error(e.getMessage(), e);
+			throw Throwables.propagate(e);
+		}
 	}
 
 }
