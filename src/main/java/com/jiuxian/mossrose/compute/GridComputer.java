@@ -15,6 +15,12 @@
  */
 package com.jiuxian.mossrose.compute;
 
+/**
+ * Abstraction for grid compute
+ * 
+ * @author <a href="mailto:wangyuxuan@jiuxian.com">Yuxuan Wang</a>
+ *
+ */
 public interface GridComputer extends AutoCloseable {
 
 	public interface ComputeFuture {
@@ -24,7 +30,20 @@ public interface GridComputer extends AutoCloseable {
 		void join();
 	}
 
+	/**
+	 * 发送计算任务到网格
+	 * 
+	 * @param gridCompute
+	 * @return
+	 */
 	ComputeFuture execute(ComputeUnit gridCompute);
-	
+
+	/**
+	 * 计算网格的并行度
+	 * 
+	 * @return
+	 */
+	int concurrency();
+
 	void init();
 }

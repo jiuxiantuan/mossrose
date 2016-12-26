@@ -11,7 +11,7 @@ import com.jiuxian.mossrose.job.StreamingJob;
 public class SomeStreamingJob implements StreamingJob<String> {
 
 	private static final Logger LOGGER = LoggerFactory.getLogger(SomeStreamingJob.class);
-
+	
 	@Override
 	public Streamer<String> streamer() {
 		return new Streamer<String>() {

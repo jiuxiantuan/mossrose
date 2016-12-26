@@ -67,4 +67,9 @@ public class IgniteGridComputer implements GridComputer {
 		}
 	}
 
+	@Override
+	public int concurrency() {
+		return ignite.cluster().nodes().size();
+	}
+
 }
