@@ -21,7 +21,7 @@
 <dependency>
   <groupId>com.jiuxian</groupId>
   <artifactId>mossrose</artifactId>
-  <version>2.0.1-RELEASE</version>
+  <version>2.0.3-RELEASE</version>
 </dependency>
 ```
 

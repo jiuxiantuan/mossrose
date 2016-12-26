@@ -22,6 +22,8 @@ import java.io.Serializable;
  * 流式作业接口
  * <p>
  * 用于解决大量任务切分的问题，为避免OOE，使用Streamer不断输出作业分片数据
+ * <p>
+ * Mossrose会根据当前计算集群的节点数动态设定子任务的并行度
  * 
  * @author <a href="mailto:wangyuxuan@jiuxian.com">Yuxuan Wang</a>
  *
