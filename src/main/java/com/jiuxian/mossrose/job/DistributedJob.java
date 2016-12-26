@@ -21,36 +21,6 @@ import java.util.List;
 /**
  * 分布式任务，可以将密集任务分解后在集群中执行
  * 
- * 例：
- * 
- * <pre>
- * public class DistributedExampleJob implements DistributedJob<String> {
- * 
- * 	&#64;Override
- * 	public Slicer<String> slicer() {
- * 		return new Slicer<String>() {
- * 
- * 			&#64;Override
- * 			public List<String> slice() {
- * 				return Splitter.on(" ").splitToList("A B C D E F G H I J K L M N O P Q R S T U");
- * 			}
- * 		};
- * 	}
- * 
- * 	&#64;Override
- * 	public com.jiuxian.mossrose.job.DistributedJob.Executor<String> executor() {
- * 		return new Executor<String>() {
- * 
- * 			&#64;Override
- * 			public void execute(String item) {
- * 				System.out.println(item);
- * 			}
- * 		};
- * 	}
- * 
- * }
- * </pre>
- * 
  * @author <a href="mailto:wangyuxuan@jiuxian.com">Yuxuan Wang</a>
  *
  * @param <T>

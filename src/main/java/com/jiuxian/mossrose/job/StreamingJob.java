@@ -23,44 +23,6 @@ import java.io.Serializable;
  * <p>
  * 用于解决大量任务切分的问题，为避免OOE，使用Streamer不断输出作业分片数据
  * 
- * <pre>
- * public class StreamingExampleJob implements StreamingJob<String> {
- * 
- * 	&#64;Override
- * 	public Streamer<String> streamer() {
- * 		return new Streamer<String>() {
- * 
- * 			private List<String> list = Lists.newArrayList("Sunday", "Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday");
- * 
- * 			// 用于保存分页的状态
- * 			private int index = 0;
- * 
- * 			&#64;Override
- * 			public boolean hasNext() {
- * 				return index < list.size() - 1;
- * 			}
- * 
- * 			&#64;Override
- * 			public String next() {
- * 				return list.get(index++);
- * 			}
- * 		};
- * 	}
- * 
- * 	&#64;Override
- * 	public Executor<String> executor() {
- * 		return new Executor<String>() {
- * 
- * 			&#64;Override
- * 			public void execute(String item) {
- * 				System.out.println("StreamingJob: " + item);
- * 			}
- * 		};
- * 	}
- * 
- * }
- * </pre>
- * 
  * @author <a href="mailto:wangyuxuan@jiuxian.com">Yuxuan Wang</a>
  *
  * @param <T>

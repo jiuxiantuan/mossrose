@@ -22,26 +22,6 @@ import java.io.Serializable;
  * <p>
  * 任务会在集群中任意节点上执行，但不会被切分
  * 
- * 例：
- * 
- * <pre>
- * public class SimpleExampleJob implements SimpleJob<Serializable> {
- *
- * 	&#64;Override
- * 	public Executor<Serializable> executor() {
- * 		return new Executor<Serializable>() {
- *
- * 			&#64;Override
- * 			public void execute(Serializable item) {
- * 				// Ignore the argument
- * 				// Do you job
- * 			}
- * 		};
- * 	}
- *
- * }
- * </pre>
- * 
  * @author <a href="mailto:wangyuxuan@jiuxian.com">Yuxuan Wang</a>
  *
  * @param <T>
