@@ -26,7 +26,7 @@ import java.util.List;
  * @param <T>
  *            The type of the sliced data
  */
-public interface DistributedJob<T extends Serializable> extends MJob<T> {
+public interface DistributedJob<T extends Serializable> extends ExecutorJob<T> {
 
 	Slicer<T> slicer();
 

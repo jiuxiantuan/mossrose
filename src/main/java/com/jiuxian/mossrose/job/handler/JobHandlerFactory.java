@@ -29,22 +29,22 @@ import org.slf4j.LoggerFactory;
 
 import com.google.common.base.Throwables;
 import com.google.common.collect.Maps;
-import com.jiuxian.mossrose.job.MJob;
+import com.jiuxian.mossrose.job.ExecutorJob;
 
 /**
  * 
  * @author <a href="mailto:wangyuxuan@jiuxian.com">Yuxuan Wang</a>
  *
  */
-public final class MJobHandlerFactory {
+public final class JobHandlerFactory {
 
-	private Map<Class<? extends MJob<Serializable>>, MJobHandler<? extends MJob<Serializable>>> handlers;
+	private Map<Class<? extends ExecutorJob<Serializable>>, JobHandler<? extends ExecutorJob<Serializable>>> handlers;
 
 	private static final String REGISTER_FILE = "META-INF/mossrose/mjob-handler.register";
 
-	private static final Logger LOGGER = LoggerFactory.getLogger(MJobHandlerFactory.class);
+	private static final Logger LOGGER = LoggerFactory.getLogger(JobHandlerFactory.class);
 
-	private MJobHandlerFactory() {
+	private JobHandlerFactory() {
 		LOGGER.info("Initial mjob handler factory.");
 		try {
 			Properties props = new Properties();
@@ -64,9 +64,9 @@ public final class MJobHandlerFactory {
 			for (Map.Entry<Object, Object> entry : props.entrySet()) {
 				LOGGER.info("Init handler: {}", entry);
 				@SuppressWarnings("unchecked")
-				final Class<MJob<Serializable>> mJobClass = (Class<MJob<Serializable>>) Class.forName((String) entry.getKey());
+				final Class<ExecutorJob<Serializable>> mJobClass = (Class<ExecutorJob<Serializable>>) Class.forName((String) entry.getKey());
 				@SuppressWarnings("unchecked")
-				final MJobHandler<MJob<Serializable>> mJobHandler = ((Class<MJobHandler<MJob<Serializable>>>) Class
+				final JobHandler<ExecutorJob<Serializable>> mJobHandler = ((Class<JobHandler<ExecutorJob<Serializable>>>) Class
 						.forName((String) entry.getValue())).newInstance();
 				handlers.put(mJobClass, mJobHandler);
 			}
@@ -76,18 +76,18 @@ public final class MJobHandlerFactory {
 	}
 
 	private static class Holder {
-		private static MJobHandlerFactory MJOB_HANDLER_FACTORY = new MJobHandlerFactory();
+		private static JobHandlerFactory MJOB_HANDLER_FACTORY = new JobHandlerFactory();
 	}
 
-	public static MJobHandlerFactory getInstance() {
+	public static JobHandlerFactory getInstance() {
 		return Holder.MJOB_HANDLER_FACTORY;
 	}
 
-	public MJobHandler<? extends MJob<Serializable>> getMJobHandler(Class<?> mJobClazz) {
+	public JobHandler<? extends ExecutorJob<Serializable>> getMJobHandler(Class<?> mJobClazz) {
 		Class<?>[] interfaces = mJobClazz.getInterfaces();
 		if (interfaces != null) {
 			for (Class<?> interfass : interfaces) {
-				Optional<Entry<Class<? extends MJob<Serializable>>, MJobHandler<? extends MJob<Serializable>>>> optionalEntry = handlers.entrySet()
+				Optional<Entry<Class<? extends ExecutorJob<Serializable>>, JobHandler<? extends ExecutorJob<Serializable>>>> optionalEntry = handlers.entrySet()
 						.stream().filter((entry) -> {
 							return entry.getKey() == interfass;
 						}).findFirst();

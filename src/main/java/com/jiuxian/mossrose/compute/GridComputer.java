@@ -15,6 +15,8 @@
  */
 package com.jiuxian.mossrose.compute;
 
+import java.io.Serializable;
+
 /**
  * Abstraction for grid compute
  * 
@@ -26,8 +28,10 @@ public interface GridComputer extends AutoCloseable {
 	public interface ComputeFuture {
 		/**
 		 * Wait for the GridComputer execution complete
+		 * 
+		 * @return The execution result
 		 */
-		void join();
+		Serializable join();
 	}
 
 	/**

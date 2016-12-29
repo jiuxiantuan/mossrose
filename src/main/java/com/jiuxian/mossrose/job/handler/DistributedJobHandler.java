@@ -23,10 +23,10 @@ import com.jiuxian.mossrose.compute.GridComputer;
 import com.jiuxian.mossrose.compute.GridComputer.ComputeFuture;
 import com.jiuxian.mossrose.config.MossroseConfig.JobMeta;
 import com.jiuxian.mossrose.job.DistributedJob;
-import com.jiuxian.mossrose.job.to.JobUnit;
+import com.jiuxian.mossrose.job.ExecutorJob;
 import com.jiuxian.mossrose.job.to.ObjectResource;
 
-public class DistributedJobHandler implements MJobHandler<DistributedJob<Serializable>> {
+public class DistributedJobHandler implements JobHandler<DistributedJob<Serializable>> {
 
 	@Override
 	@SuppressWarnings("unchecked")
@@ -34,11 +34,18 @@ public class DistributedJobHandler implements MJobHandler<DistributedJob<Seriali
 		final DistributedJob<Serializable> mJob = (DistributedJob<Serializable>) objectResource.generate();
 		final List<Serializable> items = mJob.slicer().slice();
 		if (items != null) {
-			List<ComputeFuture> futures = items.stream().parallel()
-					.map(item -> gridComputer.execute(new JobUnit<Serializable>(objectResource, item)::execute)).collect(Collectors.toList());
+			List<ComputeFuture> futures = items.stream().parallel().map(item -> gridComputer.execute(() -> this.runInCluster(objectResource, item)))
+					.collect(Collectors.toList());
 			futures.forEach(ComputeFuture::join);
 		}
 
+	}
+
+	@SuppressWarnings("unchecked")
+	@Override
+	public Object runInCluster(ObjectResource objectResource, Serializable data) {
+		((ExecutorJob<Serializable>) objectResource.generate()).executor().execute(data);
+		return null;
 	}
 
 }

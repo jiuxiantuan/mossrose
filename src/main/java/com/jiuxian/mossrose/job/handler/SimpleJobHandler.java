@@ -20,14 +20,19 @@ import java.io.Serializable;
 import com.jiuxian.mossrose.compute.GridComputer;
 import com.jiuxian.mossrose.config.MossroseConfig.JobMeta;
 import com.jiuxian.mossrose.job.SimpleJob;
-import com.jiuxian.mossrose.job.to.JobUnit;
 import com.jiuxian.mossrose.job.to.ObjectResource;
 
-public class SimpleJobHandler implements MJobHandler<SimpleJob<Serializable>> {
+public class SimpleJobHandler implements JobHandler<SimpleJob> {
 
 	@Override
 	public void handle(JobMeta jobMeta, ObjectResource objectResource, GridComputer gridComputer) {
-		gridComputer.execute(new JobUnit<Serializable>(objectResource, "execute")::execute).join();
+		gridComputer.execute(() -> this.runInCluster(objectResource, null)).join();
+	}
+
+	@Override
+	public Object runInCluster(ObjectResource objectResource, Serializable data) {
+		((SimpleJob) objectResource.generate()).executor().execute();
+		return null;
 	}
 
 }

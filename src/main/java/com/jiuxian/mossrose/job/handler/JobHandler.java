@@ -13,34 +13,19 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package com.jiuxian.mossrose.job.to;
+package com.jiuxian.mossrose.job.handler;
 
 import java.io.Serializable;
 
-import com.jiuxian.mossrose.job.MJob;
+import com.jiuxian.mossrose.compute.GridComputer;
+import com.jiuxian.mossrose.config.MossroseConfig.JobMeta;
+import com.jiuxian.mossrose.job.RunnableJob;
+import com.jiuxian.mossrose.job.to.ObjectResource;
 
-/**
- * 任务数据单元
- * 
- * @author <a href="mailto:wangyuxuan@jiuxian.com">Yuxuan Wang</a>
- *
- * @param <T>
- */
-public class JobUnit<T extends Serializable> {
+public interface JobHandler<T extends RunnableJob> {
 
-	private ObjectResource objectResource;
-
-	private T argument;
-
-	public JobUnit(ObjectResource objectResource, T argument) {
-		super();
-		this.objectResource = objectResource;
-		this.argument = argument;
-	}
-
-	@SuppressWarnings("unchecked")
-	public void execute() {
-		((MJob<T>) objectResource.generate()).executor().execute(argument);
-	}
+	void handle(JobMeta jobMeta, ObjectResource objectResource, GridComputer gridComputer);
+	
+	Object runInCluster(ObjectResource objectResource, Serializable data);
 
 }

@@ -15,8 +15,6 @@
  */
 package com.jiuxian.mossrose.job;
 
-import java.io.Serializable;
-
 /**
  * 简单任务
  * <p>
@@ -27,6 +25,12 @@ import java.io.Serializable;
  * @param <T>
  *            无意义，仅为接口一致性
  */
-public interface SimpleJob<T extends Serializable> extends MJob<T> {
+public interface SimpleJob extends RunnableJob {
+
+	Executor executor();
+
+	interface Executor {
+		void execute();
+	}
 
 }

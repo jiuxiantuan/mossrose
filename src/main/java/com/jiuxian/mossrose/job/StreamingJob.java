@@ -29,7 +29,7 @@ import java.io.Serializable;
  *
  * @param <T>
  */
-public interface StreamingJob<T extends Serializable> extends MJob<T> {
+public interface StreamingJob<T extends Serializable> extends ExecutorJob<T> {
 
 	Streamer<T> streamer();
 

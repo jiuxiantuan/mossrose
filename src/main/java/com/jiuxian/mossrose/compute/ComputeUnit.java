@@ -20,6 +20,6 @@ import java.io.Serializable;
 @FunctionalInterface
 public interface ComputeUnit extends Serializable {
 
-	void apply();
+	Object apply();
 
 }

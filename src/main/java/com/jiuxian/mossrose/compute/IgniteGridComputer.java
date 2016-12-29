@@ -15,6 +15,8 @@
  */
 package com.jiuxian.mossrose.compute;
 
+import java.io.Serializable;
+
 import org.apache.ignite.Ignite;
 import org.apache.ignite.IgniteCompute;
 import org.apache.ignite.lang.IgniteFuture;
@@ -25,16 +27,16 @@ import com.jiuxian.mossrose.config.MossroseConfig.Cluster;
 public class IgniteGridComputer implements GridComputer {
 
 	public static class IgniteComputeFuture implements ComputeFuture {
-		private IgniteFuture<?> igniteFuture;
+		private IgniteFuture<Object> igniteFuture;
 
-		IgniteComputeFuture(IgniteFuture<?> igniteFuture) {
+		IgniteComputeFuture(IgniteFuture<Object> igniteFuture) {
 			super();
 			this.igniteFuture = igniteFuture;
 		}
 
 		@Override
-		public void join() {
-			igniteFuture.get();
+		public Serializable join() {
+			return (Serializable) igniteFuture.get();
 		}
 
 	}
@@ -56,7 +58,7 @@ public class IgniteGridComputer implements GridComputer {
 	@Override
 	public ComputeFuture execute(ComputeUnit gridCompute) {
 		final IgniteCompute async = ignite.compute().withAsync();
-		async.run(gridCompute::apply);
+		async.call(gridCompute::apply);
 		return new IgniteComputeFuture(async.future());
 	}
 

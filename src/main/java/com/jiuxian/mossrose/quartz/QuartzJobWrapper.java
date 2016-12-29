@@ -28,9 +28,9 @@ import com.google.common.base.Stopwatch;
 import com.google.common.base.Strings;
 import com.jiuxian.mossrose.compute.GridComputer;
 import com.jiuxian.mossrose.config.MossroseConfig.JobMeta;
-import com.jiuxian.mossrose.job.MJob;
-import com.jiuxian.mossrose.job.handler.MJobHandler;
-import com.jiuxian.mossrose.job.handler.MJobHandlerFactory;
+import com.jiuxian.mossrose.job.ExecutorJob;
+import com.jiuxian.mossrose.job.handler.JobHandler;
+import com.jiuxian.mossrose.job.handler.JobHandlerFactory;
 import com.jiuxian.mossrose.job.to.ClassnameObjectResource;
 import com.jiuxian.mossrose.job.to.ObjectResource;
 import com.jiuxian.mossrose.job.to.SpringBeanObjectResource;
@@ -49,7 +49,7 @@ public class QuartzJobWrapper implements Job {
 	public void execute(JobExecutionContext context) throws JobExecutionException {
 		final Stopwatch watch = Stopwatch.createStarted();
 		@SuppressWarnings("unchecked")
-		final MJobHandler<MJob<Serializable>> mJobHandler = (MJobHandler<MJob<Serializable>>) MJobHandlerFactory.getInstance()
+		final JobHandler<ExecutorJob<Serializable>> mJobHandler = (JobHandler<ExecutorJob<Serializable>>) JobHandlerFactory.getInstance()
 				.getMJobHandler(objectResource.clazz());
 		mJobHandler.handle(jobMeta, objectResource, gridComputer);
 		watch.stop();
