@@ -72,6 +72,10 @@ public class ZookeeperClusterDiscovery implements ClusterDiscovery, Closeable {
 	 *            cluster group to discovery with
 	 * @param zks
 	 *            zookeeper address
+	 * @param sessionTimeoutMs
+	 *            session timeout
+	 * @param connectionTimeoutMs
+	 *            connection timeout
 	 */
 	public ZookeeperClusterDiscovery(String group, String zks, int sessionTimeoutMs, int connectionTimeoutMs) {
 		super();

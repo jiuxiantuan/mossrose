@@ -37,15 +37,16 @@ public interface GridComputer extends AutoCloseable {
 	/**
 	 * 发送计算任务到网格
 	 * 
-	 * @param gridCompute
-	 * @return
+	 * @param computeUnit
+	 *            计算单元
+	 * @return ComputeFuture
 	 */
-	ComputeFuture execute(ComputeUnit gridCompute);
+	ComputeFuture execute(ComputeUnit computeUnit);
 
 	/**
 	 * 计算网格的并行度
 	 * 
-	 * @return
+	 * @return 并行度
 	 */
 	int concurrency();
 

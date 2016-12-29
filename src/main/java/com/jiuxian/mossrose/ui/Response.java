@@ -19,6 +19,7 @@ package com.jiuxian.mossrose.ui;
  * @author <a href="mailto:wangyuxuan@jiuxian.com">Yuxuan Wang</a>
  *
  * @param <T>
+ *            data type
  */
 public class Response<T> {
 

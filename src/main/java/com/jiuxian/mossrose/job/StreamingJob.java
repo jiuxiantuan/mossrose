@@ -28,6 +28,7 @@ import java.io.Serializable;
  * @author <a href="mailto:wangyuxuan@jiuxian.com">Yuxuan Wang</a>
  *
  * @param <T>
+ *            Job data
  */
 public interface StreamingJob<T extends Serializable> extends ExecutorJob<T> {
 

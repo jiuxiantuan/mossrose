@@ -21,9 +21,6 @@ package com.jiuxian.mossrose.job;
  * 任务会在集群中任意节点上执行，但不会被切分
  * 
  * @author <a href="mailto:wangyuxuan@jiuxian.com">Yuxuan Wang</a>
- *
- * @param <T>
- *            无意义，仅为接口一致性
  */
 public interface SimpleJob extends RunnableJob {
 
