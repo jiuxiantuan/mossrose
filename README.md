@@ -21,7 +21,7 @@
 <dependency>
   <groupId>com.jiuxian</groupId>
   <artifactId>mossrose</artifactId>
-  <version>2.0.4-RELEASE</version>
+  <version>2.0.5-RELEASE</version>
 </dependency>
 ```
 
@@ -43,15 +43,15 @@
 
 #### Implement a simple job
 ```
-public class SomeJob implements SimpleJob<String> {
+public class SimpleExampleJob implements SimpleJob {
 
 	@Override
-	public Executor<String> executor() {
-		return new Executor<String>() {
+	public Executor executor() {
+		return new Executor() {
 
 			@Override
-			public void execute(String item) {
-				System.out.println(Thread.currentThread() + " SimpleJob: " + UUID.randomUUID());
+			public void execute() {
+				LOGGER.info("SimpleJob");
 			}
 		};
 	}
@@ -160,6 +160,47 @@ public class SomeStreamingJob implements StreamingJob<String> {
 			@Override
 			public void execute(String item) {
 				LOGGER.info(Thread.currentThread() + " StreamingJob: " + item);
+			}
+		};
+	}
+
+}
+```
+
+## MapReduce Job
+#### Implement a map/reduce job
+```
+public class MapReduceExampleJob implements MapReduceJob<Integer, Integer> {
+
+	@Override
+	public com.jiuxian.mossrose.job.MapReduceJob.Mapper<Integer> mapper() {
+		return new Mapper<Integer>() {
+
+			@Override
+			public List<Integer> map() {
+				return Lists.newArrayList(1, 2, 3, 4, 5, 6, 7);
+			}
+		};
+	}
+
+	@Override
+	public com.jiuxian.mossrose.job.MapReduceJob.Executor<Integer, Integer> executor() {
+		return new Executor<Integer, Integer>() {
+
+			@Override
+			public Integer execute(Integer item) {
+				return item * 2;
+			}
+		};
+	}
+
+	@Override
+	public com.jiuxian.mossrose.job.MapReduceJob.Reducer<Integer> reducer() {
+		return new Reducer<Integer>() {
+
+			@Override
+			public void reduce(List<Integer> rs) {
+				LOGGER.info("Reduce result : {}", rs);
 			}
 		};
 	}
