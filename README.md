@@ -21,7 +21,7 @@
 <dependency>
   <groupId>com.jiuxian</groupId>
   <artifactId>mossrose</artifactId>
-  <version>2.0.5-RELEASE</version>
+  <version>2.0.6-RELEASE</version>
 </dependency>
 ```
 
@@ -145,7 +145,7 @@ public class SomeStreamingJob implements StreamingJob<String> {
 
 			@Override
 			public boolean hasNext() {
-				return index < list.size() - 1;
+				return index < list.size();
 			}
 
 			@Override

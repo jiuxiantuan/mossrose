@@ -2,8 +2,10 @@ package com.jiuxian.mossrose.test;
 
 import java.util.UUID;
 
+import com.jiuxian.mossrose.annotation.Singleton;
 import com.jiuxian.mossrose.job.SimpleJob;
 
+@Singleton
 public class SomeJob implements SimpleJob {
 
 	@Override
@@ -12,6 +14,7 @@ public class SomeJob implements SimpleJob {
 
 			@Override
 			public void execute() {
+				System.out.println(this.getClass());
 				System.out.println(Thread.currentThread() + " SimpleJob: " + UUID.randomUUID());
 			}
 		};

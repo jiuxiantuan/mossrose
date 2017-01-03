@@ -15,7 +15,10 @@
  */
 package com.jiuxian.mossrose.job.to;
 
+import java.util.concurrent.ConcurrentHashMap;
+
 import com.google.common.base.Throwables;
+import com.jiuxian.mossrose.annotation.Singleton;
 
 /**
  * 对象资源实现，通过classname反射获取对象
@@ -24,6 +27,8 @@ import com.google.common.base.Throwables;
  *
  */
 public class ClassnameObjectResource implements ObjectResource {
+
+	private static ConcurrentHashMap<Class<?>, Object> objects = new ConcurrentHashMap<>();
 
 	public ClassnameObjectResource() {
 		super();
@@ -47,10 +52,22 @@ public class ClassnameObjectResource implements ObjectResource {
 	@Override
 	public Object generate() {
 		try {
-			return clazz().newInstance();
+			final Class<?> clazz = clazz();
+			if (needToBeSingleton(clazz)) {
+				if (!objects.contains(clazz)) {
+					objects.putIfAbsent(clazz, clazz.newInstance());
+				}
+				return objects.get(clazz);
+			} else {
+				return clazz.newInstance();
+			}
 		} catch (InstantiationException | IllegalAccessException e) {
 			throw Throwables.propagate(e);
 		}
+	}
+
+	private boolean needToBeSingleton(Class<?> clazz) {
+		return clazz.getAnnotation(Singleton.class) != null;
 	}
 
 	@Override
