@@ -47,6 +47,21 @@ public class MossroseConfig {
 
 		private LoadBalancingMode loadBalancingMode;
 
+		/**
+		 * 是否在master节点上运行任务
+
+		 */
+		private boolean runOnMaster = true;
+
+		public boolean isRunOnMaster() {
+			return runOnMaster;
+		}
+
+		public void setRunOnMaster(boolean runOnMaster) {
+			this.runOnMaster = runOnMaster;
+		}
+
+
 		public String getName() {
 			return name;
 		}

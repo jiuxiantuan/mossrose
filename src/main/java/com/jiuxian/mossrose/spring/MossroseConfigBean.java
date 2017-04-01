@@ -45,6 +45,7 @@ public class MossroseConfigBean extends AbstractSingleBeanDefinitionParser {
 		cluster.setName(clusterEle.getAttribute("name"));
 		cluster.setPort(Integer.parseInt(clusterEle.getAttribute("port")));
 		cluster.setLoadBalancingMode(LoadBalancingMode.valueOf(clusterEle.getAttribute("load-balancing-mode")));
+		cluster.setRunOnMaster(Boolean.valueOf(clusterEle.getAttribute("run-on-master")));
 		builder.addPropertyValue("cluster", cluster);
 
 		// Init jobs property

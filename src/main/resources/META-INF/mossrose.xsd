@@ -49,6 +49,13 @@
 							</documentation>
 						</annotation>
 					</attribute>
+					<attribute name="run-on-master" type="boolean" use="optional" default="true">
+						<annotation>
+							<documentation>
+										<![CDATA[ If run execution on master node. ]]>
+							</documentation>
+						</annotation>
+					</attribute>
 					<attribute name="load-balancing-mode" use="optional" default="ROUND_ROBIN">
 						<annotation>
 							<documentation>
