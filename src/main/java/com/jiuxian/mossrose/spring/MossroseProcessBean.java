@@ -38,9 +38,6 @@ public class MossroseProcessBean extends AbstractSingleBeanDefinitionParser {
 
 		String mossroseConfigRef = element.getAttribute("mossrose-config-ref");
 		builder.addConstructorArgReference(mossroseConfigRef);
-
-		String zks = element.getAttribute("zks");
-		builder.addConstructorArgValue(zks);
 	}
 
 	private void preLoad() {

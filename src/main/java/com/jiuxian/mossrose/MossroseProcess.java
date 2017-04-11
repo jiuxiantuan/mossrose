@@ -49,11 +49,9 @@ public class MossroseProcess extends CompetitiveProcess {
 	/**
 	 * @param mossroseConfig
 	 *            mossrose configuration
-	 * @param zks
-	 *            zookeeper address
 	 */
-	public MossroseProcess(MossroseConfig mossroseConfig, String zks) {
-		this(new QuartzProcess(mossroseConfig), new ZookeeperCompetitiveImpl(zks, mossroseConfig.getCluster().getName()),
+	public MossroseProcess(MossroseConfig mossroseConfig) {
+		this(new QuartzProcess(mossroseConfig), new ZookeeperCompetitiveImpl(mossroseConfig.getCluster().getDiscoveryZk(), mossroseConfig.getCluster().getName()),
 				new IgniteGridComputer(mossroseConfig.getCluster()));
 	}
 

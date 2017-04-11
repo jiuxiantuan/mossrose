@@ -21,7 +21,7 @@
 <dependency>
   <groupId>com.jiuxian</groupId>
   <artifactId>mossrose</artifactId>
-  <version>2.0.7-RELEASE</version>
+  <version>2.1.0-RELEASE</version>
 </dependency>
 ```
 
@@ -76,7 +76,7 @@ public class SimpleExampleJob implements SimpleJob {
 
 	<mossrose:springholder />
 	<mossrose:config>
-		<mossrose:cluster name="mossrose-example" />
+		<mossrose:cluster name="mossrose-example" discovery-zk="localhost:2181" />
 		<mossrose:jobs>
 			<mossrose:job id="SimpleExampleJob" cron="0/5 * * * * ?" job-bean-name="simpleExampleJob" group="example" />
 			<mossrose:job id="DistributedExampleJob" cron="0/15 * * * * ?" job-bean-name="distributedExampleJob" group="example" />
@@ -84,7 +84,7 @@ public class SimpleExampleJob implements SimpleJob {
 				description="分布式流式任务示例" />
 		</mossrose:jobs>
 	</mossrose:config>
-	<mossrose:process zks="#{configTookitProp['zk.address']}" />
+	<mossrose:process />
 	<mossrose:ui />
 
 </beans>

@@ -15,13 +15,14 @@
  */
 package com.jiuxian.mossrose.spring;
 
-import com.google.common.base.Strings;
-import com.google.common.collect.Lists;
 import com.jiuxian.mossrose.config.MossroseConfig;
 import com.jiuxian.mossrose.config.MossroseConfig.Cluster;
-import com.jiuxian.mossrose.config.MossroseConfig.Cluster.LoadBalancingMode;
 import com.jiuxian.mossrose.config.MossroseConfig.JobMeta;
+import org.springframework.beans.factory.config.BeanReference;
+import org.springframework.beans.factory.config.RuntimeBeanReference;
+import org.springframework.beans.factory.parsing.BeanComponentDefinition;
 import org.springframework.beans.factory.support.BeanDefinitionBuilder;
+import org.springframework.beans.factory.support.ManagedList;
 import org.springframework.beans.factory.xml.AbstractSingleBeanDefinitionParser;
 import org.springframework.beans.factory.xml.ParserContext;
 import org.springframework.util.xml.DomUtils;
@@ -31,6 +32,8 @@ import java.util.List;
 
 public class MossroseConfigBean extends AbstractSingleBeanDefinitionParser {
 
+	private static final String CLUSTER = "cluster";
+
 	@Override
 	protected Class<?> getBeanClass(Element element) {
 		return MossroseConfig.class;
@@ -39,36 +42,35 @@ public class MossroseConfigBean extends AbstractSingleBeanDefinitionParser {
 	@Override
 	protected void doParse(Element element, ParserContext parserContext, BeanDefinitionBuilder builder) {
 		// Init cluster property
-		Element clusterEle = DomUtils.getChildElementByTagName(element, "cluster");
-		Cluster cluster = new Cluster();
-		cluster.setName(clusterEle.getAttribute("name"));
-		cluster.setPort(Integer.parseInt(clusterEle.getAttribute("port")));
-		cluster.setLoadBalancingMode(LoadBalancingMode.valueOf(clusterEle.getAttribute("load-balancing-mode")));
-		cluster.setRunOnMaster(Boolean.valueOf(clusterEle.getAttribute("run-on-master")));
-		cluster.setDiscoveryZk(clusterEle.getAttribute("discovery-zk"));
-		builder.addPropertyValue("cluster", cluster);
+		Element clusterEle = DomUtils.getChildElementByTagName(element, CLUSTER);
+		BeanDefinitionBuilder clusterBeanBuilder = BeanDefinitionBuilder.genericBeanDefinition(Cluster.class);
+		clusterBeanBuilder.addPropertyValue("name", clusterEle.getAttribute("name"));
+		clusterBeanBuilder.addPropertyValue("port", clusterEle.getAttribute("port"));
+		clusterBeanBuilder.addPropertyValue("loadBalancingMode", clusterEle.getAttribute("load-balancing-mode"));
+		clusterBeanBuilder.addPropertyValue("runOnMaster", clusterEle.getAttribute("run-on-master"));
+		clusterBeanBuilder.addPropertyValue("discoveryZk", clusterEle.getAttribute("discovery-zk"));
+
+		parserContext.registerBeanComponent(new BeanComponentDefinition(clusterBeanBuilder.getBeanDefinition(), CLUSTER));
+		builder.addPropertyReference(CLUSTER, CLUSTER);
+
 
 		// Init jobs property
-		Element jobsEle = DomUtils.getChildElementByTagName(element, "jobs");
-		List<Element> jobEles = DomUtils.getChildElementsByTagName(jobsEle, "job");
-		final List<JobMeta> jobs = Lists.newArrayList();
-		for (Element jobEle : jobEles) {
-			JobMeta job = new JobMeta();
-			job.setId(jobEle.getAttribute("id"));
-			job.setCron(jobEle.getAttribute("cron"));
-			job.setGroup(jobEle.getAttribute("group"));
-			job.setDescription(jobEle.getAttribute("description"));
+		final Element jobsEle = DomUtils.getChildElementByTagName(element, "jobs");
+		final List<Element> jobEles = DomUtils.getChildElementsByTagName(jobsEle, "job");
+		final ManagedList<BeanReference> jobs = new ManagedList<>();
+		for (int i=0;i<jobEles.size();i++) {
+			Element jobEle = jobEles.get(i);
+			BeanDefinitionBuilder jobBeanBuilder = BeanDefinitionBuilder.genericBeanDefinition(JobMeta.class);
+			jobBeanBuilder.addPropertyValue("id", jobEle.getAttribute("id"));
+			jobBeanBuilder.addPropertyValue("cron", jobEle.getAttribute("cron"));
+			jobBeanBuilder.addPropertyValue("group", jobEle.getAttribute("group"));
+			jobBeanBuilder.addPropertyValue("description", jobEle.getAttribute("description"));
+			jobBeanBuilder.addPropertyValue("main", jobEle.getAttribute("main"));
+			jobBeanBuilder.addPropertyValue("jobBeanName", jobEle.getAttribute("job-bean-name"));
 
-			String mainClazz = jobEle.getAttribute("main");
-			String springRef = jobEle.getAttribute("job-bean-name");
-			if (Strings.isNullOrEmpty(mainClazz) && Strings.isNullOrEmpty(springRef)) {
-				parserContext.getReaderContext().error("one of the 'main' or 'job-bean-name' attributes is required", jobEle);
-				continue;
-			}
-
-			job.setMain(mainClazz);
-			job.setJobBeanName(springRef);
-			jobs.add(job);
+			String jobBean = "job" + i;
+			parserContext.registerBeanComponent(new BeanComponentDefinition(jobBeanBuilder.getBeanDefinition(), jobBean));
+			jobs.add(new RuntimeBeanReference(jobBean));
 		}
 		builder.addPropertyValue("jobs", jobs);
 	}
