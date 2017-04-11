@@ -48,8 +48,12 @@ public class MossroseConfig {
 		private LoadBalancingMode loadBalancingMode;
 
 		/**
-		 * 是否在master节点上运行任务
+		 * 用于节点发现的zk
+		 */
+		private String discoveryZk;
 
+		/**
+		 * 是否在master节点上运行任务
 		 */
 		private boolean runOnMaster = true;
 
@@ -61,6 +65,13 @@ public class MossroseConfig {
 			this.runOnMaster = runOnMaster;
 		}
 
+		public String getDiscoveryZk() {
+			return discoveryZk;
+		}
+
+		public void setDiscoveryZk(String discoveryZk) {
+			this.discoveryZk = discoveryZk;
+		}
 
 		public String getName() {
 			return name;
@@ -92,7 +103,7 @@ public class MossroseConfig {
 		}
 
 		public enum LoadBalancingMode {
-			ROUND_ROBIN, RANDOM;
+			ROUND_ROBIN, RANDOM
 		}
 
 	}

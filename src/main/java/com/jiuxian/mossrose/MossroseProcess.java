@@ -15,7 +15,6 @@
  */
 package com.jiuxian.mossrose;
 
-import com.jiuxian.mossrose.cluster.ZookeeperClusterDiscovery;
 import com.jiuxian.mossrose.compute.GridComputer;
 import com.jiuxian.mossrose.compute.IgniteGridComputer;
 import com.jiuxian.mossrose.config.MossroseConfig;
@@ -55,7 +54,7 @@ public class MossroseProcess extends CompetitiveProcess {
 	 */
 	public MossroseProcess(MossroseConfig mossroseConfig, String zks) {
 		this(new QuartzProcess(mossroseConfig), new ZookeeperCompetitiveImpl(zks, mossroseConfig.getCluster().getName()),
-				new IgniteGridComputer(mossroseConfig.getCluster(), new ZookeeperClusterDiscovery(mossroseConfig.getCluster().getName(), zks)));
+				new IgniteGridComputer(mossroseConfig.getCluster()));
 	}
 
 	public JobOperation getJobOperation() {

@@ -15,20 +15,19 @@
  */
 package com.jiuxian.mossrose.spring;
 
-import java.util.List;
-
-import org.springframework.beans.factory.support.BeanDefinitionBuilder;
-import org.springframework.beans.factory.xml.AbstractSingleBeanDefinitionParser;
-import org.springframework.beans.factory.xml.ParserContext;
-import org.springframework.util.xml.DomUtils;
-import org.w3c.dom.Element;
-
 import com.google.common.base.Strings;
 import com.google.common.collect.Lists;
 import com.jiuxian.mossrose.config.MossroseConfig;
 import com.jiuxian.mossrose.config.MossroseConfig.Cluster;
 import com.jiuxian.mossrose.config.MossroseConfig.Cluster.LoadBalancingMode;
 import com.jiuxian.mossrose.config.MossroseConfig.JobMeta;
+import org.springframework.beans.factory.support.BeanDefinitionBuilder;
+import org.springframework.beans.factory.xml.AbstractSingleBeanDefinitionParser;
+import org.springframework.beans.factory.xml.ParserContext;
+import org.springframework.util.xml.DomUtils;
+import org.w3c.dom.Element;
+
+import java.util.List;
 
 public class MossroseConfigBean extends AbstractSingleBeanDefinitionParser {
 
@@ -46,6 +45,7 @@ public class MossroseConfigBean extends AbstractSingleBeanDefinitionParser {
 		cluster.setPort(Integer.parseInt(clusterEle.getAttribute("port")));
 		cluster.setLoadBalancingMode(LoadBalancingMode.valueOf(clusterEle.getAttribute("load-balancing-mode")));
 		cluster.setRunOnMaster(Boolean.valueOf(clusterEle.getAttribute("run-on-master")));
+		cluster.setDiscoveryZk(clusterEle.getAttribute("discovery-zk"));
 		builder.addPropertyValue("cluster", cluster);
 
 		// Init jobs property

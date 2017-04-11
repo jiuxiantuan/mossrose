@@ -1,7 +1,8 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<schema xmlns="http://www.w3.org/2001/XMLSchema" xmlns:beans="http://www.springframework.org/schema/beans" xmlns:tool="http://www.springframework.org/schema/tool"
-	xmlns:tns="https://jiuxiantuan.github.io/mossrose" targetNamespace="https://jiuxiantuan.github.io/mossrose" elementFormDefault="qualified"
-	attributeFormDefault="unqualified">
+<schema xmlns="http://www.w3.org/2001/XMLSchema" xmlns:tool="http://www.springframework.org/schema/tool"
+		xmlns:tns="https://jiuxiantuan.github.io/mossrose" targetNamespace="https://jiuxiantuan.github.io/mossrose"
+		elementFormDefault="qualified"
+		attributeFormDefault="unqualified">
 
 	<import namespace="http://www.springframework.org/schema/beans" />
 	<import namespace="http://www.springframework.org/schema/tool" />
@@ -73,6 +74,13 @@
 						<annotation>
 							<documentation>
 										<![CDATA[ Port for nodes join with each other. ]]>
+							</documentation>
+						</annotation>
+					</attribute>
+					<attribute name="discovery-zk" type="string" use="required">
+						<annotation>
+							<documentation>
+										<![CDATA[ Zookeeper address for node discovery. ]]>
 							</documentation>
 						</annotation>
 					</attribute>

@@ -15,15 +15,13 @@
  */
 package com.jiuxian.mossrose.compute;
 
-import java.io.Serializable;
-
+import com.jiuxian.mossrose.config.MossroseConfig.Cluster;
 import org.apache.ignite.Ignite;
 import org.apache.ignite.IgniteCompute;
 import org.apache.ignite.cluster.ClusterGroup;
 import org.apache.ignite.lang.IgniteFuture;
 
-import com.jiuxian.mossrose.cluster.ClusterDiscovery;
-import com.jiuxian.mossrose.config.MossroseConfig.Cluster;
+import java.io.Serializable;
 
 public class IgniteGridComputer implements GridComputer {
 
@@ -45,16 +43,14 @@ public class IgniteGridComputer implements GridComputer {
     private Ignite ignite;
 
     private Cluster cluster;
-    private ClusterDiscovery clusterDiscovery;
 
-    public IgniteGridComputer(Cluster cluster, ClusterDiscovery clusterDiscovery) {
+    public IgniteGridComputer(Cluster cluster) {
         this.cluster = cluster;
-        this.clusterDiscovery = clusterDiscovery;
     }
 
     @Override
     public void init() {
-        ignite = IgniteClusterBuilder.build(cluster, clusterDiscovery);
+        ignite = IgniteClusterBuilder.build(cluster);
     }
 
     @Override
