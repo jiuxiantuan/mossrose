@@ -51,9 +51,9 @@ public class MasterRouting implements ContainerRequestFilter {
 		final String currentLocker = competitive.currentLocker();
 		final String localIp = NetworkUtils.getLocalIp();
 		if (!Objects.equals(currentLocker, localIp)) {
-			URI masterLocation = requestContext.getUriInfo().getAbsolutePathBuilder().host(currentLocker).build();
+			final URI masterLocation = requestContext.getUriInfo().getAbsolutePathBuilder().host(currentLocker).build();
 			LOGGER.info("Redirect url to {}.", masterLocation);
-			Response response = javax.ws.rs.core.Response.seeOther(masterLocation).build();
+			final Response response = javax.ws.rs.core.Response.seeOther(masterLocation).build();
 			requestContext.abortWith(response);
 		}
 	}

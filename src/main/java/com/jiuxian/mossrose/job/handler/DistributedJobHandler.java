@@ -30,11 +30,11 @@ public class DistributedJobHandler implements JobHandler<DistributedJob<Serializ
 
 	@Override
 	@SuppressWarnings("unchecked")
-	public void handle(JobMeta jobMeta, ObjectResource objectResource, GridComputer gridComputer) {
+	public void handle(final JobMeta jobMeta, final ObjectResource objectResource, final GridComputer gridComputer) {
 		final DistributedJob<Serializable> mJob = (DistributedJob<Serializable>) objectResource.generate();
 		final List<Serializable> items = mJob.slicer().slice();
 		if (items != null) {
-			List<ComputeFuture> futures = items.stream().parallel().map(item -> gridComputer.execute(() -> this.runInCluster(objectResource, item)))
+			final List<ComputeFuture> futures = items.stream().parallel().map(item -> gridComputer.execute(() -> this.runInCluster(objectResource, item)))
 					.collect(Collectors.toList());
 			futures.forEach(ComputeFuture::join);
 		}
@@ -43,7 +43,7 @@ public class DistributedJobHandler implements JobHandler<DistributedJob<Serializ
 
 	@SuppressWarnings("unchecked")
 	@Override
-	public Object runInCluster(ObjectResource objectResource, Serializable data) {
+	public Object runInCluster(final ObjectResource objectResource, final Serializable data) {
 		((ExecutorJob<Serializable>) objectResource.generate()).executor().execute(data);
 		return null;
 	}

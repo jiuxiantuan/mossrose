@@ -31,18 +31,16 @@ public class YamlConfigParser implements ConfigParser {
 
 	@Override
 	public MossroseConfig fromClasspathFile(String file) {
-		ObjectMapper mapper = new ObjectMapper(new YAMLFactory());
-		MossroseConfig config = null;
+		final ObjectMapper mapper = new ObjectMapper(new YAMLFactory());
 		try (InputStream in = this.getClass().getClassLoader().getResourceAsStream(file)) {
 			if (in == null) {
 				throw new RuntimeException("Mossrose config file " + file + " cannot be found.");
 			}
-			config = mapper.readValue(in, MossroseConfig.class);
+			return mapper.readValue(in, MossroseConfig.class);
 		} catch (IOException e) {
 			LOGGER.error(e.getMessage(), e);
 			throw Throwables.propagate(e);
 		}
-		return config;
 	}
 
 }

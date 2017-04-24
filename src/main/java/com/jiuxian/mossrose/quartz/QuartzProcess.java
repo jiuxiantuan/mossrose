@@ -62,8 +62,8 @@ public class QuartzProcess extends QuartzJobOperation implements Process, JobOpe
 		try {
 			scheduler = StdSchedulerFactory.getDefaultScheduler();
 			// define the jobs
-			List<JobMeta> jobs = mossroseConfig.getJobs();
-			for (JobMeta jobMeta : jobs) {
+			final List<JobMeta> jobs = mossroseConfig.getJobs();
+			for (final JobMeta jobMeta : jobs) {
 				final String id = jobMeta.getId() != null ? jobMeta.getId() : UUID.randomUUID().toString();
 				final String group = jobMeta.getGroup() != null ? jobMeta.getGroup() : "default-group";
 				final JobDetail job = JobBuilder.newJob(QuartzJobWrapper.class).withIdentity(id, group).withDescription(jobMeta.getDescription())

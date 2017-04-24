@@ -34,11 +34,11 @@ import com.jiuxian.theone.zk.ZookeeperCompetitiveImpl;
  */
 public class MossroseProcess extends CompetitiveProcess {
 
-	private JobOperation jobOperation;
-	private Competitive competitive;
-	private GridComputer gridComputer;
+	private final JobOperation jobOperation;
+	private final Competitive competitive;
+	private final GridComputer gridComputer;
 
-	public MossroseProcess(QuartzProcess quartzProcess, Competitive competitive, GridComputer gridComputer) {
+	public MossroseProcess(final QuartzProcess quartzProcess, final Competitive competitive, final GridComputer gridComputer) {
 		super(quartzProcess, competitive);
 		this.jobOperation = quartzProcess;
 		this.competitive = competitive;
@@ -50,7 +50,7 @@ public class MossroseProcess extends CompetitiveProcess {
 	 * @param mossroseConfig
 	 *            mossrose configuration
 	 */
-	public MossroseProcess(MossroseConfig mossroseConfig) {
+	public MossroseProcess(final MossroseConfig mossroseConfig) {
 		this(new QuartzProcess(mossroseConfig), new ZookeeperCompetitiveImpl(mossroseConfig.getCluster().getDiscoveryZk(), mossroseConfig.getCluster().getName()),
 				new IgniteGridComputer(mossroseConfig.getCluster()));
 	}

@@ -38,12 +38,12 @@ public class IgniteConfigurationRenderRegistry {
 
 	private static final List<IgniteConfigurationRender> RENDERS = Lists.newCopyOnWriteArrayList();
 
-	public static void register(IgniteConfigurationRender render) {
+	public static void register(final IgniteConfigurationRender render) {
 		RENDERS.add(Preconditions.checkNotNull(render));
 	}
 
-	public static void render(IgniteConfiguration igniteConfiguration) {
-		for (IgniteConfigurationRender render : RENDERS) {
+	public static void render(final IgniteConfiguration igniteConfiguration) {
+		for (final IgniteConfigurationRender render : RENDERS) {
 			render.render(igniteConfiguration);
 		}
 	}

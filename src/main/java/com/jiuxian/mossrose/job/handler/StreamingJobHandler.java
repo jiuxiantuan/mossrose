@@ -40,7 +40,7 @@ public class StreamingJobHandler implements JobHandler<StreamingJob<Serializable
 		final StreamingJob<Serializable> mJob = (StreamingJob<Serializable>) objectResource.generate();
 		final Streamer<Serializable> streamer = mJob.streamer();
 
-		int concurrency = gridComputer.concurrency();
+		final int concurrency = gridComputer.concurrency();
 		LOGGER.info("Cluster concurrency : {}", concurrency);
 
 		final List<ComputeFuture> futures = Lists.newArrayList();

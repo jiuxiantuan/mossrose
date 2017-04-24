@@ -26,9 +26,9 @@ import java.io.Serializable;
 public class IgniteGridComputer implements GridComputer {
 
     public static class IgniteComputeFuture implements ComputeFuture {
-        private IgniteFuture<Object> igniteFuture;
+        private final IgniteFuture<Object> igniteFuture;
 
-        IgniteComputeFuture(IgniteFuture<Object> igniteFuture) {
+        IgniteComputeFuture(final IgniteFuture<Object> igniteFuture) {
             super();
             this.igniteFuture = igniteFuture;
         }
@@ -42,9 +42,9 @@ public class IgniteGridComputer implements GridComputer {
 
     private Ignite ignite;
 
-    private Cluster cluster;
+    private final Cluster cluster;
 
-    public IgniteGridComputer(Cluster cluster) {
+    public IgniteGridComputer(final Cluster cluster) {
         this.cluster = cluster;
     }
 
@@ -54,10 +54,10 @@ public class IgniteGridComputer implements GridComputer {
     }
 
     @Override
-    public ComputeFuture execute(ComputeUnit gridCompute) {
+    public ComputeFuture execute(final ComputeUnit gridCompute) {
         // get run info by run-on-master
-        ClusterGroup clusterGroup = ignite.cluster().forRemotes();
-        IgniteCompute compute = null;
+        final ClusterGroup clusterGroup = ignite.cluster().forRemotes();
+        IgniteCompute compute;
         if(cluster.isRunOnMaster() || clusterGroup.hostNames().isEmpty()) {
              compute = ignite.compute().withAsync();
         } else {

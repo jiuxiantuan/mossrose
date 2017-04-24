@@ -99,9 +99,9 @@ public class QuartzJobOperation implements JobOperation {
 				job.setGroup(jobKey.getGroup());
 				job.setDescription(jobDetail.getDescription());
 
-				JobDataMap dataMap = jobDetail.getJobDataMap();
+				final JobDataMap dataMap = jobDetail.getJobDataMap();
 
-				Object jobMain = dataMap.get(JobDataMapKeys.MJOB);
+				final Object jobMain = dataMap.get(JobDataMapKeys.MJOB);
 				if (jobMain != null) {
 					job.setMainClass(jobMain.getClass().getName());
 				}

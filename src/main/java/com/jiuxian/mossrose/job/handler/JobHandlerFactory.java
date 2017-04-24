@@ -15,6 +15,12 @@
  */
 package com.jiuxian.mossrose.job.handler;
 
+import com.google.common.base.Throwables;
+import com.google.common.collect.Maps;
+import com.jiuxian.mossrose.job.ExecutorJob;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 import java.io.InputStream;
 import java.io.Serializable;
 import java.net.URL;
@@ -23,13 +29,6 @@ import java.util.Map;
 import java.util.Map.Entry;
 import java.util.Optional;
 import java.util.Properties;
-
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-
-import com.google.common.base.Throwables;
-import com.google.common.collect.Maps;
-import com.jiuxian.mossrose.job.ExecutorJob;
 
 /**
  * 
@@ -47,10 +46,10 @@ public final class JobHandlerFactory {
 	private JobHandlerFactory() {
 		LOGGER.info("Initial mjob handler factory.");
 		try {
-			Properties props = new Properties();
+			final Properties props = new Properties();
 
 			// Load register file contents
-			Enumeration<URL> registerFiles = this.getClass().getClassLoader().getResources(REGISTER_FILE);
+			final Enumeration<URL> registerFiles = this.getClass().getClassLoader().getResources(REGISTER_FILE);
 			URL registerFile = null;
 			while (registerFiles.hasMoreElements()) {
 				registerFile = registerFiles.nextElement();
@@ -84,13 +83,11 @@ public final class JobHandlerFactory {
 	}
 
 	public JobHandler<? extends ExecutorJob<Serializable>> getMJobHandler(Class<?> mJobClazz) {
-		Class<?>[] interfaces = mJobClazz.getInterfaces();
+		final Class<?>[] interfaces = mJobClazz.getInterfaces();
 		if (interfaces != null) {
-			for (Class<?> interfass : interfaces) {
-				Optional<Entry<Class<? extends ExecutorJob<Serializable>>, JobHandler<? extends ExecutorJob<Serializable>>>> optionalEntry = handlers.entrySet()
-						.stream().filter((entry) -> {
-							return entry.getKey() == interfass;
-						}).findFirst();
+			for (final Class<?> interfass : interfaces) {
+				final Optional<Entry<Class<? extends ExecutorJob<Serializable>>, JobHandler<? extends ExecutorJob<Serializable>>>> optionalEntry = handlers.entrySet()
+						.stream().filter(entry -> entry.getKey() == interfass).findFirst();
 				if (optionalEntry.isPresent()) {
 					return optionalEntry.get().getValue();
 				}

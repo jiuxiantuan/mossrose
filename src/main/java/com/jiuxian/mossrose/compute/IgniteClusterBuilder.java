@@ -34,7 +34,7 @@ public final class IgniteClusterBuilder {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(IgniteClusterBuilder.class);
 
-    public static Ignite build(Cluster cluster) {
+    public static Ignite build(final Cluster cluster) {
         // Get ignite instance
         final String clusterName = cluster.getName();
         final LoadBalancingMode loadBalancingMode = Objects.firstNonNull(cluster.getLoadBalancingMode(), LoadBalancingMode.ROUND_ROBIN);
