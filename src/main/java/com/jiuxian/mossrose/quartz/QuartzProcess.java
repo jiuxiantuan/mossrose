@@ -15,30 +15,21 @@
  */
 package com.jiuxian.mossrose.quartz;
 
-import java.io.IOException;
-import java.util.List;
-import java.util.UUID;
-
-import org.quartz.CronScheduleBuilder;
-import org.quartz.JobBuilder;
-import org.quartz.JobDetail;
-import org.quartz.Scheduler;
-import org.quartz.SchedulerException;
-import org.quartz.Trigger;
-import org.quartz.TriggerBuilder;
-import org.quartz.impl.StdSchedulerFactory;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-
 import com.google.common.base.Preconditions;
-import com.google.common.base.Throwables;
 import com.jiuxian.mossrose.JobOperation;
 import com.jiuxian.mossrose.compute.GridComputer;
 import com.jiuxian.mossrose.config.MossroseConfig;
 import com.jiuxian.mossrose.config.MossroseConfig.JobMeta;
-import com.jiuxian.theone.Process;
+import org.quartz.*;
+import org.quartz.impl.StdSchedulerFactory;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
-public class QuartzProcess extends QuartzJobOperation implements Process, JobOperation {
+import java.io.IOException;
+import java.util.List;
+import java.util.UUID;
+
+public class QuartzProcess extends QuartzJobOperation implements JobOperation, AutoCloseable {
 
 	private Scheduler scheduler;
 
@@ -57,7 +48,6 @@ public class QuartzProcess extends QuartzJobOperation implements Process, JobOpe
 		this.gridComputer = gridComputer;
 	}
 
-	@Override
 	public void run() {
 		try {
 			scheduler = StdSchedulerFactory.getDefaultScheduler();
@@ -78,13 +68,12 @@ public class QuartzProcess extends QuartzJobOperation implements Process, JobOpe
 				// Tell quartz to schedule the job using our trigger
 				scheduler.scheduleJob(job, trigger);
 			}
+			super.setScheduler(scheduler);
 
 			scheduler.start();
-
-			super.setScheduler(scheduler);
 		} catch (SchedulerException e) {
 			LOGGER.error(e.getMessage(), e);
-			throw Throwables.propagate(e);
+			throw new RuntimeException(e);
 		}
 	}
 

@@ -15,20 +15,18 @@
  */
 package com.jiuxian.mossrose.ui;
 
-import java.util.Set;
-
-import javax.ws.rs.core.Application;
-
+import com.google.common.collect.Lists;
+import com.google.common.collect.Sets;
+import com.jiuxian.mossrose.JobOperation;
+import com.jiuxian.mossrose.MossroseProcess;
+import org.apache.curator.framework.recipes.leader.LeaderSelector;
 import org.jboss.resteasy.plugins.server.netty.NettyJaxrsServer;
 import org.jboss.resteasy.spi.ResteasyDeployment;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import com.google.common.collect.Lists;
-import com.google.common.collect.Sets;
-import com.jiuxian.mossrose.JobOperation;
-import com.jiuxian.mossrose.MossroseProcess;
-import com.jiuxian.theone.Competitive;
+import javax.ws.rs.core.Application;
+import java.util.Set;
 
 /**
  * @author <a href="mailto:wangyuxuan@jiuxian.com">Yuxuan Wang</a>
@@ -41,10 +39,10 @@ public class RestMossroseUI implements AutoCloseable {
 	private static final Logger LOGGER = LoggerFactory.getLogger(RestMossroseUI.class);
 	
 	public RestMossroseUI(final MossroseProcess mossroseProcess, final int port) {
-		this(mossroseProcess.getJobOperation(), mossroseProcess.getCompetitive(), port);
+		this(mossroseProcess.getJobOperation(), mossroseProcess.getLeaderSelector(), port);
 	}
 
-	public RestMossroseUI(final JobOperation jobOperation, final Competitive competitive, final int port) {
+	public RestMossroseUI(final JobOperation jobOperation, final LeaderSelector leaderSelector, final int port) {
 		super();
 		final ResteasyDeployment deployment = new ResteasyDeployment();
 		deployment.setSecurityEnabled(true);
@@ -58,7 +56,7 @@ public class RestMossroseUI implements AutoCloseable {
 			}
 
 		});
-		deployment.setProviders(Lists.<Object> newArrayList(new MasterRouting(competitive), new MossroseJackson2Provider()));
+		deployment.setProviders(Lists.<Object> newArrayList(new MasterRouting(leaderSelector), new MossroseJackson2Provider()));
 
 		final NettyJaxrsServer server = new NettyJaxrsServer();
 		server.setDeployment(deployment);

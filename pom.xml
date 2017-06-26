@@ -2,9 +2,9 @@
          xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
     <modelVersion>4.0.0</modelVersion>
     <parent>
-        <groupId>com.jiuxian</groupId>
-        <artifactId>jiuxian-bom</artifactId>
-        <version>1.0.3-RELEASE</version>
+        <groupId>io.spring.platform</groupId>
+        <artifactId>platform-bom</artifactId>
+        <version>Brussels-RELEASE</version>
     </parent>
     <groupId>com.jiuxian</groupId>
     <artifactId>mossrose</artifactId>
@@ -21,18 +21,11 @@
     </licenses>
 
     <properties>
-        <theone.version>1.4.1-RELEASE</theone.version>
         <resteasy-netty.version>3.0.19.Final</resteasy-netty.version>
         <ignite.version>1.9.0</ignite.version>
-        <curator.version>2.9.1</curator.version>
     </properties>
 
     <dependencies>
-        <dependency>
-            <groupId>com.jiuxian</groupId>
-            <artifactId>theone</artifactId>
-            <version>${theone.version}</version>
-        </dependency>
         <dependency>
             <groupId>org.springframework</groupId>
             <artifactId>spring-beans</artifactId>
@@ -44,14 +37,17 @@
         <dependency>
             <groupId>org.apache.ignite</groupId>
             <artifactId>ignite-spring</artifactId>
+            <version>${ignite.version}</version>
         </dependency>
         <dependency>
             <groupId>org.apache.ignite</groupId>
             <artifactId>ignite-core</artifactId>
+            <version>${ignite.version}</version>
         </dependency>
         <dependency>
             <groupId>org.apache.ignite</groupId>
             <artifactId>ignite-slf4j</artifactId>
+            <version>${ignite.version}</version>
         </dependency>
         <dependency>
             <groupId>org.apache.ignite</groupId>
@@ -107,6 +103,11 @@
         <dependency>
             <groupId>commons-beanutils</groupId>
             <artifactId>commons-beanutils</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>org.apache.curator</groupId>
+            <artifactId>curator-framework</artifactId>
+            <version>2.10.0</version>
         </dependency>
     </dependencies>
 

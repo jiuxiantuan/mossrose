@@ -1,12 +1,12 @@
 /**
  * Copyright 2015-2020 jiuxian.com.
- *  
+ * <p>
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
- *  
- *      http://www.apache.org/licenses/LICENSE-2.0
- *  
+ * <p>
+ * http://www.apache.org/licenses/LICENSE-2.0
+ * <p>
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
@@ -15,20 +15,18 @@
  */
 package com.jiuxian.mossrose.ui;
 
-import java.io.IOException;
-import java.net.URI;
-import java.util.Objects;
+import org.apache.curator.framework.recipes.leader.LeaderSelector;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import javax.ws.rs.container.ContainerRequestContext;
 import javax.ws.rs.container.ContainerRequestFilter;
 import javax.ws.rs.container.PreMatching;
 import javax.ws.rs.core.Response;
-
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-
-import com.jiuxian.theone.Competitive;
-import com.jiuxian.theone.util.NetworkUtils;
+import java.io.IOException;
+import java.net.InetAddress;
+import java.net.URI;
+import java.util.Objects;
 
 /**
  * @author <a href="mailto:wangyuxuan@jiuxian.com">Yuxuan Wang</a>
@@ -37,25 +35,29 @@ import com.jiuxian.theone.util.NetworkUtils;
 @PreMatching
 public class MasterRouting implements ContainerRequestFilter {
 
-	private Competitive competitive;
+    private LeaderSelector leaderSelector;
 
-	protected MasterRouting(Competitive competitive) {
-		super();
-		this.competitive = competitive;
-	}
+    protected MasterRouting(LeaderSelector leaderSelector) {
+        super();
+        this.leaderSelector = leaderSelector;
+    }
 
-	private static final Logger LOGGER = LoggerFactory.getLogger(MasterRouting.class);
+    private static final Logger LOGGER = LoggerFactory.getLogger(MasterRouting.class);
 
-	@Override
-	public void filter(ContainerRequestContext requestContext) throws IOException {
-		final String currentLocker = competitive.currentLocker();
-		final String localIp = NetworkUtils.getLocalIp();
-		if (!Objects.equals(currentLocker, localIp)) {
-			final URI masterLocation = requestContext.getUriInfo().getAbsolutePathBuilder().host(currentLocker).build();
-			LOGGER.info("Redirect url to {}.", masterLocation);
-			final Response response = javax.ws.rs.core.Response.seeOther(masterLocation).build();
-			requestContext.abortWith(response);
-		}
-	}
+    @Override
+    public void filter(ContainerRequestContext requestContext) throws IOException {
+        try {
+            final String currentLocker = leaderSelector.getLeader().getId();
+            final String localIp = InetAddress.getLocalHost().getHostAddress();
+            if (!Objects.equals(currentLocker, localIp)) {
+                final URI masterLocation = requestContext.getUriInfo().getAbsolutePathBuilder().host(currentLocker).build();
+                LOGGER.info("Redirect url to {}.", masterLocation);
+                final Response response = javax.ws.rs.core.Response.seeOther(masterLocation).build();
+                requestContext.abortWith(response);
+            }
+        } catch (Exception e) {
+            LOGGER.error("Error while get leader address.", e);
+        }
+    }
 
 }

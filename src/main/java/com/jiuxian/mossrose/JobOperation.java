@@ -41,7 +41,7 @@ public interface JobOperation {
 
 	void runJobNow(String group, String id);
 
-	public static class JobRuntimeInfo implements Serializable {
+	class JobRuntimeInfo implements Serializable {
 		private static final long serialVersionUID = 1L;
 
 		public enum State {

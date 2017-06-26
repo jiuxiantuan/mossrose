@@ -15,10 +15,9 @@
  */
 package com.jiuxian.mossrose.compute;
 
-import com.google.common.base.Objects;
+import com.google.common.base.MoreObjects;
 import com.jiuxian.mossrose.config.MossroseConfig.Cluster;
 import com.jiuxian.mossrose.config.MossroseConfig.Cluster.LoadBalancingMode;
-import com.jiuxian.theone.util.NetworkUtils;
 import org.apache.ignite.Ignite;
 import org.apache.ignite.Ignition;
 import org.apache.ignite.configuration.IgniteConfiguration;
@@ -30,6 +29,9 @@ import org.apache.ignite.spi.loadbalancing.weightedrandom.WeightedRandomLoadBala
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import java.net.InetAddress;
+import java.net.UnknownHostException;
+
 public final class IgniteClusterBuilder {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(IgniteClusterBuilder.class);
@@ -37,11 +39,17 @@ public final class IgniteClusterBuilder {
     public static Ignite build(final Cluster cluster) {
         // Get ignite instance
         final String clusterName = cluster.getName();
-        final LoadBalancingMode loadBalancingMode = Objects.firstNonNull(cluster.getLoadBalancingMode(), LoadBalancingMode.ROUND_ROBIN);
+        final LoadBalancingMode loadBalancingMode = MoreObjects.firstNonNull(cluster.getLoadBalancingMode(), LoadBalancingMode.ROUND_ROBIN);
 
         // constuct ignite
         final TcpDiscoverySpi discoSpi = new TcpDiscoverySpi();
+        try {
+            discoSpi.setLocalAddress(InetAddress.getLocalHost().getHostAddress());
+        } catch (UnknownHostException e) {
+            LOGGER.warn("Error while getting local address.", e);
+        }
         discoSpi.setLocalPort(cluster.getPort());
+
         final TcpDiscoveryZookeeperIpFinder ipFinder = new TcpDiscoveryZookeeperIpFinder();
         ipFinder.setZkConnectionString(cluster.getDiscoveryZk());
         ipFinder.setServiceName(cluster.getName());
@@ -64,7 +72,7 @@ public final class IgniteClusterBuilder {
         IgniteConfigurationRenderRegistry.render(cfg);
 
         final Ignite ignite = Ignition.start(cfg);
-        LOGGER.info("{} join ignite cluser", NetworkUtils.getLocalIp());
+        LOGGER.info("{} join ignite cluser", ignite.cluster().localNode().addresses());
 
         return ignite;
     }
