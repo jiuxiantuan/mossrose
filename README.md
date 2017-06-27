@@ -27,17 +27,17 @@
 
 ## Key concept
 
-* SimpleJob
+#### SimpleJob
   <h5>简单任务</h5>
-* DistributedJob
+#### DistributedJob
  <h5>分布式任务，通过Slicer将作业分隔成多个子任务，子任务在集群内分布执行</h5>
-* StreamingJob
+#### StreamingJob
  <h5>分布式流式任务，解决分片非常多时DistributedJob内存占用大的问题</h5>
-* MapReduceJob
+#### MapReduceJob
  <h5>MapReduce任务</h5>
-* MossroseProcess
+#### MossroseProcess
  <h5>多个MossroseProcess组成集群，集群保证有且只有一个节点竞选成为主节点，主节点负责触发作业；所有节点都是工作节点，主节点触发的任务会在所有工作节点上分布执行</h5>
-* MossroseConfig
+#### MossroseConfig
  <h5>Mossrose配置，包括集群元信息和任务元信息</h5>
 
 
