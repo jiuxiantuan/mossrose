@@ -4,7 +4,7 @@ cluster:
   name: mossrose-ut    # 集群命名空间，MossroseProcess将以此分组，在组内选举主节点，并且同一个命名空间内的节点组成一个计算网格
   loadBalancingMode: ROUND_ROBIN    # 集群负载均衡策略，可选：ROUND_ROBIN/RANDOM
   port: 18888 # 集群运行所在的端口号，默认为18888
-  runOnMaster: false # 当有slaver节点存在时，是否在master节点上执行任务
+  runOnMaster: true # 当有slaver节点存在时，是否在master节点上执行任务
   discoveryZk: 192.168.5.99 # 用于节点发现的zk
 jobs:
   - id: SomeJob   # 作业ID，可选，如果为空则自动生成一个惟一ID
