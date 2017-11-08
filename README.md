@@ -4,6 +4,7 @@
 <hr>
 
 ## 社区
+ * Yahoo Group: https://groups.yahoo.com/group/mossrose
  * QQ群：595011342
 
 ## 文档
