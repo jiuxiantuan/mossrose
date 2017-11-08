@@ -18,6 +18,7 @@ package com.jiuxian.mossrose.quartz;
 import java.io.Serializable;
 import java.util.concurrent.TimeUnit;
 
+import org.quartz.DisallowConcurrentExecution;
 import org.quartz.Job;
 import org.quartz.JobExecutionContext;
 import org.quartz.JobExecutionException;
@@ -35,6 +36,7 @@ import com.jiuxian.mossrose.job.to.ClassnameObjectResource;
 import com.jiuxian.mossrose.job.to.ObjectResource;
 import com.jiuxian.mossrose.job.to.SpringBeanObjectResource;
 
+@DisallowConcurrentExecution
 public class QuartzJobWrapper implements Job {
 
 	private GridComputer gridComputer;
