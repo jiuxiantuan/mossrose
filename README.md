@@ -9,14 +9,15 @@
 
 ## 文档
  * Wiki: https://github.com/jiuxiantuan/mossrose/wiki
+ * Example: https://github.com/jiuxiantuan/mossrose-example
+ * Spring Boot Starter: https://github.com/jiuxiantuan/mossrose-spring-boot-starter
 
 ## Requirement
 
 * Zookeeper
 * Java 8
 * Spring 3.x+ 
-非Spring用户：[https://github.com/jiuxiantuan/mossrose/wiki/Use-mossrose-without-spring]
- 
+
 ## Installation
 ```
 <dependency>
