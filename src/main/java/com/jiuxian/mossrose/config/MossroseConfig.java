@@ -191,9 +191,15 @@ public class MossroseConfig {
 
 		@Override
 		public String toString() {
-			return "JobMeta [id=" + id + ", cron=" + cron + ", main=" + main + ", group=" + group + "]";
+			return "JobMeta{" +
+					"id='" + id + '\'' +
+					", cron='" + cron + '\'' +
+					", main='" + main + '\'' +
+					", group='" + group + '\'' +
+					", description='" + description + '\'' +
+					", jobBeanName='" + jobBeanName + '\'' +
+					'}';
 		}
-
 	}
 
 	public Cluster getCluster() {

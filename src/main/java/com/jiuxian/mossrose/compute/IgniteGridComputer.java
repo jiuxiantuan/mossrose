@@ -66,7 +66,6 @@ public class IgniteGridComputer implements GridComputer {
         } else {
              compute = ignite.compute(clusterGroup);
         }
-        compute.call(gridCompute::apply);
         final IgniteFuture<Object> future = compute.callAsync(gridCompute::apply);
         return new IgniteComputeFuture(future);
     }
