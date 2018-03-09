@@ -15,7 +15,6 @@
  */
 package com.jiuxian.mossrose.job.handler;
 
-import com.google.common.base.Throwables;
 import com.google.common.collect.Maps;
 import com.jiuxian.mossrose.job.ExecutorJob;
 import org.slf4j.Logger;
@@ -70,7 +69,7 @@ public final class JobHandlerFactory {
 				handlers.put(mJobClass, mJobHandler);
 			}
 		} catch (Exception e) {
-			throw Throwables.propagate(e);
+			throw new RuntimeException(e);
 		}
 	}
 

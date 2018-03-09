@@ -15,10 +15,9 @@
  */
 package com.jiuxian.mossrose.job.to;
 
-import java.util.concurrent.ConcurrentHashMap;
-
-import com.google.common.base.Throwables;
 import com.jiuxian.mossrose.annotation.Singleton;
+
+import java.util.concurrent.ConcurrentHashMap;
 
 /**
  * 对象资源实现，通过classname反射获取对象
@@ -62,7 +61,7 @@ public class ClassnameObjectResource implements ObjectResource {
 				return clazz.newInstance();
 			}
 		} catch (InstantiationException | IllegalAccessException e) {
-			throw Throwables.propagate(e);
+			throw new RuntimeException(e);
 		}
 	}
 
@@ -75,7 +74,7 @@ public class ClassnameObjectResource implements ObjectResource {
 		try {
 			return Class.forName(classname);
 		} catch (ClassNotFoundException e) {
-			throw Throwables.propagate(e);
+			throw new RuntimeException(e);
 		}
 	}
 

@@ -20,6 +20,7 @@ import com.jiuxian.mossrose.config.MossroseConfig.Cluster;
 import com.jiuxian.mossrose.config.MossroseConfig.Cluster.LoadBalancingMode;
 import org.apache.ignite.Ignite;
 import org.apache.ignite.Ignition;
+import org.apache.ignite.configuration.CacheConfiguration;
 import org.apache.ignite.configuration.IgniteConfiguration;
 import org.apache.ignite.logger.slf4j.Slf4jLogger;
 import org.apache.ignite.spi.discovery.tcp.TcpDiscoverySpi;
@@ -57,10 +58,15 @@ public final class IgniteClusterBuilder {
         discoSpi.setIpFinder(ipFinder);
 
         final IgniteConfiguration cfg = new IgniteConfiguration();
-        cfg.setGridName(clusterName);
+        cfg.setIgniteInstanceName(clusterName);
         cfg.setMetricsLogFrequency(0);
         cfg.setGridLogger(new Slf4jLogger());
         cfg.setDiscoverySpi(discoSpi);
+
+        CacheConfiguration cacheCfg = new CacheConfiguration();
+        cacheCfg.setName(clusterName);
+        cacheCfg.setBackups(0);
+        cfg.setCacheConfiguration(cacheCfg);
 
         if (loadBalancingMode == LoadBalancingMode.ROUND_ROBIN) {
             cfg.setLoadBalancingSpi(new RoundRobinLoadBalancingSpi());

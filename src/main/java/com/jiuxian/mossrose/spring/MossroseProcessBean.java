@@ -34,24 +34,8 @@ public class MossroseProcessBean extends AbstractSingleBeanDefinitionParser {
 
 	@Override
 	protected void doParse(Element element, BeanDefinitionBuilder builder) {
-		preLoad();
-
 		String mossroseConfigRef = element.getAttribute("mossrose-config-ref");
 		builder.addConstructorArgReference(mossroseConfigRef);
-	}
-
-	private void preLoad() {
-		IgniteConfigurationRenderRegistry.register(new IgniteConfigurationRender() {
-
-			@Override
-			public void render(IgniteConfiguration igniteConfiguration) {
-				// igniteConfiguration.setMarshaller(new BinaryMarshaller());
-
-				CacheConfiguration<Object, Object> cacheConfiguration = new CacheConfiguration<>();
-				cacheConfiguration.setBackups(0);
-				igniteConfiguration.setCacheConfiguration(cacheConfiguration);
-			}
-		});
 	}
 
 }

@@ -23,6 +23,9 @@ import org.apache.ignite.lang.IgniteFuture;
 
 import java.io.Serializable;
 
+/**
+ * @author yuxuan.wang
+ */
 public class IgniteGridComputer implements GridComputer {
 
     public static class IgniteComputeFuture implements ComputeFuture {
@@ -59,12 +62,13 @@ public class IgniteGridComputer implements GridComputer {
         final ClusterGroup clusterGroup = ignite.cluster().forRemotes();
         IgniteCompute compute;
         if(cluster.isRunOnMaster() || clusterGroup.hostNames().isEmpty()) {
-             compute = ignite.compute().withAsync();
+             compute = ignite.compute();
         } else {
-             compute = ignite.compute(clusterGroup).withAsync();
+             compute = ignite.compute(clusterGroup);
         }
         compute.call(gridCompute::apply);
-        return new IgniteComputeFuture(compute.future());
+        final IgniteFuture<Object> future = compute.callAsync(gridCompute::apply);
+        return new IgniteComputeFuture(future);
     }
 
     @Override

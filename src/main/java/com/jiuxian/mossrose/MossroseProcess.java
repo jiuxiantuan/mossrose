@@ -68,8 +68,9 @@ public class MossroseProcess implements AutoCloseable {
                 // Block for leader
                 synchronized (this) {
                     try {
-                        while (true)
+                        while (true) {
                             this.wait();
+                        }
                     } catch (InterruptedException e) {
                         LOGGER.error(e.getMessage(), e);
                     }

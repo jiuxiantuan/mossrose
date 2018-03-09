@@ -15,15 +15,13 @@
  */
 package com.jiuxian.mossrose.config;
 
-import java.io.IOException;
-import java.io.InputStream;
-
+import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.dataformat.yaml.YAMLFactory;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import com.fasterxml.jackson.databind.ObjectMapper;
-import com.fasterxml.jackson.dataformat.yaml.YAMLFactory;
-import com.google.common.base.Throwables;
+import java.io.IOException;
+import java.io.InputStream;
 
 public class YamlConfigParser implements ConfigParser {
 
@@ -39,7 +37,7 @@ public class YamlConfigParser implements ConfigParser {
 			return mapper.readValue(in, MossroseConfig.class);
 		} catch (IOException e) {
 			LOGGER.error(e.getMessage(), e);
-			throw Throwables.propagate(e);
+			throw new RuntimeException(e);
 		}
 	}
 
