@@ -34,8 +34,8 @@ public class DistributedJobHandler implements JobHandler<DistributedJob<Serializ
 		final DistributedJob<Serializable> mJob = (DistributedJob<Serializable>) objectResource.generate();
 		final List<Serializable> items = mJob.slicer().slice();
 		if (items != null) {
-			final List<ComputeFuture> futures = items.stream().parallel().map(item -> gridComputer.execute(() -> this.runInCluster(objectResource, item)))
-					.collect(Collectors.toList());
+			final List<ComputeFuture> futures = items.stream().parallel().map(item -> gridComputer.execute(
+					jobMeta.getId(), () -> this.runInCluster(objectResource, item))).collect(Collectors.toList());
 			futures.forEach(ComputeFuture::join);
 		}
 

@@ -19,7 +19,7 @@ public class MapReduceJobHandler implements JobHandler<MapReduceJob<Serializable
 		final List<Serializable> items = mJob.mapper().map();
 		if (items != null) {
 			final List<ComputeFuture> futures = items.stream().parallel()
-					.map(item -> gridComputer.execute(() -> this.runInCluster(objectResource, item))).collect(Collectors.toList());
+					.map(item -> gridComputer.execute(jobMeta.getId(), () -> this.runInCluster(objectResource, item))).collect(Collectors.toList());
 			final List<Serializable> rs = futures.stream().map(e -> e.join()).collect(Collectors.toList());
 			mJob.reducer().reduce(rs);
 		}

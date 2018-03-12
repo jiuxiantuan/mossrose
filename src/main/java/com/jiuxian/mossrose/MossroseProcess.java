@@ -50,8 +50,10 @@ public class MossroseProcess implements AutoCloseable {
      *            mossrose configuration
      */
     public MossroseProcess(final MossroseConfig mossroseConfig) {
+        mossroseConfig.applyDefault();
+
         this.quartzProcess = new QuartzProcess(mossroseConfig);
-        this.gridComputer = new IgniteGridComputer(mossroseConfig.getCluster());
+        this.gridComputer = new IgniteGridComputer(mossroseConfig);
 
         quartzProcess.setGridComputer(gridComputer);
 

@@ -15,12 +15,13 @@
  */
 package com.jiuxian.mossrose.compute;
 
-import com.google.common.base.MoreObjects;
+import com.jiuxian.mossrose.config.MossroseConfig;
 import com.jiuxian.mossrose.config.MossroseConfig.Cluster;
 import com.jiuxian.mossrose.config.MossroseConfig.Cluster.LoadBalancingMode;
 import org.apache.ignite.Ignite;
 import org.apache.ignite.Ignition;
 import org.apache.ignite.configuration.CacheConfiguration;
+import org.apache.ignite.configuration.ExecutorConfiguration;
 import org.apache.ignite.configuration.IgniteConfiguration;
 import org.apache.ignite.logger.slf4j.Slf4jLogger;
 import org.apache.ignite.spi.discovery.tcp.TcpDiscoverySpi;
@@ -32,15 +33,18 @@ import org.slf4j.LoggerFactory;
 
 import java.net.InetAddress;
 import java.net.UnknownHostException;
+import java.util.List;
 
 public final class IgniteClusterBuilder {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(IgniteClusterBuilder.class);
 
-    public static Ignite build(final Cluster cluster) {
+    public static Ignite build(final MossroseConfig mossroseConfig) {
+        final Cluster cluster = mossroseConfig.getCluster();
+
         // Get ignite instance
         final String clusterName = cluster.getName();
-        final LoadBalancingMode loadBalancingMode = MoreObjects.firstNonNull(cluster.getLoadBalancingMode(), LoadBalancingMode.ROUND_ROBIN);
+        final LoadBalancingMode loadBalancingMode = cluster.getLoadBalancingMode();
 
         // constuct ignite
         final TcpDiscoverySpi discoSpi = new TcpDiscoverySpi();
@@ -72,6 +76,16 @@ public final class IgniteClusterBuilder {
             cfg.setLoadBalancingSpi(new RoundRobinLoadBalancingSpi());
         } else if (loadBalancingMode == LoadBalancingMode.RANDOM) {
             cfg.setLoadBalancingSpi(new WeightedRandomLoadBalancingSpi());
+        }
+
+        // Isolate thread pool for jobs
+        final List<MossroseConfig.JobMeta> jobs = mossroseConfig.getJobs();
+        if (jobs != null) {
+            final ExecutorConfiguration[] executorConfigurations = jobs.stream()
+                    .map(job -> new ExecutorConfiguration(job.getId()).setSize(job.getThreads()))
+                    .toArray(ExecutorConfiguration[]::new);
+
+            cfg.setExecutorConfiguration(executorConfigurations);
         }
 
         // SPI

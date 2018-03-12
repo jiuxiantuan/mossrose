@@ -67,6 +67,7 @@ public class MossroseConfigBean extends AbstractSingleBeanDefinitionParser {
 			jobBeanBuilder.addPropertyValue("description", jobEle.getAttribute("description"));
 			jobBeanBuilder.addPropertyValue("main", jobEle.getAttribute("main"));
 			jobBeanBuilder.addPropertyValue("jobBeanName", jobEle.getAttribute("job-bean-name"));
+			jobBeanBuilder.addPropertyValue("threads", jobEle.getAttribute("threads"));
 
 			String jobBean = "job" + i;
 			parserContext.registerBeanComponent(new BeanComponentDefinition(jobBeanBuilder.getBeanDefinition(), jobBean));

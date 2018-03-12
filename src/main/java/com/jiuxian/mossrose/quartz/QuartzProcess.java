@@ -27,7 +27,6 @@ import org.slf4j.LoggerFactory;
 
 import java.io.IOException;
 import java.util.List;
-import java.util.UUID;
 
 public class QuartzProcess extends QuartzJobOperation implements JobOperation, AutoCloseable {
 
@@ -56,8 +55,8 @@ public class QuartzProcess extends QuartzJobOperation implements JobOperation, A
 			for (final JobMeta jobMeta : jobs) {
 				LOGGER.info("Load job: {}", jobMeta);
 
-				final String id = jobMeta.getId() != null ? jobMeta.getId() : UUID.randomUUID().toString();
-				final String group = jobMeta.getGroup() != null ? jobMeta.getGroup() : "default-group";
+				final String id = jobMeta.getId();
+				final String group = jobMeta.getGroup();
 				final JobDetail job = JobBuilder.newJob(QuartzJobWrapper.class).withIdentity(id, group).withDescription(jobMeta.getDescription())
 						.build();
 

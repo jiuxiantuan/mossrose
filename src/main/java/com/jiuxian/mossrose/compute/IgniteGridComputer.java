@@ -15,7 +15,7 @@
  */
 package com.jiuxian.mossrose.compute;
 
-import com.jiuxian.mossrose.config.MossroseConfig.Cluster;
+import com.jiuxian.mossrose.config.MossroseConfig;
 import org.apache.ignite.Ignite;
 import org.apache.ignite.IgniteCompute;
 import org.apache.ignite.cluster.ClusterGroup;
@@ -45,28 +45,28 @@ public class IgniteGridComputer implements GridComputer {
 
     private Ignite ignite;
 
-    private final Cluster cluster;
+    private final MossroseConfig mossroseConfig;
 
-    public IgniteGridComputer(final Cluster cluster) {
-        this.cluster = cluster;
+    public IgniteGridComputer(final MossroseConfig mossroseConfig) {
+        this.mossroseConfig = mossroseConfig;
     }
 
     @Override
     public void init() {
-        ignite = IgniteClusterBuilder.build(cluster);
+        ignite = IgniteClusterBuilder.build(mossroseConfig);
     }
 
     @Override
-    public ComputeFuture execute(final ComputeUnit gridCompute) {
+    public ComputeFuture execute(final String taskId, final ComputeUnit gridCompute) {
         // get run info by run-on-master
         final ClusterGroup clusterGroup = ignite.cluster().forRemotes();
         IgniteCompute compute;
-        if(cluster.isRunOnMaster() || clusterGroup.hostNames().isEmpty()) {
+        if(mossroseConfig.getCluster().isRunOnMaster() || clusterGroup.hostNames().isEmpty()) {
              compute = ignite.compute();
         } else {
              compute = ignite.compute(clusterGroup);
         }
-        final IgniteFuture<Object> future = compute.callAsync(gridCompute::apply);
+        final IgniteFuture<Object> future = compute.withExecutor(taskId).callAsync(gridCompute::apply);
         return new IgniteComputeFuture(future);
     }
 

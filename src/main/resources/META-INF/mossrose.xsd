@@ -144,6 +144,7 @@
         <attribute name="description" type="xsd:string" use="optional"/>
         <attribute name="main" type="xsd:string"/>
         <attribute name="job-bean-name" type="xsd:string"/>
+        <attribute name="threads" type="xsd:int" use="optional" default="0"/>
     </complexType>
 
     <complexType name="jobs">

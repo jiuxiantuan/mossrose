@@ -26,7 +26,7 @@ public class SimpleJobHandler implements JobHandler<SimpleJob> {
 
 	@Override
 	public void handle(JobMeta jobMeta, ObjectResource objectResource, GridComputer gridComputer) {
-		gridComputer.execute(() -> this.runInCluster(objectResource, null)).join();
+		gridComputer.execute(jobMeta.getId(), () -> this.runInCluster(objectResource, null)).join();
 	}
 
 	@Override
