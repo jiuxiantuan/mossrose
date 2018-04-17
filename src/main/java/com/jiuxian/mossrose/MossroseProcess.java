@@ -23,9 +23,12 @@ import org.apache.curator.framework.CuratorFramework;
 import org.apache.curator.framework.CuratorFrameworkFactory;
 import org.apache.curator.framework.recipes.leader.LeaderSelector;
 import org.apache.curator.framework.recipes.leader.LeaderSelectorListenerAdapter;
+import org.apache.curator.framework.state.ConnectionState;
 import org.apache.curator.retry.BoundedExponentialBackoffRetry;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+
+import java.io.IOException;
 
 /**
  * Mossrose basic implementation<br>
@@ -78,6 +81,19 @@ public class MossroseProcess implements AutoCloseable {
                     }
                 }
             }
+
+            @Override
+            public void stateChanged(CuratorFramework client, ConnectionState newState){
+                if ( client.getConnectionStateErrorPolicy().isErrorState(newState) ) {
+                    try {
+                        LOGGER.warn("Shutdown quartz after state: {}", newState);
+                        quartzProcess.close();
+                    } catch (IOException e) {
+                        LOGGER.error("Error while shutting down quartz process.", e);
+                    }
+                }
+                super.stateChanged(client, newState);
+            }
         });
 
     }
@@ -93,6 +109,7 @@ public class MossroseProcess implements AutoCloseable {
     public void run() {
         gridComputer.init();
 
+        leaderSelector.autoRequeue();
         leaderSelector.start();
     }
 
