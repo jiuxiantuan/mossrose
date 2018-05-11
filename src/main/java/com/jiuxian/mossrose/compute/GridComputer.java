@@ -24,7 +24,7 @@ import java.io.Serializable;
  */
 public interface GridComputer extends AutoCloseable {
 
-    public interface ComputeFuture {
+    interface ComputeFuture {
         /**
          * Wait for the GridComputer execution complete
          *

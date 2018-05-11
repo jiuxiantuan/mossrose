@@ -15,10 +15,6 @@
  */
 package com.jiuxian.mossrose.job.handler;
 
-import java.io.Serializable;
-import java.util.List;
-import java.util.stream.Collectors;
-
 import com.jiuxian.mossrose.compute.GridComputer;
 import com.jiuxian.mossrose.compute.GridComputer.ComputeFuture;
 import com.jiuxian.mossrose.config.MossroseConfig.JobMeta;
@@ -26,26 +22,31 @@ import com.jiuxian.mossrose.job.DistributedJob;
 import com.jiuxian.mossrose.job.ExecutorJob;
 import com.jiuxian.mossrose.job.to.ObjectResource;
 
+import java.io.Serializable;
+import java.util.List;
+import java.util.stream.Collectors;
+
 public class DistributedJobHandler implements JobHandler<DistributedJob<Serializable>> {
 
 	@Override
 	@SuppressWarnings("unchecked")
 	public void handle(final JobMeta jobMeta, final ObjectResource objectResource, final GridComputer gridComputer) {
-		final DistributedJob<Serializable> mJob = (DistributedJob<Serializable>) objectResource.generate();
-		final List<Serializable> items = mJob.slicer().slice();
-		if (items != null) {
-			final List<ComputeFuture> futures = items.stream().parallel().map(item -> gridComputer.execute(
-					jobMeta.getId(), () -> this.runInCluster(objectResource, item))).collect(Collectors.toList());
-			futures.forEach(ComputeFuture::join);
-		}
+		// Slice
+		gridComputer.execute(jobMeta.getId(), () -> {
+			final DistributedJob<Serializable> mJob = (DistributedJob<Serializable>) objectResource.generate();
+			final List<Serializable> items = mJob.slicer().slice();
+			if (items != null) {
+				// Execute
+				final List<ComputeFuture> futures = items.stream().parallel().map(item -> gridComputer.execute(
+						jobMeta.getId(), () -> {
+							((ExecutorJob<Serializable>) objectResource.generate()).executor().execute(item);
+							return null;
+						})).collect(Collectors.toList());
+				futures.forEach(ComputeFuture::join);
+			}
+			return null;
+		}).join();
 
-	}
-
-	@SuppressWarnings("unchecked")
-	@Override
-	public Object runInCluster(final ObjectResource objectResource, final Serializable data) {
-		((ExecutorJob<Serializable>) objectResource.generate()).executor().execute(data);
-		return null;
 	}
 
 }

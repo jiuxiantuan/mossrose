@@ -15,8 +15,6 @@
  */
 package com.jiuxian.mossrose.job.handler;
 
-import java.io.Serializable;
-
 import com.jiuxian.mossrose.compute.GridComputer;
 import com.jiuxian.mossrose.config.MossroseConfig.JobMeta;
 import com.jiuxian.mossrose.job.RunnableJob;
@@ -26,6 +24,4 @@ public interface JobHandler<T extends RunnableJob> {
 
 	void handle(JobMeta jobMeta, ObjectResource objectResource, GridComputer gridComputer);
 	
-	Object runInCluster(ObjectResource objectResource, Serializable data);
-
 }

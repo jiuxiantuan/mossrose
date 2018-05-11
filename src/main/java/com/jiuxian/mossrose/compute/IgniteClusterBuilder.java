@@ -18,6 +18,7 @@ package com.jiuxian.mossrose.compute;
 import com.jiuxian.mossrose.config.MossroseConfig;
 import com.jiuxian.mossrose.config.MossroseConfig.Cluster;
 import com.jiuxian.mossrose.config.MossroseConfig.Cluster.LoadBalancingMode;
+import com.jiuxian.mossrose.util.NetworkUtils;
 import org.apache.ignite.Ignite;
 import org.apache.ignite.Ignition;
 import org.apache.ignite.configuration.CacheConfiguration;
@@ -31,8 +32,6 @@ import org.apache.ignite.spi.loadbalancing.weightedrandom.WeightedRandomLoadBala
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import java.net.InetAddress;
-import java.net.UnknownHostException;
 import java.util.List;
 
 public final class IgniteClusterBuilder {
@@ -48,11 +47,9 @@ public final class IgniteClusterBuilder {
 
         // constuct ignite
         final TcpDiscoverySpi discoSpi = new TcpDiscoverySpi();
-        try {
-            discoSpi.setLocalAddress(InetAddress.getLocalHost().getHostAddress());
-        } catch (UnknownHostException e) {
-            LOGGER.warn("Error while getting local address.", e);
-        }
+        final String address = getLocalIp(cluster.getDiscoveryZk());
+        LOGGER.info("Local address: {}", address);
+        discoSpi.setLocalAddress(address);
         discoSpi.setLocalPort(cluster.getPort());
 
         final TcpDiscoveryZookeeperIpFinder ipFinder = new TcpDiscoveryZookeeperIpFinder();
@@ -95,6 +92,21 @@ public final class IgniteClusterBuilder {
         LOGGER.info("{} join ignite cluser", ignite.cluster().localNode().addresses());
 
         return ignite;
+    }
+
+    private static String getLocalIp(String zkAddress) {
+        String firstZkAddress = zkAddress;
+        if(zkAddress.contains(",")) {
+            firstZkAddress = zkAddress.split(",")[0];
+        }
+        String host = firstZkAddress;
+        int port = 2181;
+        if(firstZkAddress.contains(":")) {
+            final String[] parts = firstZkAddress.split(":");
+            host = parts[0];
+            port = Integer.parseInt(parts[1]);
+        }
+        return NetworkUtils.getReachableIp(host, port);
     }
 
 }
