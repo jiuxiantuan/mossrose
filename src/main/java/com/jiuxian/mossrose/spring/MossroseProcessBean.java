@@ -15,15 +15,10 @@
  */
 package com.jiuxian.mossrose.spring;
 
-import org.apache.ignite.configuration.CacheConfiguration;
-import org.apache.ignite.configuration.IgniteConfiguration;
+import com.jiuxian.mossrose.MossroseProcess;
 import org.springframework.beans.factory.support.BeanDefinitionBuilder;
 import org.springframework.beans.factory.xml.AbstractSingleBeanDefinitionParser;
 import org.w3c.dom.Element;
-
-import com.jiuxian.mossrose.MossroseProcess;
-import com.jiuxian.mossrose.compute.IgniteConfigurationRender;
-import com.jiuxian.mossrose.compute.IgniteConfigurationRenderRegistry;
 
 public class MossroseProcessBean extends AbstractSingleBeanDefinitionParser {
 

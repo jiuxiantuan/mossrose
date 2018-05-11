@@ -1,12 +1,11 @@
 package com.jiuxian.mossrose.test;
 
-import java.util.List;
-
+import com.google.common.collect.Lists;
+import com.jiuxian.mossrose.job.StreamingJob;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import com.google.common.collect.Lists;
-import com.jiuxian.mossrose.job.StreamingJob;
+import java.util.List;
 
 public class SomeStreamingJob implements StreamingJob<String> {
 

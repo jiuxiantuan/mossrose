@@ -15,13 +15,11 @@
  */
 package com.jiuxian.mossrose.compute;
 
-import java.util.List;
-
+import com.google.common.collect.Lists;
+import jline.internal.Preconditions;
 import org.apache.ignite.configuration.IgniteConfiguration;
 
-import com.google.common.collect.Lists;
-
-import jline.internal.Preconditions;
+import java.util.List;
 
 /**
  * Registry for user-custom IgniteConfigurationRender

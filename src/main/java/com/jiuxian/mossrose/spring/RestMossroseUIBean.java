@@ -15,11 +15,10 @@
  */
 package com.jiuxian.mossrose.spring;
 
+import com.jiuxian.mossrose.ui.RestMossroseUI;
 import org.springframework.beans.factory.support.BeanDefinitionBuilder;
 import org.springframework.beans.factory.xml.AbstractSingleBeanDefinitionParser;
 import org.w3c.dom.Element;
-
-import com.jiuxian.mossrose.ui.RestMossroseUI;
 
 public class RestMossroseUIBean extends AbstractSingleBeanDefinitionParser {
 	

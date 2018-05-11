@@ -1,14 +1,13 @@
 package com.jiuxian.mossrose.test;
 
-import java.util.List;
-
-import org.junit.Test;
-
 import com.google.common.collect.Iterables;
 import com.jiuxian.mossrose.JobOperation;
 import com.jiuxian.mossrose.JobOperation.JobRuntimeInfo;
 import com.jiuxian.mossrose.MossroseProcess;
 import com.jiuxian.mossrose.config.MossroseConfigFactory;
+import org.junit.Test;
+
+import java.util.List;
 
 public class JobOperationTest {
 

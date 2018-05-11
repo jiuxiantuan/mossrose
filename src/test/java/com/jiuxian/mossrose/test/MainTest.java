@@ -1,9 +1,8 @@
 package com.jiuxian.mossrose.test;
 
-import org.junit.Test;
-
 import com.jiuxian.mossrose.MossroseProcess;
 import com.jiuxian.mossrose.config.MossroseConfigFactory;
+import org.junit.Test;
 
 public class MainTest {
 

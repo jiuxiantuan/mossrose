@@ -15,16 +15,6 @@
  */
 package com.jiuxian.mossrose.quartz;
 
-import java.io.Serializable;
-import java.util.concurrent.TimeUnit;
-
-import org.quartz.DisallowConcurrentExecution;
-import org.quartz.Job;
-import org.quartz.JobExecutionContext;
-import org.quartz.JobExecutionException;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-
 import com.google.common.base.Stopwatch;
 import com.google.common.base.Strings;
 import com.jiuxian.mossrose.compute.GridComputer;
@@ -35,6 +25,15 @@ import com.jiuxian.mossrose.job.handler.JobHandlerFactory;
 import com.jiuxian.mossrose.job.to.ClassnameObjectResource;
 import com.jiuxian.mossrose.job.to.ObjectResource;
 import com.jiuxian.mossrose.job.to.SpringBeanObjectResource;
+import org.quartz.DisallowConcurrentExecution;
+import org.quartz.Job;
+import org.quartz.JobExecutionContext;
+import org.quartz.JobExecutionException;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
+import java.io.Serializable;
+import java.util.concurrent.TimeUnit;
 
 @DisallowConcurrentExecution
 public class QuartzJobWrapper implements Job {

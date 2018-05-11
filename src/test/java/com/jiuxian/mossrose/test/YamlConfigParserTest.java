@@ -1,12 +1,11 @@
 package com.jiuxian.mossrose.test;
 
-import org.junit.Assert;
-import org.junit.Test;
-
 import com.jiuxian.mossrose.config.ConfigParser;
 import com.jiuxian.mossrose.config.MossroseConfig;
 import com.jiuxian.mossrose.config.MossroseConfig.JobMeta;
 import com.jiuxian.mossrose.config.YamlConfigParser;
+import org.junit.Assert;
+import org.junit.Test;
 
 public class YamlConfigParserTest {
 

@@ -1,12 +1,11 @@
 package com.jiuxian.mossrose.test;
 
-import java.util.List;
-
+import com.google.common.base.Splitter;
+import com.jiuxian.mossrose.job.DistributedJob;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import com.google.common.base.Splitter;
-import com.jiuxian.mossrose.job.DistributedJob;
+import java.util.List;
 
 public class SomeDistributedJob implements DistributedJob<String> {
 

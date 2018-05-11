@@ -15,15 +15,14 @@
  */
 package com.jiuxian.mossrose.ui;
 
-import java.util.List;
+import com.jiuxian.mossrose.JobOperation;
+import com.jiuxian.mossrose.JobOperation.JobRuntimeInfo;
 
 import javax.ws.rs.GET;
 import javax.ws.rs.Path;
 import javax.ws.rs.PathParam;
 import javax.ws.rs.Produces;
-
-import com.jiuxian.mossrose.JobOperation;
-import com.jiuxian.mossrose.JobOperation.JobRuntimeInfo;
+import java.util.List;
 
 /**
  * @author <a href="mailto:wangyuxuan@jiuxian.com">Yuxuan Wang</a>
