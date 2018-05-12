@@ -15,9 +15,13 @@
  */
 package com.jiuxian.mossrose;
 
+import com.google.common.base.Strings;
 import com.jiuxian.mossrose.compute.GridComputer;
 import com.jiuxian.mossrose.compute.IgniteGridComputer;
 import com.jiuxian.mossrose.config.MossroseConfig;
+import com.jiuxian.mossrose.job.to.ClassnameObjectResource;
+import com.jiuxian.mossrose.job.to.ObjectContainer;
+import com.jiuxian.mossrose.job.to.SpringBeanObjectResource;
 import com.jiuxian.mossrose.quartz.QuartzProcess;
 import org.apache.curator.framework.CuratorFramework;
 import org.apache.curator.framework.CuratorFrameworkFactory;
@@ -29,6 +33,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.io.IOException;
+import java.util.List;
 
 /**
  * Mossrose basic implementation<br>
@@ -46,6 +51,8 @@ public class MossroseProcess implements AutoCloseable {
     private final LeaderSelector leaderSelector;
     private final CuratorFramework client;
 
+    private final MossroseConfig mossroseConfig;
+
     private static final Logger LOGGER = LoggerFactory.getLogger(MossroseProcess.class);
 
     /**
@@ -54,6 +61,7 @@ public class MossroseProcess implements AutoCloseable {
      */
     public MossroseProcess(final MossroseConfig mossroseConfig) {
         mossroseConfig.applyDefault();
+        this.mossroseConfig = mossroseConfig;
 
         this.quartzProcess = new QuartzProcess(mossroseConfig);
         this.gridComputer = new IgniteGridComputer(mossroseConfig);
@@ -107,10 +115,30 @@ public class MossroseProcess implements AutoCloseable {
     }
 
     public void run() {
+        initObjectContainer();
+
         gridComputer.init();
 
         leaderSelector.autoRequeue();
         leaderSelector.start();
+    }
+
+    private void initObjectContainer() {
+        ObjectContainer.putGridComputer(gridComputer);
+        final List<MossroseConfig.JobMeta> jobs = mossroseConfig.getJobs();
+        if(jobs != null) {
+            jobs.forEach(jobMeta -> {
+                final String id = jobMeta.getId();
+                Object job = null;
+                if (!Strings.isNullOrEmpty(jobMeta.getMain())) {
+                    job = new ClassnameObjectResource(jobMeta.getMain()).generate();
+                } else if (!Strings.isNullOrEmpty(jobMeta.getJobBeanName())) {
+                    job = new SpringBeanObjectResource(jobMeta.getJobBeanName()).generate();
+                }
+                ObjectContainer.put(id, job);
+            });
+        }
+
     }
 
     @Override

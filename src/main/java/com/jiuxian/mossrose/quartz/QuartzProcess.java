@@ -60,7 +60,6 @@ public class QuartzProcess extends QuartzJobOperation implements JobOperation, A
 				final JobDetail job = JobBuilder.newJob(QuartzJobWrapper.class).withIdentity(id, group).withDescription(jobMeta.getDescription())
 						.build();
 
-				job.getJobDataMap().put(JobDataMapKeys.GRID_COMPUTER, gridComputer);
 				job.getJobDataMap().put(JobDataMapKeys.JOB_META, jobMeta);
 
 				final Trigger trigger = TriggerBuilder.newTrigger().withIdentity(id + "trigger", group).startNow()

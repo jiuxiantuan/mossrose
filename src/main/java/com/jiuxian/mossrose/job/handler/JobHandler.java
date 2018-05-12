@@ -15,13 +15,10 @@
  */
 package com.jiuxian.mossrose.job.handler;
 
-import com.jiuxian.mossrose.compute.GridComputer;
 import com.jiuxian.mossrose.config.MossroseConfig.JobMeta;
-import com.jiuxian.mossrose.job.RunnableJob;
-import com.jiuxian.mossrose.job.to.ObjectResource;
 
-public interface JobHandler<T extends RunnableJob> {
+public interface JobHandler {
 
-	void handle(JobMeta jobMeta, ObjectResource objectResource, GridComputer gridComputer);
+	void handle(JobMeta jobMeta);
 	
 }

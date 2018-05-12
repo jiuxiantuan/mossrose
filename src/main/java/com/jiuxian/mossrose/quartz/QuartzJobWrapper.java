@@ -1,12 +1,12 @@
 /**
  * Copyright 2015-2020 jiuxian.com.
- *  
+ * <p>
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
- *  
- *      http://www.apache.org/licenses/LICENSE-2.0
- *  
+ * <p>
+ * http://www.apache.org/licenses/LICENSE-2.0
+ * <p>
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
@@ -16,15 +16,10 @@
 package com.jiuxian.mossrose.quartz;
 
 import com.google.common.base.Stopwatch;
-import com.google.common.base.Strings;
-import com.jiuxian.mossrose.compute.GridComputer;
 import com.jiuxian.mossrose.config.MossroseConfig.JobMeta;
-import com.jiuxian.mossrose.job.ExecutorJob;
 import com.jiuxian.mossrose.job.handler.JobHandler;
 import com.jiuxian.mossrose.job.handler.JobHandlerFactory;
-import com.jiuxian.mossrose.job.to.ClassnameObjectResource;
-import com.jiuxian.mossrose.job.to.ObjectResource;
-import com.jiuxian.mossrose.job.to.SpringBeanObjectResource;
+import com.jiuxian.mossrose.job.to.ObjectContainer;
 import org.quartz.DisallowConcurrentExecution;
 import org.quartz.Job;
 import org.quartz.JobExecutionContext;
@@ -32,46 +27,27 @@ import org.quartz.JobExecutionException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import java.io.Serializable;
 import java.util.concurrent.TimeUnit;
 
 @DisallowConcurrentExecution
 public class QuartzJobWrapper implements Job {
 
-	private GridComputer gridComputer;
+    private JobMeta jobMeta;
 
-	private JobMeta jobMeta;
+    private static final Logger LOGGER = LoggerFactory.getLogger(QuartzJobWrapper.class);
 
-	private ObjectResource objectResource;
+    @Override
+    public void execute(JobExecutionContext context) throws JobExecutionException {
+        final Stopwatch watch = Stopwatch.createStarted();
+        final JobHandler mJobHandler = JobHandlerFactory.getInstance()
+                .getMJobHandler(ObjectContainer.getClazz(jobMeta.getId()));
+        mJobHandler.handle(jobMeta);
+        watch.stop();
+        LOGGER.info("Job {} use time: {} ms.", jobMeta.getId(), watch.elapsed(TimeUnit.MILLISECONDS));
+    }
 
-	private static final Logger LOGGER = LoggerFactory.getLogger(QuartzJobWrapper.class);
-
-	@Override
-	public void execute(JobExecutionContext context) throws JobExecutionException {
-		final Stopwatch watch = Stopwatch.createStarted();
-		@SuppressWarnings("unchecked")
-		final JobHandler<ExecutorJob<Serializable>> mJobHandler = (JobHandler<ExecutorJob<Serializable>>) JobHandlerFactory.getInstance()
-				.getMJobHandler(objectResource.clazz());
-		mJobHandler.handle(jobMeta, objectResource, gridComputer);
-		watch.stop();
-		LOGGER.info("Job {} use time: {} ms.", jobMeta.getId(), watch.elapsed(TimeUnit.MILLISECONDS));
-	}
-
-	public void setGridComputer(GridComputer gridComputer) {
-		this.gridComputer = gridComputer;
-	}
-
-	public void setJobMeta(JobMeta jobMeta) {
-		this.jobMeta = jobMeta;
-		ObjectResource objectResource = null;
-		if (!Strings.isNullOrEmpty(jobMeta.getMain())) {
-			objectResource = new ClassnameObjectResource(jobMeta.getMain());
-		} else if (!Strings.isNullOrEmpty(jobMeta.getJobBeanName())) {
-			objectResource = new SpringBeanObjectResource(jobMeta.getJobBeanName());
-		} else {
-			throw new IllegalArgumentException("property 'main' and 'job-bean-name' must exists one.");
-		}
-		this.objectResource = objectResource;
-	}
+    public void setJobMeta(JobMeta jobMeta) {
+        this.jobMeta = jobMeta;
+    }
 
 }
