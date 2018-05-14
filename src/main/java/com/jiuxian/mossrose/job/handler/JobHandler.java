@@ -16,9 +16,10 @@
 package com.jiuxian.mossrose.job.handler;
 
 import com.jiuxian.mossrose.config.MossroseConfig.JobMeta;
+import org.apache.ignite.Ignite;
 
 public interface JobHandler {
 
-	void handle(JobMeta jobMeta);
+	void handle(JobMeta jobMeta, Ignite ignite);
 	
 }

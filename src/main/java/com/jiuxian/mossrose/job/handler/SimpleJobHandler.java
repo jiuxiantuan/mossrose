@@ -18,15 +18,17 @@ package com.jiuxian.mossrose.job.handler;
 import com.jiuxian.mossrose.config.MossroseConfig.JobMeta;
 import com.jiuxian.mossrose.job.SimpleJob;
 import com.jiuxian.mossrose.job.to.ObjectContainer;
+import org.apache.ignite.Ignite;
 
-public class SimpleJobHandler implements JobHandler {
+public class SimpleJobHandler extends AbstractJobHandler implements JobHandler {
 
     @Override
-    public void handle(JobMeta jobMeta) {
-        ObjectContainer.getGridComputer().execute(jobMeta.getId(), () -> {
-            ObjectContainer.<SimpleJob>get(jobMeta.getId()).executor().execute();
-            return null;
-        }).join();
+    public void handle(JobMeta jobMeta, Ignite ignite) {
+        ignite.compute(select(ignite))
+                .withExecutor(jobMeta.getId())
+                .run(() -> {
+                    ObjectContainer.<SimpleJob>get(jobMeta.getId()).executor().execute();
+                });
     }
 
 }

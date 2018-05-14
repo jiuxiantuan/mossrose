@@ -15,53 +15,71 @@
  */
 package com.jiuxian.mossrose.job.handler;
 
-import com.google.common.collect.Lists;
-import com.jiuxian.mossrose.compute.GridComputer;
-import com.jiuxian.mossrose.compute.GridComputer.ComputeFuture;
 import com.jiuxian.mossrose.config.MossroseConfig.JobMeta;
 import com.jiuxian.mossrose.job.StreamingJob;
 import com.jiuxian.mossrose.job.StreamingJob.Streamer;
 import com.jiuxian.mossrose.job.to.ObjectContainer;
+import org.apache.ignite.Ignite;
+import org.apache.ignite.IgniteCompute;
+import org.apache.ignite.lang.IgniteFuture;
+import org.apache.ignite.lang.IgniteRunnable;
+import org.apache.ignite.resources.IgniteInstanceResource;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.io.Serializable;
+import java.util.ArrayList;
 import java.util.List;
+import java.util.concurrent.Semaphore;
 
-public class StreamingJobHandler implements JobHandler {
+public class StreamingJobHandler extends AbstractJobHandler implements JobHandler {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(StreamingJobHandler.class);
 
     @Override
-    public void handle(JobMeta jobMeta) {
-        // streaming
-        ObjectContainer.getGridComputer().execute(jobMeta.getId(), () -> {
-            final Streamer<Serializable> streamer = ObjectContainer.<StreamingJob<Serializable>>get(jobMeta.getId()).streamer();
-            final GridComputer remoteGridComputer = ObjectContainer.getGridComputer();
+    public void handle(JobMeta jobMeta, Ignite ignite) {
+        ignite.compute(select(ignite))
+                .withExecutor(jobMeta.getId())
+                .run(new IgniteRunnable() {
 
-            final int concurrency = remoteGridComputer.concurrency() * jobMeta.getThreads();
-            LOGGER.info("Cluster concurrency : {}", concurrency);
+                    @IgniteInstanceResource
+                    private Ignite igniteRemote;
 
-            final List<ComputeFuture> futures = Lists.newArrayList();
-            int cycle = concurrency;
-            while (streamer.hasNext()) {
-                // execute
-                final Serializable next = streamer.next();
-                futures.add(remoteGridComputer.execute(jobMeta.getId(), () -> {
-                    ObjectContainer.<StreamingJob<Serializable>>get(jobMeta.getId()).executor().execute(next);
-                    return null;
-                }));
+                    @Override
+                    public void run() {
+                        final String s = igniteRemote.toString();
+                        System.err.println(s.substring(s.length() - 9));
 
-                cycle--;
-                if (cycle == 0) {
-                    futures.forEach(ComputeFuture::join);
-                    futures.clear();
-                    cycle = concurrency;
-                }
-            }
-            futures.forEach(ComputeFuture::join);
-            return null;
-        }).join();
+                        final Streamer<Serializable> streamer = ObjectContainer.<StreamingJob<Serializable>>get(jobMeta.getId()).streamer();
+                        final int concurrency = igniteRemote.cluster().nodes().size() * jobMeta.getThreads();
+                        LOGGER.info("Cluster concurrency : {}", concurrency);
+
+                        final Semaphore cycle = new Semaphore(concurrency);
+                        final List<IgniteFuture> futures = new ArrayList<>();
+
+                        final IgniteCompute igniteCompute = igniteRemote.compute(select(ignite)).withExecutor(jobMeta.getId());
+                        while (streamer.hasNext()) {
+                            // execute
+                            final Serializable next = streamer.next();
+                            try {
+                                cycle.acquire();
+                                final IgniteFuture<Void> igniteFuture = igniteCompute
+                                        .runAsync(() -> {
+                                            ObjectContainer.<StreamingJob<Serializable>>get(jobMeta.getId()).executor().execute(next);
+                                        });
+                                futures.add(igniteFuture);
+                                igniteFuture.listen((future) -> {
+                                    cycle.release();
+                                });
+                            } catch (InterruptedException e) {
+                            }
+
+                        }
+
+                        futures.forEach(IgniteFuture::get);
+                    }
+                });
+
     }
 
 }

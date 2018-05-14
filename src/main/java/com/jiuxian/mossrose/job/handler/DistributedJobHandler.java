@@ -15,35 +15,49 @@
  */
 package com.jiuxian.mossrose.job.handler;
 
-import com.jiuxian.mossrose.compute.GridComputer.ComputeFuture;
 import com.jiuxian.mossrose.config.MossroseConfig.JobMeta;
 import com.jiuxian.mossrose.job.DistributedJob;
 import com.jiuxian.mossrose.job.to.ObjectContainer;
+import org.apache.ignite.Ignite;
+import org.apache.ignite.lang.IgniteRunnable;
+import org.apache.ignite.resources.IgniteInstanceResource;
 
 import java.io.Serializable;
+import java.util.ArrayList;
+import java.util.Collection;
 import java.util.List;
-import java.util.stream.Collectors;
 
-public class DistributedJobHandler implements JobHandler {
+public class DistributedJobHandler extends AbstractJobHandler implements JobHandler {
 
     @Override
-    @SuppressWarnings("unchecked")
-    public void handle(final JobMeta jobMeta) {
-        // Slice
-        ObjectContainer.getGridComputer().execute(jobMeta.getId(), () -> {
-            final List<Serializable> items = ObjectContainer.<DistributedJob<Serializable>>get(jobMeta.getId()).slicer().slice();
-            if (items != null) {
-                // Execute
-                final List<ComputeFuture> futures = items.stream().parallel().map(
-                        item -> ObjectContainer.getGridComputer().execute(
-                                jobMeta.getId(), () -> {
+    public void handle(final JobMeta jobMeta, Ignite ignite) {
+        ignite.compute(select(ignite))
+                .withExecutor(jobMeta.getId())
+                .run(new IgniteRunnable() {
+
+                    @IgniteInstanceResource
+                    private Ignite igniteRemote;
+
+                    @Override
+                    public void run() {
+                        final String s = igniteRemote.toString();
+                        System.err.println(s.substring(s.length() - 9));
+
+                        final List<Serializable> items = ObjectContainer.<DistributedJob<Serializable>>get(jobMeta.getId()).slicer().slice();
+                        if (items != null) {
+                            // Execute
+                            Collection<IgniteRunnable> jobs = new ArrayList<>();
+                            items.forEach(item -> {
+                                jobs.add(() -> {
                                     ObjectContainer.<DistributedJob<Serializable>>get(jobMeta.getId()).executor().execute(item);
-                                    return null;
-                                })).collect(Collectors.toList());
-                futures.forEach(ComputeFuture::join);
-            }
-            return null;
-        }).join();
+                                });
+                            });
+                            igniteRemote.compute(select(ignite))
+                                    .withExecutor(jobMeta.getId())
+                                    .run(jobs);
+                        }
+                    }
+                });
 
     }
 

@@ -20,6 +20,7 @@ import com.jiuxian.mossrose.config.MossroseConfig.JobMeta;
 import com.jiuxian.mossrose.job.handler.JobHandler;
 import com.jiuxian.mossrose.job.handler.JobHandlerFactory;
 import com.jiuxian.mossrose.job.to.ObjectContainer;
+import org.apache.ignite.Ignite;
 import org.quartz.DisallowConcurrentExecution;
 import org.quartz.Job;
 import org.quartz.JobExecutionContext;
@@ -34,6 +35,8 @@ public class QuartzJobWrapper implements Job {
 
     private JobMeta jobMeta;
 
+    private Ignite ignite;
+
     private static final Logger LOGGER = LoggerFactory.getLogger(QuartzJobWrapper.class);
 
     @Override
@@ -41,7 +44,7 @@ public class QuartzJobWrapper implements Job {
         final Stopwatch watch = Stopwatch.createStarted();
         final JobHandler mJobHandler = JobHandlerFactory.getInstance()
                 .getMJobHandler(ObjectContainer.getClazz(jobMeta.getId()));
-        mJobHandler.handle(jobMeta);
+        mJobHandler.handle(jobMeta, ignite);
         watch.stop();
         LOGGER.info("Job {} use time: {} ms.", jobMeta.getId(), watch.elapsed(TimeUnit.MILLISECONDS));
     }
@@ -50,4 +53,7 @@ public class QuartzJobWrapper implements Job {
         this.jobMeta = jobMeta;
     }
 
+    public void setIgnite(Ignite ignite) {
+        this.ignite = ignite;
+    }
 }

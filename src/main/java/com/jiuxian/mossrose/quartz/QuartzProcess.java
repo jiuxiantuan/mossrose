@@ -17,9 +17,9 @@ package com.jiuxian.mossrose.quartz;
 
 import com.google.common.base.Preconditions;
 import com.jiuxian.mossrose.JobOperation;
-import com.jiuxian.mossrose.compute.GridComputer;
 import com.jiuxian.mossrose.config.MossroseConfig;
 import com.jiuxian.mossrose.config.MossroseConfig.JobMeta;
+import org.apache.ignite.Ignite;
 import org.quartz.*;
 import org.quartz.impl.StdSchedulerFactory;
 import org.slf4j.Logger;
@@ -32,7 +32,7 @@ public class QuartzProcess extends QuartzJobOperation implements JobOperation, A
 
 	private Scheduler scheduler;
 
-	private GridComputer gridComputer;
+	private Ignite ignite;
 
 	private static final Logger LOGGER = LoggerFactory.getLogger(QuartzProcess.class);
 
@@ -43,8 +43,8 @@ public class QuartzProcess extends QuartzJobOperation implements JobOperation, A
 		this.mossroseConfig = Preconditions.checkNotNull(mossroseConfig);
 	}
 
-	public void setGridComputer(GridComputer gridComputer) {
-		this.gridComputer = gridComputer;
+	public void setIgnite(Ignite ignite) {
+		this.ignite = ignite;
 	}
 
 	public void run() {
@@ -61,6 +61,7 @@ public class QuartzProcess extends QuartzJobOperation implements JobOperation, A
 						.build();
 
 				job.getJobDataMap().put(JobDataMapKeys.JOB_META, jobMeta);
+				job.getJobDataMap().put(JobDataMapKeys.IGNITE, ignite);
 
 				final Trigger trigger = TriggerBuilder.newTrigger().withIdentity(id + "trigger", group).startNow()
 						.withSchedule(CronScheduleBuilder.cronSchedule(jobMeta.getCron())).build();

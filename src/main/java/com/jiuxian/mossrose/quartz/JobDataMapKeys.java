@@ -18,7 +18,7 @@ package com.jiuxian.mossrose.quartz;
 public interface JobDataMapKeys {
 
 	String MJOB = "mJob";
-	String GRID_COMPUTER = "gridComputer";
+	String IGNITE = "ignite";
 	String JOB_META = "jobMeta";
 
 }

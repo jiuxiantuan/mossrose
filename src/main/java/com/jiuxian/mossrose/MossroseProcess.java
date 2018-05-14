@@ -16,8 +16,7 @@
 package com.jiuxian.mossrose;
 
 import com.google.common.base.Strings;
-import com.jiuxian.mossrose.compute.GridComputer;
-import com.jiuxian.mossrose.compute.IgniteGridComputer;
+import com.jiuxian.mossrose.compute.IgniteClusterBuilder;
 import com.jiuxian.mossrose.config.MossroseConfig;
 import com.jiuxian.mossrose.job.to.ClassnameObjectResource;
 import com.jiuxian.mossrose.job.to.ObjectContainer;
@@ -29,6 +28,7 @@ import org.apache.curator.framework.recipes.leader.LeaderSelector;
 import org.apache.curator.framework.recipes.leader.LeaderSelectorListenerAdapter;
 import org.apache.curator.framework.state.ConnectionState;
 import org.apache.curator.retry.BoundedExponentialBackoffRetry;
+import org.apache.ignite.Ignite;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -37,17 +37,16 @@ import java.util.List;
 
 /**
  * Mossrose basic implementation<br>
- *
+ * <p>
  * Use zookeeper for master election, zookeeper for discovery, and ignite for
  * grid computation
  *
  * @author <a href="mailto:wangyuxuan@jiuxian.com">Yuxuan Wang</a>
- *
  */
 public class MossroseProcess implements AutoCloseable {
 
     private final QuartzProcess quartzProcess;
-    private final GridComputer gridComputer;
+    private final Ignite ignite;
     private final LeaderSelector leaderSelector;
     private final CuratorFramework client;
 
@@ -56,17 +55,16 @@ public class MossroseProcess implements AutoCloseable {
     private static final Logger LOGGER = LoggerFactory.getLogger(MossroseProcess.class);
 
     /**
-     * @param mossroseConfig
-     *            mossrose configuration
+     * @param mossroseConfig mossrose configuration
      */
     public MossroseProcess(final MossroseConfig mossroseConfig) {
         mossroseConfig.applyDefault();
         this.mossroseConfig = mossroseConfig;
 
         this.quartzProcess = new QuartzProcess(mossroseConfig);
-        this.gridComputer = new IgniteGridComputer(mossroseConfig);
+        this.ignite = IgniteClusterBuilder.build(mossroseConfig);
 
-        quartzProcess.setGridComputer(gridComputer);
+        quartzProcess.setIgnite(ignite);
 
         this.client = CuratorFrameworkFactory.newClient(mossroseConfig.getCluster().getDiscoveryZk(), new BoundedExponentialBackoffRetry(1000, 8000, 4));
         client.start();
@@ -77,6 +75,9 @@ public class MossroseProcess implements AutoCloseable {
             public void takeLeadership(CuratorFramework curatorFramework) throws Exception {
                 LOGGER.info("Become leader.");
                 quartzProcess.run();
+//                if (!mossroseConfig.getCluster().isRunOnMaster()) {
+//                    ignite.cluster().localNode().attributes().put(IgniteConsts.ONLY_TRIGGER, true);
+//                }
 
                 // Block for leader
                 synchronized (this) {
@@ -85,16 +86,17 @@ public class MossroseProcess implements AutoCloseable {
                             this.wait();
                         }
                     } catch (InterruptedException e) {
-                        LOGGER.error(e.getMessage(), e);
+                        LOGGER.warn("Shutdown signal");
                     }
                 }
             }
 
             @Override
-            public void stateChanged(CuratorFramework client, ConnectionState newState){
-                if ( client.getConnectionStateErrorPolicy().isErrorState(newState) ) {
+            public void stateChanged(CuratorFramework client, ConnectionState newState) {
+                if (client.getConnectionStateErrorPolicy().isErrorState(newState)) {
                     try {
                         LOGGER.warn("Shutdown quartz after state: {}", newState);
+                      //  ignite.cluster().localNode().attributes().remove(IgniteConsts.ONLY_TRIGGER);
                         quartzProcess.close();
                     } catch (IOException e) {
                         LOGGER.error("Error while shutting down quartz process.", e);
@@ -117,16 +119,15 @@ public class MossroseProcess implements AutoCloseable {
     public void run() {
         initObjectContainer();
 
-        gridComputer.init();
+//        ignite.cluster().localNode().attributes().put(IgniteConsts.STATE, IgniteConsts.STATE_READY);
 
         leaderSelector.autoRequeue();
         leaderSelector.start();
     }
 
     private void initObjectContainer() {
-        ObjectContainer.putGridComputer(gridComputer);
         final List<MossroseConfig.JobMeta> jobs = mossroseConfig.getJobs();
-        if(jobs != null) {
+        if (jobs != null) {
             jobs.forEach(jobMeta -> {
                 final String id = jobMeta.getId();
                 Object job = null;
@@ -143,10 +144,10 @@ public class MossroseProcess implements AutoCloseable {
 
     @Override
     public void close() throws Exception {
-        if(client != null) {
+        if (client != null) {
             client.close();
         }
-        if(leaderSelector != null) {
+        if (leaderSelector != null) {
             leaderSelector.close();
         }
     }

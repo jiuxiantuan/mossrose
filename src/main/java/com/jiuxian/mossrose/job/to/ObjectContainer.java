@@ -1,7 +1,5 @@
 package com.jiuxian.mossrose.job.to;
 
-import com.jiuxian.mossrose.compute.GridComputer;
-
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 
@@ -10,7 +8,6 @@ import java.util.concurrent.ConcurrentHashMap;
  */
 public final class ObjectContainer {
 
-    private static final String GRID_COMPUTER = "gridComputer";
     private static Map<String, Object> objects = new ConcurrentHashMap<>();
 
     public static void put(String key, Object object) {
@@ -24,13 +21,4 @@ public final class ObjectContainer {
     public static Class<?> getClazz(String key) {
         return objects.get(key).getClass();
     }
-
-    public static void putGridComputer(GridComputer gridComputer) {
-        put(GRID_COMPUTER, gridComputer);
-    }
-
-    public static GridComputer getGridComputer() {
-        return get(GRID_COMPUTER);
-    }
-
 }
