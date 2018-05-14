@@ -2,8 +2,8 @@ package com.jiuxian.mossrose.job.to;
 
 import com.jiuxian.mossrose.compute.GridComputer;
 
-import java.util.HashMap;
 import java.util.Map;
+import java.util.concurrent.ConcurrentHashMap;
 
 /**
  * 用于缓存对象的容器，避免Ignite远程计算时反复创建对象
@@ -11,7 +11,7 @@ import java.util.Map;
 public final class ObjectContainer {
 
     private static final String GRID_COMPUTER = "gridComputer";
-    private static Map<String, Object> objects = new HashMap<>();
+    private static Map<String, Object> objects = new ConcurrentHashMap<>();
 
     public static void put(String key, Object object) {
         objects.put(key, object);
