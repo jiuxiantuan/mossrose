@@ -20,6 +20,7 @@ import com.google.common.collect.Sets;
 import com.jiuxian.mossrose.JobOperation;
 import com.jiuxian.mossrose.MossroseProcess;
 import org.apache.curator.framework.recipes.leader.LeaderSelector;
+import org.apache.ignite.Ignite;
 import org.jboss.resteasy.plugins.server.netty.NettyJaxrsServer;
 import org.jboss.resteasy.spi.ResteasyDeployment;
 import org.slf4j.Logger;
@@ -39,16 +40,17 @@ public class RestMossroseUI implements AutoCloseable {
 	private static final Logger LOGGER = LoggerFactory.getLogger(RestMossroseUI.class);
 	
 	public RestMossroseUI(final MossroseProcess mossroseProcess, final int port) {
-		this(mossroseProcess.getJobOperation(), mossroseProcess.getLeaderSelector(), port);
-	}
-
-	public RestMossroseUI(final JobOperation jobOperation, final LeaderSelector leaderSelector, final int port) {
 		super();
+
+		final JobOperation jobOperation = mossroseProcess.getJobOperation();
+		final LeaderSelector leaderSelector = mossroseProcess.getLeaderSelector();
+		final Ignite ignite = mossroseProcess.getIgnite();
+
 		final ResteasyDeployment deployment = new ResteasyDeployment();
 		deployment.setSecurityEnabled(true);
 		deployment.setApplication(new Application() {
 
-			private Set<Object> singletons = Sets.<Object> newHashSet(new MossroseRequestHandler(jobOperation));
+			private Set<Object> singletons = Sets.newHashSet(new MossroseRequestHandler(jobOperation, ignite, leaderSelector));
 
 			@Override
 			public Set<Object> getSingletons() {
@@ -56,9 +58,9 @@ public class RestMossroseUI implements AutoCloseable {
 			}
 
 		});
-		deployment.setProviders(Lists.<Object> newArrayList(new MasterRouting(leaderSelector), new MossroseJackson2Provider()));
+		deployment.setProviders(Lists.newArrayList(new MasterRouting(leaderSelector), new MossroseJackson2Provider()));
 
-		final NettyJaxrsServer server = new NettyJaxrsServer();
+		server = new NettyJaxrsServer();
 		server.setDeployment(deployment);
 		server.setExecutorThreadCount(1);
 		server.setPort(port);
@@ -67,7 +69,7 @@ public class RestMossroseUI implements AutoCloseable {
 
 		server.start();
 
-		LOGGER.info("Server startup at port [{}].", port);
+		LOGGER.info("Mossrose UI startup at port [{}].", port);
 	}
 
 	@Override

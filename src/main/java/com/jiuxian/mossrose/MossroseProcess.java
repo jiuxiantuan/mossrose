@@ -15,12 +15,8 @@
  */
 package com.jiuxian.mossrose;
 
-import com.google.common.base.Strings;
-import com.jiuxian.mossrose.compute.IgniteClusterBuilder;
+import com.jiuxian.mossrose.compute.IgniteHelper;
 import com.jiuxian.mossrose.config.MossroseConfig;
-import com.jiuxian.mossrose.job.to.ClassnameObjectResource;
-import com.jiuxian.mossrose.job.to.ObjectContainer;
-import com.jiuxian.mossrose.job.to.SpringBeanObjectResource;
 import com.jiuxian.mossrose.quartz.QuartzProcess;
 import org.apache.curator.framework.CuratorFramework;
 import org.apache.curator.framework.CuratorFrameworkFactory;
@@ -33,7 +29,6 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.io.IOException;
-import java.util.List;
 
 /**
  * Mossrose basic implementation<br>
@@ -62,7 +57,7 @@ public class MossroseProcess implements AutoCloseable {
         this.mossroseConfig = mossroseConfig;
 
         this.quartzProcess = new QuartzProcess(mossroseConfig);
-        this.ignite = IgniteClusterBuilder.build(mossroseConfig);
+        this.ignite = IgniteHelper.build(mossroseConfig);
 
         quartzProcess.setIgnite(ignite);
 
@@ -74,10 +69,14 @@ public class MossroseProcess implements AutoCloseable {
             @Override
             public void takeLeadership(CuratorFramework curatorFramework) throws Exception {
                 LOGGER.info("Become leader.");
-                quartzProcess.run();
-//                if (!mossroseConfig.getCluster().isRunOnMaster()) {
-//                    ignite.cluster().localNode().attributes().put(IgniteConsts.ONLY_TRIGGER, true);
-//                }
+
+                try {
+                    IgniteHelper.registerService(ignite, mossroseConfig);
+
+                    quartzProcess.run();
+                } catch (Exception e) {
+                    LOGGER.error(e.getMessage(), e);
+                }
 
                 // Block for leader
                 synchronized (this) {
@@ -96,7 +95,6 @@ public class MossroseProcess implements AutoCloseable {
                 if (client.getConnectionStateErrorPolicy().isErrorState(newState)) {
                     try {
                         LOGGER.warn("Shutdown quartz after state: {}", newState);
-                      //  ignite.cluster().localNode().attributes().remove(IgniteConsts.ONLY_TRIGGER);
                         quartzProcess.close();
                     } catch (IOException e) {
                         LOGGER.error("Error while shutting down quartz process.", e);
@@ -105,6 +103,8 @@ public class MossroseProcess implements AutoCloseable {
                 super.stateChanged(client, newState);
             }
         });
+
+        leaderSelector.setId(IgniteHelper.getLocalIp(mossroseConfig.getCluster().getDiscoveryZk()));
 
     }
 
@@ -116,30 +116,13 @@ public class MossroseProcess implements AutoCloseable {
         return leaderSelector;
     }
 
-    public void run() {
-        initObjectContainer();
-
-//        ignite.cluster().localNode().attributes().put(IgniteConsts.STATE, IgniteConsts.STATE_READY);
-
-        leaderSelector.autoRequeue();
-        leaderSelector.start();
+    public Ignite getIgnite() {
+        return ignite;
     }
 
-    private void initObjectContainer() {
-        final List<MossroseConfig.JobMeta> jobs = mossroseConfig.getJobs();
-        if (jobs != null) {
-            jobs.forEach(jobMeta -> {
-                final String id = jobMeta.getId();
-                Object job = null;
-                if (!Strings.isNullOrEmpty(jobMeta.getMain())) {
-                    job = new ClassnameObjectResource(jobMeta.getMain()).generate();
-                } else if (!Strings.isNullOrEmpty(jobMeta.getJobBeanName())) {
-                    job = new SpringBeanObjectResource(jobMeta.getJobBeanName()).generate();
-                }
-                ObjectContainer.put(id, job);
-            });
-        }
-
+    public void run() {
+        leaderSelector.autoRequeue();
+        leaderSelector.start();
     }
 
     @Override

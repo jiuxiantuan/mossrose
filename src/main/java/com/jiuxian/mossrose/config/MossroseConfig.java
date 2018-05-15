@@ -15,7 +15,9 @@
  */
 package com.jiuxian.mossrose.config;
 
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 import java.util.UUID;
 
 /**
@@ -242,10 +244,17 @@ public class MossroseConfig {
         }
 
         final List<JobMeta> jobs = getJobs();
+
+        final Set<String> ids = new HashSet<>();
         if (jobs != null) {
             jobs.forEach(job -> {
                 if (job.getId() == null || job.getId().isEmpty()) {
                     job.setId(UUID.randomUUID().toString());
+                }
+                if (ids.contains(job.getId())) {
+                    throw new IllegalArgumentException("Found multiple job with same id: " + job.getId());
+                } else {
+                    ids.add(job.getId());
                 }
                 if (job.getGroup() == null || job.getGroup().isEmpty()) {
                     job.setGroup("default-group");

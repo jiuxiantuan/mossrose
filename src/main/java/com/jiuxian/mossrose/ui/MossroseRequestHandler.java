@@ -17,6 +17,10 @@ package com.jiuxian.mossrose.ui;
 
 import com.jiuxian.mossrose.JobOperation;
 import com.jiuxian.mossrose.JobOperation.JobRuntimeInfo;
+import org.apache.curator.framework.recipes.leader.LeaderSelector;
+import org.apache.ignite.Ignite;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import javax.ws.rs.GET;
 import javax.ws.rs.Path;
@@ -33,16 +37,43 @@ public class MossroseRequestHandler {
 
 	private JobOperation jobOperation;
 
-	protected MossroseRequestHandler(JobOperation jobOperation) {
+	private Ignite ignite;
+
+	private LeaderSelector leaderSelector;
+
+	private static final Logger LOGGER = LoggerFactory.getLogger(MossroseRequestHandler.class);
+
+	protected MossroseRequestHandler(JobOperation jobOperation, Ignite ignite, LeaderSelector leaderSelector) {
 		super();
 		this.jobOperation = jobOperation;
+		this.ignite = ignite;
+		this.leaderSelector = leaderSelector;
+	}
+
+	@GET
+	@Path("cluster")
+	@Produces("application/json")
+	public Response<Object> cluster() {
+		try {
+			return new Response<>(0, leaderSelector.getParticipants());
+		} catch (Exception e) {
+			LOGGER.error(e.getMessage(), e);
+			return new Response<>(-1, e.getMessage());
+		}
+	}
+
+	@GET
+	@Path("metrics")
+	@Produces("application/json")
+	public Response<Object> topology() {
+		return new Response<>(0, ignite.cluster().metrics());
 	}
 
 	@GET
 	@Path("all")
 	@Produces("application/json")
 	public Response<List<JobRuntimeInfo>> allJobInfo() {
-		return new Response<List<JobRuntimeInfo>>(0, jobOperation.allJobs());
+		return new Response<>(0, jobOperation.allJobs());
 	}
 
 	@GET
@@ -50,7 +81,7 @@ public class MossroseRequestHandler {
 	@Produces("application/json")
 	public Response<Object> pauseAllJob() {
 		jobOperation.pauseAllJob();
-		return new Response<Object>(0, null);
+		return new Response<>(0, null);
 	}
 
 	@GET
@@ -58,14 +89,14 @@ public class MossroseRequestHandler {
 	@Produces("application/json")
 	public Response<Object> resumeAllJob() {
 		jobOperation.resumeAllJob();
-		return new Response<Object>(0, null);
+		return new Response<>(0, null);
 	}
 
 	@GET
 	@Path("/{group}/{jobId}")
 	@Produces("application/json")
 	public Response<JobRuntimeInfo> jobInfo(@PathParam(value = "group") String group, @PathParam("jobId") String jobId) {
-		return new Response<JobRuntimeInfo>(0, jobOperation.jobInfo(group, jobId));
+		return new Response<>(0, jobOperation.jobInfo(group, jobId));
 	}
 
 	@GET
@@ -73,7 +104,7 @@ public class MossroseRequestHandler {
 	@Produces("application/json")
 	public Response<Object> pauseJob(@PathParam(value = "group") String group, @PathParam("jobId") String jobId) {
 		jobOperation.pauseJob(group, jobId);
-		return new Response<Object>(0, null);
+		return new Response<>(0, null);
 	}
 
 	@GET
@@ -81,7 +112,7 @@ public class MossroseRequestHandler {
 	@Produces("application/json")
 	public Response<Object> resumeJob(@PathParam(value = "group") String group, @PathParam("jobId") String jobId) {
 		jobOperation.resumeJob(group, jobId);
-		return new Response<Object>(0, null);
+		return new Response<>(0, null);
 	}
 
 	@GET
@@ -89,7 +120,7 @@ public class MossroseRequestHandler {
 	@Produces("application/json")
 	public Response<Object> runJob(@PathParam(value = "group") String group, @PathParam("jobId") String jobId) {
 		jobOperation.runJobNow(group, jobId);
-		return new Response<Object>(0, null);
+		return new Response<>(0, null);
 	}
 
 }

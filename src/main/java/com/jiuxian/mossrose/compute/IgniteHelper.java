@@ -15,16 +15,22 @@
  */
 package com.jiuxian.mossrose.compute;
 
+import com.google.common.base.Strings;
+import com.jiuxian.mossrose.compute.jobhandler.JobHandlerFactory;
 import com.jiuxian.mossrose.config.MossroseConfig;
 import com.jiuxian.mossrose.config.MossroseConfig.Cluster;
 import com.jiuxian.mossrose.config.MossroseConfig.Cluster.LoadBalancingMode;
+import com.jiuxian.mossrose.job.to.ClassnameObjectResource;
+import com.jiuxian.mossrose.job.to.SpringBeanObjectResource;
 import com.jiuxian.mossrose.util.NetworkUtils;
 import org.apache.ignite.Ignite;
+import org.apache.ignite.IgniteServices;
 import org.apache.ignite.Ignition;
 import org.apache.ignite.configuration.CacheConfiguration;
 import org.apache.ignite.configuration.ExecutorConfiguration;
 import org.apache.ignite.configuration.IgniteConfiguration;
 import org.apache.ignite.logger.slf4j.Slf4jLogger;
+import org.apache.ignite.services.Service;
 import org.apache.ignite.spi.discovery.tcp.TcpDiscoverySpi;
 import org.apache.ignite.spi.discovery.tcp.ipfinder.zk.TcpDiscoveryZookeeperIpFinder;
 import org.apache.ignite.spi.loadbalancing.roundrobin.RoundRobinLoadBalancingSpi;
@@ -34,9 +40,9 @@ import org.slf4j.LoggerFactory;
 
 import java.util.List;
 
-public final class IgniteClusterBuilder {
+public final class IgniteHelper {
 
-    private static final Logger LOGGER = LoggerFactory.getLogger(IgniteClusterBuilder.class);
+    private static final Logger LOGGER = LoggerFactory.getLogger(IgniteHelper.class);
 
     public static Ignite build(final MossroseConfig mossroseConfig) {
         final Cluster cluster = mossroseConfig.getCluster();
@@ -94,14 +100,42 @@ public final class IgniteClusterBuilder {
         return ignite;
     }
 
-    private static String getLocalIp(String zkAddress) {
+    public static void registerService(Ignite ignite, MossroseConfig mossroseConfig) {
+        final List<MossroseConfig.JobMeta> jobs = mossroseConfig.getJobs();
+
+        final IgniteServices services = ignite.services();
+
+        if (jobs != null) {
+            jobs.forEach(jobMeta -> {
+                LOGGER.info("Register service for job: {}", jobMeta);
+
+                final String id = jobMeta.getId();
+
+                if(services.service(id) == null) {
+                    Object job = null;
+                    if (!Strings.isNullOrEmpty(jobMeta.getMain())) {
+                        job = new ClassnameObjectResource(jobMeta.getMain()).generate();
+                    } else if (!Strings.isNullOrEmpty(jobMeta.getJobBeanName())) {
+                        job = new SpringBeanObjectResource(jobMeta.getJobBeanName()).generate();
+                    }
+
+                    Service service = JobHandlerFactory.getInstance().getMJobHandler(job.getClass()).asService(job);
+
+                    // Register ignite service
+                    services.deployNodeSingleton(id, service);
+                }
+            });
+        }
+    }
+
+    public static String getLocalIp(String zkAddress) {
         String firstZkAddress = zkAddress;
-        if(zkAddress.contains(",")) {
+        if (zkAddress.contains(",")) {
             firstZkAddress = zkAddress.split(",")[0];
         }
         String host = firstZkAddress;
         int port = 2181;
-        if(firstZkAddress.contains(":")) {
+        if (firstZkAddress.contains(":")) {
             final String[] parts = firstZkAddress.split(":");
             host = parts[0];
             port = Integer.parseInt(parts[1]);

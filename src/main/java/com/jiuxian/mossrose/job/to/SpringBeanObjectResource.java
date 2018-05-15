@@ -27,20 +27,8 @@ public class SpringBeanObjectResource implements ObjectResource {
 
 	private String beanName;
 
-	public SpringBeanObjectResource() {
-		super();
-	}
-
 	public SpringBeanObjectResource(String beanName) {
 		super();
-		this.beanName = beanName;
-	}
-
-	public String getBeanName() {
-		return beanName;
-	}
-
-	public void setBeanName(String beanName) {
 		this.beanName = beanName;
 	}
 

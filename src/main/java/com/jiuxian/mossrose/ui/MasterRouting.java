@@ -24,7 +24,6 @@ import javax.ws.rs.container.ContainerRequestFilter;
 import javax.ws.rs.container.PreMatching;
 import javax.ws.rs.core.Response;
 import java.io.IOException;
-import java.net.InetAddress;
 import java.net.URI;
 import java.util.Objects;
 
@@ -47,10 +46,10 @@ public class MasterRouting implements ContainerRequestFilter {
     @Override
     public void filter(ContainerRequestContext requestContext) throws IOException {
         try {
-            final String currentLocker = leaderSelector.getLeader().getId();
-            final String localIp = InetAddress.getLocalHost().getHostAddress();
-            if (!Objects.equals(currentLocker, localIp)) {
-                final URI masterLocation = requestContext.getUriInfo().getAbsolutePathBuilder().host(currentLocker).build();
+            final String host = requestContext.getUriInfo().getRequestUri().getHost();
+            final String leader = leaderSelector.getLeader().getId();
+            if (!Objects.equals(leader, host)) {
+                final URI masterLocation = requestContext.getUriInfo().getAbsolutePathBuilder().host(leader).build();
                 LOGGER.info("Redirect url to {}.", masterLocation);
                 final Response response = javax.ws.rs.core.Response.seeOther(masterLocation).build();
                 requestContext.abortWith(response);

@@ -16,10 +16,9 @@
 package com.jiuxian.mossrose.quartz;
 
 import com.google.common.base.Stopwatch;
+import com.jiuxian.mossrose.compute.jobhandler.JobHandler;
+import com.jiuxian.mossrose.compute.jobhandler.JobHandlerFactory;
 import com.jiuxian.mossrose.config.MossroseConfig.JobMeta;
-import com.jiuxian.mossrose.job.handler.JobHandler;
-import com.jiuxian.mossrose.job.handler.JobHandlerFactory;
-import com.jiuxian.mossrose.job.to.ObjectContainer;
 import org.apache.ignite.Ignite;
 import org.quartz.DisallowConcurrentExecution;
 import org.quartz.Job;
@@ -43,7 +42,7 @@ public class QuartzJobWrapper implements Job {
     public void execute(JobExecutionContext context) throws JobExecutionException {
         final Stopwatch watch = Stopwatch.createStarted();
         final JobHandler mJobHandler = JobHandlerFactory.getInstance()
-                .getMJobHandler(ObjectContainer.getClazz(jobMeta.getId()));
+                .getMJobHandler(ignite.services().service(jobMeta.getId()).getClass());
         mJobHandler.handle(jobMeta, ignite);
         watch.stop();
         LOGGER.info("Job {} use time: {} ms.", jobMeta.getId(), watch.elapsed(TimeUnit.MILLISECONDS));

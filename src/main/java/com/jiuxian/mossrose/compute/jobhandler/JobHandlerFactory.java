@@ -13,7 +13,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package com.jiuxian.mossrose.job.handler;
+package com.jiuxian.mossrose.compute.jobhandler;
 
 import com.google.common.collect.Maps;
 import com.jiuxian.mossrose.job.ExecutorJob;

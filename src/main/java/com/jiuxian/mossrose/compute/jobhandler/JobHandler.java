@@ -13,13 +13,16 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package com.jiuxian.mossrose.job.handler;
+package com.jiuxian.mossrose.compute.jobhandler;
 
 import com.jiuxian.mossrose.config.MossroseConfig.JobMeta;
 import org.apache.ignite.Ignite;
+import org.apache.ignite.services.Service;
 
 public interface JobHandler {
 
 	void handle(JobMeta jobMeta, Ignite ignite);
+
+	Service asService(Object job);
 	
 }
