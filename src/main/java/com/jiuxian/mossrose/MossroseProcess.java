@@ -127,11 +127,11 @@ public class MossroseProcess implements AutoCloseable {
 
     @Override
     public void close() throws Exception {
-        if (client != null) {
-            client.close();
-        }
         if (leaderSelector != null) {
             leaderSelector.close();
+        }
+        if (client != null) {
+            client.close();
         }
     }
 }
