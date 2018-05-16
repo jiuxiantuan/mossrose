@@ -53,6 +53,8 @@ public class MossroseProcess implements AutoCloseable {
      * @param mossroseConfig mossrose configuration
      */
     public MossroseProcess(final MossroseConfig mossroseConfig) {
+        LOGGER.info("Init mossrose with config: {}", mossroseConfig);
+
         mossroseConfig.applyDefault();
         this.mossroseConfig = mossroseConfig;
 

@@ -15,6 +15,11 @@
  */
 package com.jiuxian.mossrose.config;
 
+import com.google.common.base.Strings;
+import com.jiuxian.mossrose.job.RunnableJob;
+import com.jiuxian.mossrose.job.to.ClassnameObjectResource;
+import com.jiuxian.mossrose.job.to.SpringBeanObjectResource;
+
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
@@ -24,7 +29,6 @@ import java.util.UUID;
  * Mossrose meta configuration
  *
  * @author <a href="mailto:wangyuxuan@jiuxian.com">Yuxuan Wang</a>
- *
  */
 public class MossroseConfig {
 
@@ -35,7 +39,6 @@ public class MossroseConfig {
      * cluster meta
      *
      * @author <a href="mailto:wangyuxuan@jiuxian.com">Yuxuan Wang</a>
-     *
      */
     public static class Cluster {
 
@@ -102,7 +105,13 @@ public class MossroseConfig {
 
         @Override
         public String toString() {
-            return "Cluster [name=" + name + ", port=" + port + ", loadBalancingMode=" + loadBalancingMode + "]";
+            return "Cluster{" +
+                    "name='" + name + '\'' +
+                    ", port=" + port +
+                    ", loadBalancingMode=" + loadBalancingMode +
+                    ", discoveryZk='" + discoveryZk + '\'' +
+                    ", runOnMaster=" + runOnMaster +
+                    '}';
         }
 
         public enum LoadBalancingMode {
@@ -115,7 +124,6 @@ public class MossroseConfig {
      * job meta
      *
      * @author <a href="mailto:wangyuxuan@jiuxian.com">Yuxuan Wang</a>
-     *
      */
     public static class JobMeta {
         /**
@@ -203,6 +211,31 @@ public class MossroseConfig {
 
         public void setThreads(int threads) {
             this.threads = threads;
+        }
+
+        public RunnableJob getJobBean() {
+            Object job = null;
+            if (!Strings.isNullOrEmpty(main)) {
+                job = new ClassnameObjectResource(main).generate();
+            } else if (!Strings.isNullOrEmpty(jobBeanName)) {
+                job = new SpringBeanObjectResource(jobBeanName).generate();
+            }
+
+            return (RunnableJob) job;
+        }
+
+        public Class getJobClazz() {
+            if (!Strings.isNullOrEmpty(main)) {
+                try {
+                    return Class.forName(main);
+                } catch (ClassNotFoundException e) {
+                    throw new RuntimeException(e);
+                }
+            } else if (!Strings.isNullOrEmpty(jobBeanName)) {
+                return new SpringBeanObjectResource(jobBeanName).clazz();
+            }
+
+            throw new RuntimeException("Cannot get job class");
         }
 
         @Override

@@ -13,15 +13,15 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package com.jiuxian.mossrose.compute.jobhandler;
+package com.jiuxian.mossrose.job.handler;
 
 import com.google.common.collect.Maps;
-import com.jiuxian.mossrose.job.ExecutorJob;
+import com.jiuxian.mossrose.job.RunnableJob;
+import javafx.util.Pair;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.io.InputStream;
-import java.io.Serializable;
 import java.net.URL;
 import java.util.Enumeration;
 import java.util.Map;
@@ -34,7 +34,7 @@ import java.util.Properties;
  */
 public final class JobHandlerFactory {
 
-    private Map<Class<? extends ExecutorJob<Serializable>>, JobHandler> handlers;
+    private Map<Class<RunnableJob>, Handler> handlers;
 
     private static final String REGISTER_FILE = "META-INF/mossrose/mjob-handler.register";
 
@@ -59,8 +59,8 @@ public final class JobHandlerFactory {
             handlers = Maps.newHashMap();
             for (Map.Entry<Object, Object> entry : props.entrySet()) {
                 LOGGER.info("Init handler: {}", entry);
-                @SuppressWarnings("unchecked") final Class<ExecutorJob<Serializable>> mJobClass = (Class<ExecutorJob<Serializable>>) Class.forName((String) entry.getKey());
-                @SuppressWarnings("unchecked") final JobHandler mJobHandler = ((Class<JobHandler>) Class
+                @SuppressWarnings("unchecked") final Class<RunnableJob> mJobClass = (Class<RunnableJob>) Class.forName((String) entry.getKey());
+                @SuppressWarnings("unchecked") final Handler mJobHandler = ((Class<Handler>) Class
                         .forName((String) entry.getValue())).newInstance();
                 handlers.put(mJobClass, mJobHandler);
             }
@@ -77,14 +77,15 @@ public final class JobHandlerFactory {
         return Holder.MJOB_HANDLER_FACTORY;
     }
 
-    public JobHandler getMJobHandler(Class<?> mJobClazz) {
+    public Pair<Class<RunnableJob>, Handler> getMJobHandler(Class<RunnableJob> mJobClazz) {
         final Class<?>[] interfaces = mJobClazz.getInterfaces();
         if (interfaces != null) {
             for (final Class<?> interfass : interfaces) {
-                final Optional<Entry<Class<? extends ExecutorJob<Serializable>>, JobHandler>> optionalEntry = handlers.entrySet()
-                        .stream().filter(entry -> entry.getKey() == interfass).findFirst();
+                final Optional<Entry<Class<RunnableJob>, Handler>> optionalEntry =
+                        handlers.entrySet()
+                                .stream().filter(entry -> entry.getKey() == interfass).findFirst();
                 if (optionalEntry.isPresent()) {
-                    return optionalEntry.get().getValue();
+                    return new Pair<>(optionalEntry.get().getKey(), optionalEntry.get().getValue());
                 }
             }
         }

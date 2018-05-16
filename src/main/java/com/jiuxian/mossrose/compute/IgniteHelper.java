@@ -15,13 +15,10 @@
  */
 package com.jiuxian.mossrose.compute;
 
-import com.google.common.base.Strings;
-import com.jiuxian.mossrose.compute.jobhandler.JobHandlerFactory;
 import com.jiuxian.mossrose.config.MossroseConfig;
 import com.jiuxian.mossrose.config.MossroseConfig.Cluster;
 import com.jiuxian.mossrose.config.MossroseConfig.Cluster.LoadBalancingMode;
-import com.jiuxian.mossrose.job.to.ClassnameObjectResource;
-import com.jiuxian.mossrose.job.to.SpringBeanObjectResource;
+import com.jiuxian.mossrose.job.RunnableJob;
 import com.jiuxian.mossrose.util.NetworkUtils;
 import org.apache.ignite.Ignite;
 import org.apache.ignite.IgniteServices;
@@ -38,6 +35,8 @@ import org.apache.ignite.spi.loadbalancing.weightedrandom.WeightedRandomLoadBala
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import java.lang.reflect.Proxy;
+import java.util.Arrays;
 import java.util.List;
 
 public final class IgniteHelper {
@@ -111,15 +110,17 @@ public final class IgniteHelper {
 
                 final String id = jobMeta.getId();
 
-                if(services.service(id) == null) {
-                    Object job = null;
-                    if (!Strings.isNullOrEmpty(jobMeta.getMain())) {
-                        job = new ClassnameObjectResource(jobMeta.getMain()).generate();
-                    } else if (!Strings.isNullOrEmpty(jobMeta.getJobBeanName())) {
-                        job = new SpringBeanObjectResource(jobMeta.getJobBeanName()).generate();
-                    }
+                if (services.service(id) == null) {
+                    RunnableJob job = jobMeta.getJobBean();
+                    JobServiceProxy proxy = new JobServiceProxy(job);
 
-                    Service service = JobHandlerFactory.getInstance().getMJobHandler(job.getClass()).asService(job);
+                    // Generate ignite service
+                    final Class<?>[] interfaces = job.getClass().getInterfaces();
+                    final int length = interfaces.length;
+                    final Class<?>[] proxyInterfaces = Arrays.copyOf(interfaces, length + 1);
+                    proxyInterfaces[length] = Service.class;
+
+                    Service service = (Service) Proxy.newProxyInstance(job.getClass().getClassLoader(), proxyInterfaces, proxy);
 
                     // Register ignite service
                     services.deployNodeSingleton(id, service);

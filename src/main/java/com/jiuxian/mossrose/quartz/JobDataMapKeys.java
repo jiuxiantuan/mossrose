@@ -20,5 +20,6 @@ public interface JobDataMapKeys {
 	String MJOB = "mJob";
 	String IGNITE = "ignite";
 	String JOB_META = "jobMeta";
+	String RUN_ON_MASTER = "runOnMaster";
 
 }

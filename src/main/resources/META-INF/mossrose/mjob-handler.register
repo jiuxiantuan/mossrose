@@ -1,4 +1,4 @@
-com.jiuxian.mossrose.job.SimpleJob=com.jiuxian.mossrose.compute.jobhandler.SimpleJobHandler
-com.jiuxian.mossrose.job.DistributedJob=com.jiuxian.mossrose.compute.jobhandler.DistributedJobHandler
-com.jiuxian.mossrose.job.StreamingJob=com.jiuxian.mossrose.compute.jobhandler.StreamingJobHandler
-com.jiuxian.mossrose.job.MapReduceJob=com.jiuxian.mossrose.compute.jobhandler.MapReduceJobHandler
+com.jiuxian.mossrose.job.SimpleJob=com.jiuxian.mossrose.job.handler.SimpleJobHandler
+com.jiuxian.mossrose.job.DistributedJob=com.jiuxian.mossrose.job.handler.DistributedJobHandler
+com.jiuxian.mossrose.job.MapReduceJob=com.jiuxian.mossrose.job.handler.MapReduceJobHandler
+com.jiuxian.mossrose.job.StreamingJob=com.jiuxian.mossrose.job.handler.StreamingJobHandler
