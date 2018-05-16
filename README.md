@@ -3,6 +3,8 @@
 
 <hr>
 
+![Mossrose Architecture](https://jiuxiantuan.github.io/mossrose/mossrose.jpg)
+
 ## 特性
  * 通过选举保证集群中只出现一个主节点，负责trigger作业
  * 所有集群节点参与作业计算任务
@@ -17,8 +19,6 @@
 
 * Zookeeper
 * Java 8
-* Spring 3.x+ 
-
 
 ## 任务类型
 
