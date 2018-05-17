@@ -20,7 +20,7 @@ import java.util.Date;
 import java.util.List;
 
 /**
- * Interface to manipulate jobs
+ * 作业管理
  * 
  * @author <a href="mailto:wangyuxuan@jiuxian.com">Yuxuan Wang</a>
  *

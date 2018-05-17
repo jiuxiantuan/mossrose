@@ -28,6 +28,9 @@ import org.slf4j.LoggerFactory;
 import java.io.IOException;
 import java.util.List;
 
+/**
+ * 负责创建、销毁Quartz Scheduler实例，注册trigger
+ */
 public class QuartzProcess extends QuartzJobOperation implements JobOperation, AutoCloseable {
 
 	private Scheduler scheduler;

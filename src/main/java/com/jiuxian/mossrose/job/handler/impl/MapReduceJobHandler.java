@@ -1,6 +1,8 @@
-package com.jiuxian.mossrose.job.handler;
+package com.jiuxian.mossrose.job.handler.impl;
 
 import com.jiuxian.mossrose.job.MapReduceJob;
+import com.jiuxian.mossrose.job.handler.Handler;
+import com.jiuxian.mossrose.job.handler.JobExecutor;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -17,11 +19,11 @@ public class MapReduceJobHandler implements Handler<MapReduceJob> {
     private static final Logger LOGGER = LoggerFactory.getLogger(MapReduceJobHandler.class);
 
     @Override
-    public void handle(JobExecutor<MapReduceJob> jobProvider) {
-        final List<Object> mapResult = jobProvider.call(mapReduceJob -> mapReduceJob.mapper().map());
+    public void handle(JobExecutor<MapReduceJob> jobExecutor) {
+        final List<Object> mapResult = jobExecutor.call(mapReduceJob -> mapReduceJob.mapper().map());
         if (mapResult != null) {
             final List<Future> futures = mapResult.parallelStream()
-                    .map(item -> EXECUTOR_SERVICE.submit(() -> jobProvider.call(mapReduceJob -> mapReduceJob.executor().execute(item))))
+                    .map(item -> EXECUTOR_SERVICE.submit(() -> jobExecutor.call(mapReduceJob -> mapReduceJob.executor().execute(item))))
                     .collect(Collectors.toList());
 
             final List<Object> executeResults = futures.stream().map(future -> {
@@ -33,7 +35,7 @@ public class MapReduceJobHandler implements Handler<MapReduceJob> {
                 return null;
             }).collect(Collectors.toList());
 
-            jobProvider.run(job -> job.reducer().reduce(executeResults));
+            jobExecutor.run(job -> job.reducer().reduce(executeResults));
         }
     }
 

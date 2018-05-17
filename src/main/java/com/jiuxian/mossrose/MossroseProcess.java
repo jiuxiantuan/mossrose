@@ -33,7 +33,7 @@ import java.io.IOException;
 /**
  * Mossrose basic implementation<br>
  * <p>
- * Use zookeeper for master election, zookeeper for discovery, and ignite for
+ * Use zookeeper for master election/discovery, and ignite for
  * grid computation
  *
  * @author <a href="mailto:wangyuxuan@jiuxian.com">Yuxuan Wang</a>

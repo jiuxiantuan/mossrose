@@ -1,6 +1,8 @@
-package com.jiuxian.mossrose.job.handler;
+package com.jiuxian.mossrose.job.handler.impl;
 
 import com.jiuxian.mossrose.job.DistributedJob;
+import com.jiuxian.mossrose.job.handler.Handler;
+import com.jiuxian.mossrose.job.handler.JobExecutor;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -18,14 +20,14 @@ public class DistributedJobHandler implements Handler<DistributedJob> {
     private static final Logger LOGGER = LoggerFactory.getLogger(DistributedJobHandler.class);
 
     @Override
-    public void handle(JobExecutor<DistributedJob> jobJobExecutor) {
+    public void handle(JobExecutor<DistributedJob> jobExecutor) {
 
-        final List<Object> slice = jobJobExecutor.call(distributedJob -> distributedJob.slicer().slice());
+        final List<Object> slice = jobExecutor.call(distributedJob -> distributedJob.slicer().slice());
 
 
         if (slice != null) {
             final List<Future> futures = slice.parallelStream().map(item ->
-                    EXECUTOR_SERVICE.submit(() -> jobJobExecutor.run(
+                    EXECUTOR_SERVICE.submit(() -> jobExecutor.run(
                             distributedJob -> distributedJob.executor().execute(item)
                     ))
             ).collect(Collectors.toList());
