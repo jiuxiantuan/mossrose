@@ -38,7 +38,7 @@
 <dependency>
     <groupId>com.jiuxian</groupId>
     <artifactId>mossrose-spring-boot-starter</artifactId>
-    <version>1.0.6-RELEASE</version>
+    <version>1.1.0-RELEASE</version>
 </dependency>
 ```
 
@@ -110,27 +110,29 @@ public class SomeDistributedJob implements DistributedJob<String> {
 DistributedJob需要把需要分布式执行的任务集合一次性的返回，在集合非常大的时候会存在内存的问题，StreamingJob解决了这个问题，任务可以以流的方式不断输出，以保证内存可以及时释放。
 ```
 @Job(id = "StreamingExampleJob", cron = "0 * * * * ?", group = "example")
-public class SomeStreamingJob implements StreamingJob<String> {
+public class StreamingExampleJob implements StreamingJob<String, Integer> {
 
-	private static final Logger LOGGER = LoggerFactory.getLogger(SomeStreamingJob.class);
+	private static final Logger LOGGER = LoggerFactory.getLogger(StreamingExampleJob.class);
+
+	// 用于模拟一个数据源
+	private static final List<String> LIST = Lists.newArrayList("Sunday", "Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday");
 
 	@Override
-	public Streamer<String> streamer() {
-		return new Streamer<String>() {
+	public Streamer<String, Integer> streamer() {
+		return new Streamer<String, Integer>() {
 
-			private List<String> list = Lists.newArrayList("Sunday", "Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday");
+            @Override
+            public Tuple<String, Integer> next(Integer mark) {
+                int index = mark != null ? mark + 1 : 0;
+                if(index > LIST.size() - 1) {
+                    return null;
+                }
+
+                return new Tuple(LIST.get(index), index);
+            }
 
 			private int index = 0;
 
-			@Override
-			public boolean hasNext() {
-				return index < list.size();
-			}
-
-			@Override
-			public String next() {
-				return list.get(index++);
-			}
 		};
 	}
 
@@ -140,7 +142,7 @@ public class SomeStreamingJob implements StreamingJob<String> {
 
 			@Override
 			public void execute(String item) {
-				LOGGER.info(Thread.currentThread() + " StreamingJob: " + item);
+				LOGGER.info("StreamingJob: " + item);
 			}
 		};
 	}
