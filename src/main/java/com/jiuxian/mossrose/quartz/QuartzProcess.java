@@ -60,7 +60,8 @@ public class QuartzProcess extends QuartzJobOperation implements JobOperation, A
 
 				final String id = jobMeta.getId();
 				final String group = jobMeta.getGroup();
-				final JobDetail job = JobBuilder.newJob(QuartzJobWrapper.class).withIdentity(id, group).withDescription(jobMeta.getDescription())
+				final JobDetail job = JobBuilder.newJob(QuartzJobWrapper.class).withIdentity(id, group)
+						.withDescription(jobMeta.getDescription())
 						.build();
 
 				job.getJobDataMap().put(JobDataMapKeys.JOB_META, jobMeta);

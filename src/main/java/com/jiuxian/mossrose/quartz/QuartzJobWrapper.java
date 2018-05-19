@@ -48,46 +48,50 @@ public class QuartzJobWrapper implements Job {
 
     @Override
     public void execute(JobExecutionContext context) throws JobExecutionException {
-        final Stopwatch watch = Stopwatch.createStarted();
+        try {
+            final Stopwatch watch = Stopwatch.createStarted();
 
-        final Pair<Class<RunnableJob>, Handler> classHandlerPair = JobHandlerFactory.getInstance().getMJobHandler(jobMeta.getJobClazz());
+            final Pair<Class<RunnableJob>, Handler> classHandlerPair = JobHandlerFactory.getInstance().getMJobHandler(jobMeta.getJobClazz());
 
-        final Class<RunnableJob> jobClass = classHandlerPair.getKey();
-        final Handler handler = classHandlerPair.getValue();
+            final Class<RunnableJob> jobClass = classHandlerPair.getKey();
+            final Handler handler = classHandlerPair.getValue();
 
-        handler.handle(new JobExecutor() {
-            @Override
-            public Object call(JobCallable jobCallable) {
-                return compute().call(new IgniteCallable<Object>() {
+            handler.handle(new JobExecutor() {
+                @Override
+                public Object call(JobCallable jobCallable) {
+                    return compute().call(new IgniteCallable<Object>() {
 
-                    @IgniteInstanceResource
-                    private Ignite igniteRemote;
+                        @IgniteInstanceResource
+                        private Ignite igniteRemote;
 
-                    @Override
-                    public Object call() throws Exception {
-                        final RunnableJob runnableJob = igniteRemote.services().serviceProxy(jobMeta.getId(), jobClass, false);
-                        return jobCallable.apply(runnableJob);
-                    }
-                });
-            }
+                        @Override
+                        public Object call() throws Exception {
+                            final RunnableJob runnableJob = igniteRemote.services().serviceProxy(jobMeta.getId(), jobClass, false);
+                            return jobCallable.apply(runnableJob);
+                        }
+                    });
+                }
 
-            @Override
-            public void run(JobRunnable jobRunnable) {
-                compute().run(new IgniteRunnable() {
+                @Override
+                public void run(JobRunnable jobRunnable) {
+                    compute().run(new IgniteRunnable() {
 
-                    @IgniteInstanceResource
-                    private Ignite igniteRemote;
+                        @IgniteInstanceResource
+                        private Ignite igniteRemote;
 
-                    @Override
-                    public void run() {
-                        final RunnableJob runnableJob = igniteRemote.services().serviceProxy(jobMeta.getId(), jobClass, false);
-                        jobRunnable.apply(runnableJob);
-                    }
-                });
-            }
-        });
-        watch.stop();
-        LOGGER.info("Job {} use time: {} ms.", jobMeta.getId(), watch.elapsed(TimeUnit.MILLISECONDS));
+                        @Override
+                        public void run() {
+                            final RunnableJob runnableJob = igniteRemote.services().serviceProxy(jobMeta.getId(), jobClass, false);
+                            jobRunnable.apply(runnableJob);
+                        }
+                    });
+                }
+            });
+            watch.stop();
+            LOGGER.info("Job {} use time: {} ms.", jobMeta.getId(), watch.elapsed(TimeUnit.MILLISECONDS));
+        } catch (Exception e) {
+            LOGGER.error("Error while executing job " + context.getJobDetail().getKey(), e);
+        }
     }
 
     private IgniteCompute compute() {
