@@ -8,4 +8,6 @@ public interface JobExecutor<T extends RunnableJob> {
 
     void run(JobRunnable<T> jobRunnable);
 
+    int concurrency();
+
 }

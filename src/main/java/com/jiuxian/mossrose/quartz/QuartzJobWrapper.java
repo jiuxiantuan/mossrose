@@ -86,6 +86,11 @@ public class QuartzJobWrapper implements Job {
                         }
                     });
                 }
+
+                @Override
+                public int concurrency() {
+                    return ignite.cluster().nodes().size() * jobMeta.getThreads();
+                }
             });
             watch.stop();
             LOGGER.info("Job {} use time: {} ms.", jobMeta.getId(), watch.elapsed(TimeUnit.MILLISECONDS));
