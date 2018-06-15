@@ -40,9 +40,6 @@ public class DistributedJobHandler extends AbstractJobHandler implements JobHand
 
                     @Override
                     public void run() {
-                        final String s = igniteRemote.toString();
-                        System.err.println(s.substring(s.length() - 9));
-
                         final List<Serializable> items = ObjectContainer.<DistributedJob<Serializable>>get(jobMeta.getId()).slicer().slice();
                         if (items != null) {
                             // Execute

@@ -27,9 +27,6 @@ public class MapReduceJobHandler extends AbstractJobHandler implements JobHandle
 
             @Override
             public void run() {
-                final String s = igniteRemote.toString();
-                System.err.println(s.substring(s.length() - 9));
-
                 final MapReduceJob<Serializable, Serializable> mJob = ObjectContainer.get(jobMeta.getId());
                 final List<Serializable> items = mJob.mapper().map();
                 if (items != null) {

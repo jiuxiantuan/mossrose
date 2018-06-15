@@ -52,7 +52,6 @@ public interface JobOperation {
 		private String group;
 		private String description;
 		private String cron;
-		private String mainClass;
 		private Date startTime;
 		private Date endTime;
 		private Date nextFireTime;
@@ -90,14 +89,6 @@ public interface JobOperation {
 
 		public void setCron(String cron) {
 			this.cron = cron;
-		}
-
-		public String getMainClass() {
-			return mainClass;
-		}
-
-		public void setMainClass(String mainClass) {
-			this.mainClass = mainClass;
 		}
 
 		public Date getStartTime() {
@@ -142,11 +133,18 @@ public interface JobOperation {
 
 		@Override
 		public String toString() {
-			return "JobRuntimeInfo [id=" + id + ", group=" + group + ", description=" + description + ", cron=" + cron + ", mainClass=" + mainClass
-					+ ", startTime=" + startTime + ", endTime=" + endTime + ", nextFireTime=" + nextFireTime + ", previousFireTime=" + previousFireTime
-					+ ", state=" + state + "]";
+			return "JobRuntimeInfo{" +
+					"id='" + id + '\'' +
+					", group='" + group + '\'' +
+					", description='" + description + '\'' +
+					", cron='" + cron + '\'' +
+					", startTime=" + startTime +
+					", endTime=" + endTime +
+					", nextFireTime=" + nextFireTime +
+					", previousFireTime=" + previousFireTime +
+					", state=" + state +
+					'}';
 		}
-
 	}
 
 }

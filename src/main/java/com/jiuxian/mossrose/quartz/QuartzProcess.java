@@ -62,6 +62,7 @@ public class QuartzProcess extends QuartzJobOperation implements JobOperation, A
 
 				job.getJobDataMap().put(JobDataMapKeys.JOB_META, jobMeta);
 				job.getJobDataMap().put(JobDataMapKeys.IGNITE, ignite);
+				job.getJobDataMap().put(JobDataMapKeys.RUN_ON_MASTER, mossroseConfig.getCluster().isRunOnMaster());
 
 				final Trigger trigger = TriggerBuilder.newTrigger().withIdentity(id + "trigger", group).startNow()
 						.withSchedule(CronScheduleBuilder.cronSchedule(jobMeta.getCron())).build();

@@ -91,14 +91,6 @@ public class QuartzJobOperation implements JobOperation {
 				job.setId(jobKey.getName());
 				job.setGroup(jobKey.getGroup());
 				job.setDescription(jobDetail.getDescription());
-
-				final JobDataMap dataMap = jobDetail.getJobDataMap();
-
-				final Object jobMain = dataMap.get(JobDataMapKeys.MJOB);
-				if (jobMain != null) {
-					job.setMainClass(jobMain.getClass().getName());
-				}
-
 				job.setStartTime(trigger.getStartTime());
 				job.setEndTime(trigger.getEndTime());
 				job.setPreviousFireTime(trigger.getPreviousFireTime());

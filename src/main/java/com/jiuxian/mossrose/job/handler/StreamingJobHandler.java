@@ -47,9 +47,6 @@ public class StreamingJobHandler extends AbstractJobHandler implements JobHandle
 
                     @Override
                     public void run() {
-                        final String s = igniteRemote.toString();
-                        System.err.println(s.substring(s.length() - 9));
-
                         final Streamer<Serializable> streamer = ObjectContainer.<StreamingJob<Serializable>>get(jobMeta.getId()).streamer();
                         final int concurrency = igniteRemote.cluster().nodes().size() * jobMeta.getThreads();
                         LOGGER.info("Cluster concurrency : {}", concurrency);

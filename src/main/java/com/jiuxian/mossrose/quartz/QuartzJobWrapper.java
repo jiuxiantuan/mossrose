@@ -37,6 +37,8 @@ public class QuartzJobWrapper implements Job {
 
     private Ignite ignite;
 
+    private boolean runOnMaster;
+
     private static final Logger LOGGER = LoggerFactory.getLogger(QuartzJobWrapper.class);
 
     @Override
@@ -45,7 +47,7 @@ public class QuartzJobWrapper implements Job {
             final Stopwatch watch = Stopwatch.createStarted();
             final JobHandler mJobHandler = JobHandlerFactory.getInstance()
                     .getMJobHandler(ObjectContainer.getClazz(jobMeta.getId()));
-            mJobHandler.handle(jobMeta, ignite);
+            mJobHandler.handle(jobMeta, ignite, runOnMaster);
             watch.stop();
             LOGGER.info("Job {} use time: {} ms.", jobMeta.getId(), watch.elapsed(TimeUnit.MILLISECONDS));
         } catch (Exception e) {
@@ -59,5 +61,9 @@ public class QuartzJobWrapper implements Job {
 
     public void setIgnite(Ignite ignite) {
         this.ignite = ignite;
+    }
+
+    public void setRunOnMaster(boolean runOnMaster) {
+        this.runOnMaster = runOnMaster;
     }
 }

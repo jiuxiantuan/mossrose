@@ -20,6 +20,6 @@ import org.apache.ignite.Ignite;
 
 public interface JobHandler {
 
-	void handle(JobMeta jobMeta, Ignite ignite);
+	void handle(JobMeta jobMeta, Ignite ignite, boolean runOnMaster);
 	
 }
