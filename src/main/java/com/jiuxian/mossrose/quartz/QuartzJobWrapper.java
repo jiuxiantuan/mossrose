@@ -41,12 +41,16 @@ public class QuartzJobWrapper implements Job {
 
     @Override
     public void execute(JobExecutionContext context) throws JobExecutionException {
-        final Stopwatch watch = Stopwatch.createStarted();
-        final JobHandler mJobHandler = JobHandlerFactory.getInstance()
-                .getMJobHandler(ObjectContainer.getClazz(jobMeta.getId()));
-        mJobHandler.handle(jobMeta, ignite);
-        watch.stop();
-        LOGGER.info("Job {} use time: {} ms.", jobMeta.getId(), watch.elapsed(TimeUnit.MILLISECONDS));
+        try {
+            final Stopwatch watch = Stopwatch.createStarted();
+            final JobHandler mJobHandler = JobHandlerFactory.getInstance()
+                    .getMJobHandler(ObjectContainer.getClazz(jobMeta.getId()));
+            mJobHandler.handle(jobMeta, ignite);
+            watch.stop();
+            LOGGER.info("Job {} use time: {} ms.", jobMeta.getId(), watch.elapsed(TimeUnit.MILLISECONDS));
+        } catch (Exception e) {
+            LOGGER.error("Error while executing job " + context.getJobDetail().getKey(), e);
+        }
     }
 
     public void setJobMeta(JobMeta jobMeta) {

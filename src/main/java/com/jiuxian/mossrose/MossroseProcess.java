@@ -75,9 +75,6 @@ public class MossroseProcess implements AutoCloseable {
             public void takeLeadership(CuratorFramework curatorFramework) throws Exception {
                 LOGGER.info("Become leader.");
                 quartzProcess.run();
-//                if (!mossroseConfig.getCluster().isRunOnMaster()) {
-//                    ignite.cluster().localNode().attributes().put(IgniteConsts.ONLY_TRIGGER, true);
-//                }
 
                 // Block for leader
                 synchronized (this) {
@@ -96,7 +93,6 @@ public class MossroseProcess implements AutoCloseable {
                 if (client.getConnectionStateErrorPolicy().isErrorState(newState)) {
                     try {
                         LOGGER.warn("Shutdown quartz after state: {}", newState);
-                      //  ignite.cluster().localNode().attributes().remove(IgniteConsts.ONLY_TRIGGER);
                         quartzProcess.close();
                     } catch (IOException e) {
                         LOGGER.error("Error while shutting down quartz process.", e);
@@ -118,9 +114,6 @@ public class MossroseProcess implements AutoCloseable {
 
     public void run() {
         initObjectContainer();
-
-//        ignite.cluster().localNode().attributes().put(IgniteConsts.STATE, IgniteConsts.STATE_READY);
-
         leaderSelector.autoRequeue();
         leaderSelector.start();
     }

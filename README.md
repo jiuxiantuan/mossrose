@@ -1,16 +1,20 @@
 # mossrose
-<h3>High-Available Distributed Schedule Framework</h3>
+<h3>轻量分布式作业框架</h3>
 
 <hr>
 
-## 社区
- * Yahoo Group: https://groups.yahoo.com/group/mossrose
- * QQ群：595011342
+![Mossrose Architecture](https://jiuxiantuan.github.io/mossrose/mossrose.jpg)
+
+## 特性
+ * 通过选举保证集群中只出现一个主节点，负责trigger作业
+ * 所有集群节点参与作业计算任务
+ * 内置多种作业类型，并预留了SPI接口支持扩展
 
 ## 文档
  * Wiki: https://github.com/jiuxiantuan/mossrose/wiki
  * Example: https://github.com/jiuxiantuan/mossrose-example
  * Spring Boot Starter: https://github.com/jiuxiantuan/mossrose-spring-boot-starter
+ * Spring Boot Example: https://github.com/jiuxiantuan/mossrose-spring-boot-example
 
 ## Requirement
 
@@ -23,7 +27,7 @@
 <dependency>
   <groupId>com.jiuxian</groupId>
   <artifactId>mossrose</artifactId>
-  <version>2.3.5-RELEASE</version>
+  <version>2.4.3-RELEASE</version>
 </dependency>
 ```
 
